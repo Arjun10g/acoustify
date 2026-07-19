@@ -48,7 +48,7 @@ Fourteen separated tracks are included:
 13. Sinking Man
 14. Yellow Light
 
-The included starts are derived from the released sequence/durations with a six-second source lead-in. They are editable in Catalog Studio.
+The included starts follow the complete tracklist in the top YouTube comment, which had about 8,200 likes when checked. They are editable in Catalog Studio.
 
 ### Of Monsters and Men — Live from Skarkali
 
@@ -64,7 +64,7 @@ Seven separated tracks are included:
 6. The Block
 7. Mouse Parade
 
-The public setlist and released song lengths were identifiable, but dependable chapter timestamps were not. The packaged map uses those lengths and distributes the film’s remaining time as inter-song padding; it is explicitly marked **draft**. Run one calibration pass in the app before treating the cuts as final.
+The included starts follow a highly rated timestamp list in the YouTube comments. A second credible list placed some openings slightly later, so the earlier starts were used to avoid clipping the beginning of a performance.
 
 ## Audio-quality model
 

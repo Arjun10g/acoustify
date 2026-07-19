@@ -13,8 +13,8 @@
       "artwork": "https://i.ytimg.com/vi/JoUq869LXeA/maxresdefault.jpg",
       "fallbackArtwork": "https://i.ytimg.com/vi/JoUq869LXeA/hqdefault.jpg",
       "description": "A live source film divided into seven individually playable songs.",
-      "timingStatus": "calibration-required",
-      "timingNote": "The seven-song setlist is seeded. These draft boundaries use the released song lengths, with the film’s remaining time distributed as inter-song padding. Use Catalog Studio once to capture the exact starts by ear.",
+      "timingStatus": "comment-derived",
+      "timingNote": "Starts follow a highly rated timestamp list in the YouTube comments. Where two credible lists differed, the earlier start was chosen to preserve the full opening of each song.",
       "tags": [
         "live",
         "iceland",
@@ -24,51 +24,51 @@
         {
           "id": "ordinary-creature",
           "title": "Ordinary Creature",
-          "start": 0,
-          "end": 264,
-          "timingConfidence": "draft"
+          "start": 115,
+          "end": 393,
+          "timingConfidence": "community"
         },
         {
           "id": "dream-team",
           "title": "Dream Team",
-          "start": 264,
-          "end": 497,
-          "timingConfidence": "draft"
+          "start": 393,
+          "end": 624,
+          "timingConfidence": "community"
         },
         {
           "id": "towering-skyscraper",
           "title": "The Towering Skyscraper at the End of the Road",
-          "start": 497,
-          "end": 755,
-          "timingConfidence": "draft"
+          "start": 624,
+          "end": 870,
+          "timingConfidence": "community"
         },
         {
           "id": "fruit-bat",
           "title": "Fruit Bat",
-          "start": 755,
-          "end": 1274,
-          "timingConfidence": "draft"
+          "start": 870,
+          "end": 1346,
+          "timingConfidence": "community"
         },
         {
           "id": "television-love",
           "title": "Television Love",
-          "start": 1274,
-          "end": 1599,
-          "timingConfidence": "draft"
+          "start": 1346,
+          "end": 1728,
+          "timingConfidence": "community"
         },
         {
           "id": "the-block",
           "title": "The Block",
-          "start": 1599,
-          "end": 1910,
-          "timingConfidence": "draft"
+          "start": 1728,
+          "end": 1990,
+          "timingConfidence": "community"
         },
         {
           "id": "mouse-parade",
           "title": "Mouse Parade",
-          "start": 1910,
+          "start": 1990,
           "end": 2233,
-          "timingConfidence": "draft"
+          "timingConfidence": "community"
         }
       ]
     },
@@ -79,12 +79,12 @@
       "year": 2022,
       "provider": "youtube",
       "youtubeId": "Y25LDO6OLzQ",
-      "duration": 3415,
+      "duration": 3416,
       "artwork": "https://i.ytimg.com/vi/Y25LDO6OLzQ/maxresdefault.jpg",
       "fallbackArtwork": "https://i.ytimg.com/vi/Y25LDO6OLzQ/hqdefault.jpg",
       "description": "The full Cabin Sessions performance divided into fourteen individual tracks.",
-      "timingStatus": "album-derived",
-      "timingNote": "Starts are derived from the released Cabin Sessions sequence and track lengths, with a six-second source lead-in. Catalog Studio can nudge any boundary without editing code.",
+      "timingStatus": "comment-derived",
+      "timingNote": "Starts follow the complete timestamp list in the top YouTube comment, endorsed by about 8,200 viewers when checked. Catalog Studio can still nudge any boundary without editing code.",
       "tags": [
         "acoustic",
         "session",
@@ -94,100 +94,100 @@
         {
           "id": "dirty-paws",
           "title": "Dirty Paws",
-          "start": 6,
-          "end": 275,
-          "timingConfidence": "high"
+          "start": 0,
+          "end": 284,
+          "timingConfidence": "community"
         },
         {
           "id": "from-finner",
           "title": "From Finner",
-          "start": 275,
-          "end": 480,
-          "timingConfidence": "high"
+          "start": 284,
+          "end": 490,
+          "timingConfidence": "community"
         },
         {
           "id": "king-and-lionheart",
           "title": "King and Lionheart",
-          "start": 480,
-          "end": 759,
-          "timingConfidence": "high"
+          "start": 490,
+          "end": 767,
+          "timingConfidence": "community"
         },
         {
           "id": "mountain-sound",
           "title": "Mountain Sound",
-          "start": 759,
-          "end": 972,
-          "timingConfidence": "high"
+          "start": 767,
+          "end": 977,
+          "timingConfidence": "community"
         },
         {
           "id": "numb-bears",
           "title": "Numb Bears",
-          "start": 972,
-          "end": 1126,
-          "timingConfidence": "high"
+          "start": 977,
+          "end": 1130,
+          "timingConfidence": "community"
         },
         {
           "id": "six-weeks",
           "title": "Six Weeks",
-          "start": 1126,
-          "end": 1405,
-          "timingConfidence": "high"
+          "start": 1130,
+          "end": 1408,
+          "timingConfidence": "community"
         },
         {
           "id": "sloom",
           "title": "Sloom",
-          "start": 1405,
+          "start": 1408,
           "end": 1658,
-          "timingConfidence": "high"
+          "timingConfidence": "community"
         },
         {
           "id": "slow-and-steady",
           "title": "Slow and Steady",
           "start": 1658,
-          "end": 1952,
-          "timingConfidence": "high"
+          "end": 1951,
+          "timingConfidence": "community"
         },
         {
           "id": "your-bones",
           "title": "Your Bones",
-          "start": 1952,
-          "end": 2213,
-          "timingConfidence": "high"
+          "start": 1951,
+          "end": 2211,
+          "timingConfidence": "community"
         },
         {
           "id": "lakehouse",
           "title": "Lakehouse",
-          "start": 2213,
-          "end": 2473,
-          "timingConfidence": "high"
+          "start": 2211,
+          "end": 2469,
+          "timingConfidence": "community"
         },
         {
           "id": "little-talks",
           "title": "Little Talks",
-          "start": 2473,
-          "end": 2699,
-          "timingConfidence": "high"
+          "start": 2469,
+          "end": 2698,
+          "timingConfidence": "community"
         },
         {
           "id": "love-love-love",
           "title": "Love Love Love",
-          "start": 2699,
-          "end": 2953,
-          "timingConfidence": "high"
+          "start": 2698,
+          "end": 2949,
+          "timingConfidence": "community"
         },
         {
           "id": "sinking-man",
           "title": "Sinking Man",
-          "start": 2953,
-          "end": 3116,
-          "timingConfidence": "high"
+          "start": 2949,
+          "end": 3123,
+          "timingConfidence": "community"
         },
         {
           "id": "yellow-light",
           "title": "Yellow Light",
-          "start": 3116,
-          "end": 3415,
-          "timingConfidence": "high"
+          "start": 3123,
+          "end": 3416,
+          "timingConfidence": "community"
         }
       ]
     }

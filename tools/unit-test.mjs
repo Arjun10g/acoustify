@@ -26,7 +26,7 @@ assert.deepEqual(repeatedTitles.map((track) => track.id), ["intro", "intro-2", "
 const indexed = buildCatalogIndex(base);
 assert.equal(indexed.sources.length, 2);
 assert.equal(indexed.tracks.length, 21);
-assert.equal(indexed.trackByKey.get("of-monsters-and-men-the-cabin-sessions::six-weeks").start, 1126);
+assert.equal(indexed.trackByKey.get("of-monsters-and-men-the-cabin-sessions::six-weeks").start, 1130);
 
 const override = structuredClone(base.sources[0]);
 override.title = "Browser Override";

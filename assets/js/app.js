@@ -192,6 +192,7 @@ function providerLabel(source) {
 function timingLabel(source) {
   if (source.timingStatus === "calibration-required") return "Needs calibration";
   if (source.timingStatus === "album-derived") return "Mapped chapters";
+  if (source.timingStatus === "comment-derived") return "Community timestamps";
   if (source.timingStatus === "user-calibrated") return "Calibrated";
   return "Track mapped";
 }
