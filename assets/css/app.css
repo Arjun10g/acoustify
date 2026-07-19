@@ -581,6 +581,20 @@ input[type="range"]:hover::-webkit-slider-thumb, input[type="range"]:focus-visib
 .setting-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 13px 0; border-top: 1px solid var(--line); }
 .setting-row:first-of-type { border-top: 0; }
+.setting-number { flex-wrap: wrap; }
+.setting-number > div { flex: 1 1 220px; }
+.setting-number input {
+  flex: 0 0 74px;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  color: var(--text);
+  background: #080d09;
+  outline: none;
+}
+.setting-number input:focus { border-color: rgba(73,230,131,.68); box-shadow: 0 0 0 3px rgba(73,230,131,.09); }
+.setting-number > span { color: var(--muted); font-size: 12px; }
 .toggle { position: relative; flex: 0 0 auto; width: 44px; height: 24px; }
 .toggle input { position: absolute; opacity: 0; }
 .toggle span { position: absolute; inset: 0; border-radius: 999px; background: #3b4840; cursor: pointer; transition: background .15s; }

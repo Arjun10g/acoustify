@@ -42,7 +42,8 @@ const DEFAULT_STATE = {
     repeat: "off",
     shuffle: false,
     autoplay: true,
-    playerPanelOpen: true
+    playerPanelOpen: false,
+    segmentLeadIn: 1.5
   },
   playback: {
     trackKey: null,
@@ -654,7 +655,8 @@ function renderSettings() {
       <section class="setting-card">
         <h3>Playback</h3><p>These choices are remembered across sessions.</p>
         <div class="setting-row"><div><strong>Automatic next track</strong><div class="muted small">Advance at each timestamp boundary.</div></div><label class="toggle"><input id="setting-autoplay" type="checkbox" ${state.settings.autoplay ? "checked" : ""}><span></span></label></div>
-        <div class="setting-row"><div><strong>Open right-side player on desktop</strong><div class="muted small">Keeps the official video visible while browsing.</div></div><label class="toggle"><input id="setting-panel" type="checkbox" ${state.settings.playerPanelOpen ? "checked" : ""}><span></span></label></div>
+        <div class="setting-row"><div><strong>Open source video panel on desktop</strong><div class="muted small">Leave this off for a cleaner listening layout.</div></div><label class="toggle"><input id="setting-panel" type="checkbox" ${state.settings.playerPanelOpen ? "checked" : ""}><span></span></label></div>
+        <label class="setting-row setting-number"><div><strong>Segment lead-in</strong><div class="muted small">Start YouTube cuts slightly before the saved timestamp.</div></div><input id="setting-lead-in" type="number" min="0" max="5" step="0.5" value="${escapeHtml(state.settings.segmentLeadIn)}" aria-label="Segment lead-in seconds"><span>sec</span></label>
       </section>
       <section class="setting-card">
         <h3>Audio quality</h3><p>YouTube determines the adaptive audio/video representation. Acoustify does not extract or transcode it. Local files are handed directly to the browser.</p>
@@ -1017,7 +1019,7 @@ async function playCalibrationSource(sourceId) {
     provider: source.provider
   };
   try {
-    await player.load(calibrationTrack, source, { autoplay: true, queue: [] });
+    await player.load(calibrationTrack, source, { autoplay: true, queue: [], preciseStart: true });
     setPanelOpen(true);
     toast("Full source is playing. Capture each boundary with ●.", "success");
   } catch (error) {
@@ -1194,6 +1196,7 @@ function wirePlayerEvents() {
     state.settings.repeat = event.detail.repeat;
     state.settings.shuffle = event.detail.shuffle;
     state.settings.autoplay = event.detail.autoplay;
+    state.settings.segmentLeadIn = event.detail.segmentLeadIn;
     persistState();
     renderPlayerSnapshot(event.detail);
   });
@@ -1470,6 +1473,13 @@ function wireDomEvents() {
       state.settings.playerPanelOpen = target.checked;
       persistState();
       if (!matchMedia("(max-width: 1120px)").matches) setPanelOpen(target.checked);
+    }
+    if (target.id === "setting-lead-in") {
+      const parsedLeadIn = Number(target.value);
+      state.settings.segmentLeadIn = Number.isFinite(parsedLeadIn) ? clamp(parsedLeadIn, 0, 5) : DEFAULT_STATE.settings.segmentLeadIn;
+      target.value = String(state.settings.segmentLeadIn);
+      player.setSegmentLeadIn(state.settings.segmentLeadIn);
+      persistState();
     }
   });
 

@@ -44,6 +44,7 @@ export class PlaybackController extends EventTarget {
     this.repeat = "off";
     this.shuffle = false;
     this.autoplay = true;
+    this.segmentLeadIn = 1.5;
     this.volume = 0.86;
 
     this.youtubePlayer = null;
@@ -68,11 +69,12 @@ export class PlaybackController extends EventTarget {
     this.dispatchEvent(new CustomEvent(type, { detail }));
   }
 
-  configure({ volume, repeat, shuffle, autoplay } = {}) {
+  configure({ volume, repeat, shuffle, autoplay, segmentLeadIn } = {}) {
     if (Number.isFinite(Number(volume))) this.setVolume(Number(volume), false);
     if (["off", "all", "one"].includes(repeat)) this.repeat = repeat;
     if (typeof shuffle === "boolean") this.shuffle = shuffle;
     if (typeof autoplay === "boolean") this.autoplay = autoplay;
+    if (Number.isFinite(Number(segmentLeadIn))) this.segmentLeadIn = clamp(Number(segmentLeadIn), 0, 5);
     this.emit("optionschange", this.snapshot());
   }
 
@@ -95,6 +97,7 @@ export class PlaybackController extends EventTarget {
       repeat: this.repeat,
       shuffle: this.shuffle,
       autoplay: this.autoplay,
+      segmentLeadIn: this.segmentLeadIn,
       volume: this.volume
     };
   }
@@ -114,20 +117,22 @@ export class PlaybackController extends EventTarget {
     return this.load(track, source, options);
   }
 
-  async load(track, source, { autoplay = true, resumePosition = null, queue = null } = {}) {
+  async load(track, source, { autoplay = true, resumePosition = null, queue = null, preciseStart = false } = {}) {
     if (!track || !source) throw new Error("A track and source are required.");
     if (queue) this.setQueue(queue, track.key);
     else if (!this.queue.includes(track.key)) this.setQueue(source.tracks.map((item) => item.key), track.key);
     else this.queueIndex = this.queue.indexOf(track.key);
 
     this.segmentEndedLock = false;
-    this.currentTrack = track;
-    this.currentSource = source;
-    this.currentTime = clamp(
-      Number.isFinite(Number(resumePosition)) ? Number(resumePosition) : track.start,
+    const hasResumePosition = Number.isFinite(Number(resumePosition));
+    const requestedPosition = clamp(
+      hasResumePosition ? Number(resumePosition) : track.start,
       track.start,
       Math.max(track.start, track.end - 0.2)
     );
+    this.currentTrack = track;
+    this.currentSource = source;
+    this.currentTime = this.#playbackStartFor(source, track, requestedPosition, { hasResumePosition, preciseStart });
     this.backend = source.provider;
     this.#showBackend(source.provider);
     this.#updateMediaMetadata();
@@ -187,6 +192,12 @@ export class PlaybackController extends EventTarget {
     }
     this.qualityLabel = "YouTube adaptive · highest available chosen by YouTube";
     this.emit("qualitychange", this.snapshot());
+  }
+
+  #playbackStartFor(source, track, requestedPosition, { hasResumePosition, preciseStart }) {
+    const leadIn = clamp(Number(this.segmentLeadIn) || 0, 0, 5);
+    const canLeadIn = source.provider === "youtube" && !hasResumePosition && !preciseStart && track.start > 0 && leadIn > 0;
+    return canLeadIn ? Math.max(0, requestedPosition - leadIn) : requestedPosition;
   }
 
   #applyPendingYouTubeLoad() {
@@ -436,6 +447,12 @@ export class PlaybackController extends EventTarget {
 
   setAutoplay(enabled) {
     this.autoplay = Boolean(enabled);
+    this.emit("optionschange", this.snapshot());
+  }
+
+  setSegmentLeadIn(seconds) {
+    const parsed = Number(seconds);
+    this.segmentLeadIn = Number.isFinite(parsed) ? clamp(parsed, 0, 5) : 0;
     this.emit("optionschange", this.snapshot());
   }
 

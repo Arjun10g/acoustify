@@ -72,7 +72,9 @@ The public setlist and released song lengths were identifiable, but dependable c
 
 Acoustify uses the official embedded player. YouTube chooses an adaptive audio/video representation according to the source, device, connection, and its own player logic. Acoustify does not download, extract, remux, or transcode YouTube audio and cannot turn a YouTube stream into lossless audio.
 
-The right-side player is intentionally visible. Do not hide or shrink it into an audio-only workaround.
+The source player remains available for YouTube playback. For a true no-video path, use a local master source.
+
+If YouTube seeks land a little late and clip the first moment of a song, open **Settings** and adjust **Segment lead-in**. This starts segmented playback slightly before the saved cut without changing the catalog timestamps. Use **Catalog Studio** for cuts that are structurally wrong or drift across the source.
 
 ### Local master sources
 
