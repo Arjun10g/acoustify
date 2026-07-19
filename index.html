@@ -6,6 +6,10 @@
   <meta name="theme-color" content="#07110c">
   <meta name="description" content="Acoustify turns long-form music sources into a personal, track-based listening library.">
   <meta name="color-scheme" content="dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Acoustify">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/icons/icon-192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
@@ -58,7 +62,10 @@
         <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M9 39 24 8l15 31"/><path d="M12 29c4 4 7 4 10 0s6-4 10 0 6 4 8 1"/></svg></span>
         <span>Acoustify</span>
       </a>
-      <button class="icon-button" type="button" data-action="open-player" aria-label="Open now playing">♫</button>
+      <div class="mobile-header-actions">
+        <button class="icon-button" type="button" data-action="open-settings" aria-label="Open settings">⚙</button>
+        <button class="icon-button" type="button" data-action="open-player" aria-label="Open now playing">♫</button>
+      </div>
     </header>
 
     <main class="main-stage" id="main-stage">
@@ -96,7 +103,7 @@
         </div>
         <div class="local-player-wrap" id="local-player-wrap" hidden>
           <img id="local-artwork" src="./assets/icons/icon-512.png" alt="">
-          <audio id="local-audio" preload="metadata"></audio>
+          <audio id="local-audio" preload="auto"></audio>
           <div class="local-format-badge">Original local file</div>
         </div>
       </div>

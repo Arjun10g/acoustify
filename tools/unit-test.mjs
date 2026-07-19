@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildCatalogIndex, mergeCatalog, parseChapterLines } from "../assets/js/catalog.js";
+import { continuousRunEnd, continuousTrackIndexAtTime, isResumePosition } from "../assets/js/player.js";
 import { formatTime, parseTimecode, parseYouTubeId } from "../assets/js/utils.js";
 import { applyMusicLinksToCatalog, getMusicLinkEntries, sourceFromMusicLink } from "./music-link-ingest.mjs";
 
@@ -27,6 +28,16 @@ const indexed = buildCatalogIndex(base);
 assert.equal(indexed.sources.length, 2);
 assert.equal(indexed.tracks.length, 21);
 assert.equal(indexed.trackByKey.get("of-monsters-and-men-the-cabin-sessions::six-weeks").start, 1130);
+
+const cabinQueue = indexed.sourceById.get("of-monsters-and-men-the-cabin-sessions").tracks.map((track) => track.key);
+assert.equal(continuousRunEnd(cabinQueue, 0, (key) => indexed.trackByKey.get(key)), 3416);
+assert.equal(continuousRunEnd(cabinQueue, 2, (key) => indexed.trackByKey.get(key), { enabled: false }), 767);
+assert.equal(continuousTrackIndexAtTime(cabinQueue, 0, 1131, (key) => indexed.trackByKey.get(key)), 5);
+assert.equal(continuousTrackIndexAtTime(cabinQueue, 5, 1200, (key) => indexed.trackByKey.get(key)), 5);
+assert.equal(isResumePosition(null), false);
+assert.equal(isResumePosition(undefined), false);
+assert.equal(isResumePosition(""), false);
+assert.equal(isResumePosition(120.5), true);
 
 const override = structuredClone(base.sources[0]);
 override.title = "Browser Override";

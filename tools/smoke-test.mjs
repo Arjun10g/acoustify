@@ -39,6 +39,8 @@ for (const src of ["./assets/css/app.css", "./assets/js/app.js", "./manifest.web
 const manifest = JSON.parse(fs.readFileSync(path.join(root, "manifest.webmanifest"), "utf8"));
 if (!String(manifest.start_url || "").startsWith("./")) errors.push("Manifest start_url must remain relative for project Pages sites.");
 if (manifest.scope !== "./") errors.push("Manifest scope must be ./ for repository subpaths.");
+if (manifest.display !== "standalone") errors.push("Manifest display must support an installed mobile app.");
+if (!manifest.icons?.some((icon) => icon.sizes === "192x192") || !manifest.icons?.some((icon) => icon.sizes === "512x512")) errors.push("Manifest needs 192px and 512px install icons.");
 
 for (const file of ["app.js", "catalog.js", "db.js", "player.js", "utils.js"]) {
   const source = fs.readFileSync(path.join(root, "assets", "js", file), "utf8");

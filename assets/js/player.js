@@ -1,6 +1,39 @@
 import { clamp, safeArtwork } from "./utils.js";
 
 let youtubeApiPromise;
+const SEGMENT_BOUNDARY_TOLERANCE = 0.35;
+const SEGMENT_END_EPSILON = 0.12;
+
+export function isResumePosition(value) {
+  return value !== null && value !== undefined && value !== "" && Number.isFinite(Number(value));
+}
+
+export function continuousRunEnd(queue, queueIndex, resolveTrack, { enabled = true } = {}) {
+  let track = resolveTrack(queue[queueIndex]);
+  if (!track) return 0;
+  if (!enabled) return track.end;
+
+  for (let index = queueIndex + 1; index < queue.length; index += 1) {
+    const next = resolveTrack(queue[index]);
+    if (!next || next.sourceId !== track.sourceId || Math.abs(next.start - track.end) > SEGMENT_BOUNDARY_TOLERANCE) break;
+    track = next;
+  }
+  return track.end;
+}
+
+export function continuousTrackIndexAtTime(queue, queueIndex, currentTime, resolveTrack) {
+  let index = queueIndex;
+  let track = resolveTrack(queue[index]);
+  if (!track) return queueIndex;
+
+  while (index + 1 < queue.length && currentTime >= track.end - SEGMENT_END_EPSILON) {
+    const next = resolveTrack(queue[index + 1]);
+    if (!next || next.sourceId !== track.sourceId || Math.abs(next.start - track.end) > SEGMENT_BOUNDARY_TOLERANCE) break;
+    index += 1;
+    track = next;
+  }
+  return index;
+}
 
 function loadYouTubeApi() {
   if (window.YT?.Player) return Promise.resolve(window.YT);
@@ -124,7 +157,7 @@ export class PlaybackController extends EventTarget {
     else this.queueIndex = this.queue.indexOf(track.key);
 
     this.segmentEndedLock = false;
-    const hasResumePosition = Number.isFinite(Number(resumePosition));
+    const hasResumePosition = isResumePosition(resumePosition);
     const requestedPosition = clamp(
       hasResumePosition ? Number(resumePosition) : track.start,
       track.start,
@@ -157,7 +190,12 @@ export class PlaybackController extends EventTarget {
   async #loadYouTube(source, startAt, autoplay) {
     this.localAudio.pause();
     const YT = await loadYouTubeApi();
-    this.pendingYouTubeLoad = { videoId: source.youtubeId, startAt, endAt: this.currentTrack.end, autoplay };
+    this.pendingYouTubeLoad = {
+      videoId: source.youtubeId,
+      startAt,
+      endAt: this.#continuousRunEndForCurrentTrack(),
+      autoplay
+    };
     if (!this.youtubePlayer) {
       this.youtubePlayer = new YT.Player("youtube-player", {
         width: "100%",
@@ -200,6 +238,11 @@ export class PlaybackController extends EventTarget {
     return canLeadIn ? Math.max(0, requestedPosition - leadIn) : requestedPosition;
   }
 
+  #continuousRunEndForCurrentTrack() {
+    const enabled = this.autoplay && this.repeat !== "one" && !this.shuffle;
+    return continuousRunEnd(this.queue, this.queueIndex, this.resolveTrack, { enabled }) || this.currentTrack.end;
+  }
+
   #applyPendingYouTubeLoad() {
     if (!this.youtubeReady || !this.pendingYouTubeLoad) return;
     const request = this.pendingYouTubeLoad;
@@ -228,7 +271,13 @@ export class PlaybackController extends EventTarget {
     if (!window.YT) return;
     if (event.data === window.YT.PlayerState.PLAYING) this.isPlaying = true;
     if ([window.YT.PlayerState.PAUSED, window.YT.PlayerState.CUED, window.YT.PlayerState.ENDED].includes(event.data)) this.isPlaying = false;
-    if (event.data === window.YT.PlayerState.ENDED && this.currentTrack) this.#handleSegmentEnd();
+    if (event.data === window.YT.PlayerState.ENDED && this.currentTrack) {
+      const time = this.youtubePlayer?.getCurrentTime?.();
+      if (Number.isFinite(time)) this.currentTime = time;
+      this.#syncContinuousTrackAtCurrentTime();
+      this.#handleSegmentEnd();
+    }
+    this.#updateMediaPlaybackState();
     this.emit("statechange", this.snapshot());
   }
 
@@ -267,13 +316,20 @@ export class PlaybackController extends EventTarget {
   #bindLocalAudio() {
     this.localAudio.addEventListener("play", () => {
       this.isPlaying = true;
+      this.#updateMediaPlaybackState();
       this.emit("statechange", this.snapshot());
     });
     this.localAudio.addEventListener("pause", () => {
       this.isPlaying = false;
+      this.#updateMediaPlaybackState();
       this.emit("statechange", this.snapshot());
     });
-    this.localAudio.addEventListener("ended", () => this.#handleSegmentEnd());
+    this.localAudio.addEventListener("timeupdate", () => this.#monitor());
+    this.localAudio.addEventListener("ended", () => {
+      this.currentTime = this.localAudio.currentTime || this.currentSource?.duration || this.currentTime;
+      this.#syncContinuousTrackAtCurrentTime();
+      this.#handleSegmentEnd();
+    });
     this.localAudio.addEventListener("error", () => {
       const error = new Error("Local audio playback failed.");
       this.emit("error", { error, ...this.snapshot() });
@@ -306,6 +362,7 @@ export class PlaybackController extends EventTarget {
       } else if (this.backend === "local") {
         this.currentTime = this.localAudio.currentTime || this.currentTrack.start;
       }
+      this.#syncContinuousTrackAtCurrentTime();
       if (!this.segmentEndedLock && this.currentTime >= this.currentTrack.end - 0.12) this.#handleSegmentEnd();
       this.#updateMediaPosition();
       this.emit("progress", this.snapshot());
@@ -316,6 +373,8 @@ export class PlaybackController extends EventTarget {
 
   async #handleSegmentEnd() {
     if (this.segmentEndedLock || !this.currentTrack) return;
+    const advanced = this.#syncContinuousTrackAtCurrentTime();
+    if (advanced && this.currentTime < this.currentTrack.end - 0.12) return;
     this.segmentEndedLock = true;
     this.emit("segmentended", this.snapshot());
     if (this.repeat === "one") {
@@ -333,12 +392,33 @@ export class PlaybackController extends EventTarget {
     this.emit("progress", this.snapshot());
   }
 
+  #syncContinuousTrackAtCurrentTime() {
+    if (!this.autoplay || this.repeat === "one" || this.shuffle || this.queueIndex < 0 || !this.currentTrack) return false;
+    const targetIndex = continuousTrackIndexAtTime(this.queue, this.queueIndex, this.currentTime, this.resolveTrack);
+    if (targetIndex <= this.queueIndex) return false;
+
+    this.emit("segmentended", this.snapshot());
+    const track = this.resolveTrack(this.queue[targetIndex]);
+    const source = track && this.resolveSource(track.sourceId);
+    if (!track || !source) return false;
+    this.queueIndex = targetIndex;
+    this.currentTrack = track;
+    this.currentSource = source;
+    this.segmentEndedLock = false;
+    this.#updateMediaMetadata();
+    this.#updateMediaPosition();
+    this.emit("trackchange", this.snapshot());
+    this.emit("queuechange", this.snapshot());
+    return true;
+  }
+
   async play() {
     if (!this.currentTrack) return false;
     this.segmentEndedLock = false;
     if (this.backend === "youtube") {
       if (!this.youtubeReady) return false;
       this.youtubePlayer.playVideo();
+      this.#updateMediaPlaybackState("playing");
       return true;
     }
     await this.localAudio.play();
@@ -349,6 +429,7 @@ export class PlaybackController extends EventTarget {
     if (this.backend === "youtube") this.youtubePlayer?.pauseVideo?.();
     if (this.backend === "local") this.localAudio.pause();
     this.isPlaying = false;
+    this.#updateMediaPlaybackState("paused");
     this.emit("statechange", this.snapshot());
   }
 
@@ -456,6 +537,18 @@ export class PlaybackController extends EventTarget {
     this.emit("optionschange", this.snapshot());
   }
 
+  syncPlaybackState() {
+    if (this.backend === "youtube" && this.youtubeReady && window.YT) {
+      const state = this.youtubePlayer?.getPlayerState?.();
+      this.isPlaying = state === window.YT.PlayerState.PLAYING;
+    } else if (this.backend === "local") {
+      this.isPlaying = !this.localAudio.paused && !this.localAudio.ended;
+    }
+    this.#monitor();
+    this.#updateMediaPlaybackState();
+    this.emit("statechange", this.snapshot());
+  }
+
   #updateMediaMetadata() {
     if (!("mediaSession" in navigator) || !this.currentTrack || !this.currentSource) return;
     try {
@@ -464,9 +557,10 @@ export class PlaybackController extends EventTarget {
         artist: this.currentTrack.artist || this.currentSource.artist,
         album: this.currentSource.title,
         artwork: [
-          { src: safeArtwork(this.currentSource), sizes: "512x512" }
+          { src: safeArtwork(this.currentSource) }
         ]
       });
+      this.#updateMediaPlaybackState();
     } catch (error) {
       console.debug("Media Session metadata was not accepted.", error);
     }
@@ -484,8 +578,19 @@ export class PlaybackController extends EventTarget {
       seekto: (details) => this.seekRelative(details.seekTime || 0)
     };
     for (const [action, handler] of Object.entries(handlers)) {
-      try { navigator.mediaSession.setActionHandler(action, handler); } catch { /* unsupported action */ }
+      try {
+        navigator.mediaSession.setActionHandler(action, (details) => {
+          Promise.resolve(handler(details)).catch((error) => this.emit("error", { error, ...this.snapshot() }));
+        });
+      } catch { /* unsupported action */ }
     }
+  }
+
+  #updateMediaPlaybackState(forcedState = null) {
+    if (!("mediaSession" in navigator)) return;
+    try {
+      navigator.mediaSession.playbackState = forcedState || (this.isPlaying ? "playing" : "paused");
+    } catch { /* unsupported state */ }
   }
 
   #updateMediaPosition() {
@@ -494,7 +599,7 @@ export class PlaybackController extends EventTarget {
     const position = clamp(this.currentTime - this.currentTrack.start, 0, duration - 0.01);
     try {
       navigator.mediaSession.setPositionState({ duration, position, playbackRate: 1 });
-      navigator.mediaSession.playbackState = this.isPlaying ? "playing" : "paused";
+      this.#updateMediaPlaybackState();
     } catch { /* transient invalid position */ }
   }
 

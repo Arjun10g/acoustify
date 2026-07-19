@@ -8,8 +8,9 @@ The project is designed to deploy as-is to **GitHub Pages**. There is no applica
 
 - Spotify-influenced dark listening interface with an original Acoustify identity.
 - Responsive desktop, tablet, mobile, and installable PWA layouts.
+- Android media-session controls for play, pause, seek, previous, and next.
 - Official, visible YouTube IFrame Player API playback.
-- Long-video segmentation: selecting a row seeks to the track start and stops/advances at its end.
+- Long-video segmentation: selecting a row seeks to the track start, while adjacent tracks from the same source continue without reloading the underlying media.
 - Local master mode for audio files you own. The Blob is stored in IndexedDB and played without Acoustify transcoding it.
 - Browser memory for:
   - likes;
@@ -75,6 +76,12 @@ Acoustify uses the official embedded player. YouTube chooses an adaptive audio/v
 The source player remains available for YouTube playback. For a true no-video path, use a local master source.
 
 If YouTube seeks land a little late and clip the first moment of a song, open **Settings** and adjust **Segment lead-in**. This starts segmented playback slightly before the saved cut without changing the catalog timestamps. Use **Catalog Studio** for cuts that are structurally wrong or drift across the source.
+
+### Mobile and background playback
+
+On Android Chrome, install Acoustify from **Settings → Phone app** for a standalone layout and lock-screen media controls. The app saves the current position as Chrome backgrounds the page and resynchronizes the logical track when it returns.
+
+Adjacent songs from one long source play as one uninterrupted stream, avoiding a media reload at every timestamp. This materially improves background continuity. YouTube and Chrome can still pause an embedded YouTube player when the browser is backgrounded or the screen is locked; a web app cannot override that provider policy. A local master played through the native audio element is the reliable background-audio path.
 
 ### Local master sources
 

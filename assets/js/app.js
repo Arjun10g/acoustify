@@ -101,6 +101,20 @@ let activeAddTrackKey = null;
 let userSeeking = false;
 let lastPlaybackPersistAt = 0;
 let currentRouteKey = "";
+let deferredInstallPrompt = null;
+let appInstalled = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  updateInstallState();
+});
+
+window.addEventListener("appinstalled", () => {
+  appInstalled = true;
+  deferredInstallPrompt = null;
+  updateInstallState();
+});
 
 const persistState = debounce(async () => {
   try {
@@ -660,6 +674,12 @@ function renderSettings() {
         <label class="setting-row setting-number"><div><strong>Segment lead-in</strong><div class="muted small">Start YouTube cuts slightly before the saved timestamp.</div></div><input id="setting-lead-in" type="number" min="0" max="5" step="0.5" value="${escapeHtml(state.settings.segmentLeadIn)}" aria-label="Segment lead-in seconds"><span>sec</span></label>
       </section>
       <section class="setting-card">
+        <h3>Phone app</h3><p id="install-status">${appInstalled ? "Installed on this device." : deferredInstallPrompt ? "Ready to install from Chrome." : "Running in a browser tab."}</p>
+        ${appInstalled ? "" : `<div class="setting-actions"><button id="install-app-button" class="button primary small-button" type="button" data-action="install-app" ${deferredInstallPrompt ? "" : "disabled"}>Install Acoustify</button></div>`}
+        <div class="device-status"><span>Local masters</span><strong>Background audio supported</strong></div>
+        <div class="device-status"><span>YouTube sources</span><strong>Subject to Chrome and YouTube</strong></div>
+      </section>
+      <section class="setting-card">
         <h3>Audio quality</h3><p>YouTube determines the adaptive audio/video representation. Acoustify does not extract or transcode it. Local files are handed directly to the browser.</p>
         <div class="info-banner"><span class="info-icon">◇</span><div><h3>Best-fidelity path</h3><p>Import a master file you own. The exact Blob is retained in IndexedDB; browser codec support still applies.</p></div></div>
       </section>
@@ -690,6 +710,13 @@ function renderSettings() {
       </section>
     </div>`;
   refreshStorageEstimate();
+}
+
+function updateInstallState() {
+  const status = document.getElementById("install-status");
+  const button = document.getElementById("install-app-button");
+  if (status) status.textContent = appInstalled ? "Installed on this device." : deferredInstallPrompt ? "Ready to install from Chrome." : "Running in a browser tab.";
+  if (button) button.disabled = !deferredInstallPrompt;
 }
 
 function renderNotFound() {
@@ -1260,6 +1287,19 @@ async function handleAction(action, element, event) {
     case "next": await player.next(); break;
     case "toggle-shuffle": player.setShuffle(!player.shuffle); break;
     case "cycle-repeat": player.cycleRepeat(); break;
+    case "install-app": {
+      if (!deferredInstallPrompt) {
+        toast("Chrome has not offered installation on this device yet.", "info");
+        break;
+      }
+      const prompt = deferredInstallPrompt;
+      deferredInstallPrompt = null;
+      await prompt.prompt();
+      const choice = await prompt.userChoice;
+      if (choice.outcome === "accepted") toast("Acoustify is being added to your phone.", "success");
+      updateInstallState();
+      break;
+    }
     case "toggle-like": toggleLike(trackKey); break;
     case "like-current": {
       const key = player.currentTrack?.key || state.playback.trackKey;
@@ -1396,6 +1436,12 @@ function wireDomEvents() {
   window.addEventListener("hashchange", renderRoute);
   window.addEventListener("online", updateNetworkStatus);
   window.addEventListener("offline", updateNetworkStatus);
+  window.addEventListener("pagehide", () => persistPlaybackImmediately());
+  window.addEventListener("pageshow", () => player?.syncPlaybackState());
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") persistPlaybackImmediately();
+    else player?.syncPlaybackState();
+  });
   window.addEventListener("resize", debounce(() => {
     if (matchMedia("(max-width: 1120px)").matches) {
       dom.shell.classList.remove("panel-collapsed");
@@ -1537,6 +1583,16 @@ function wireDomEvents() {
       toast(`Import failed: ${error.message}`, "error", 6500);
     }
   });
+}
+
+async function persistPlaybackImmediately() {
+  if (!player?.currentTrack) return;
+  updatePlaybackMemory(player.snapshot());
+  try {
+    await setValue(STATE_KEY, state);
+  } catch (error) {
+    console.debug("Playback position could not be saved during page suspension.", error);
+  }
 }
 
 async function registerServiceWorker() {
