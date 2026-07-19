@@ -1,0 +1,16 @@
+{
+  "name": "acoustify-github-pages",
+  "version": "1.0.1",
+  "private": true,
+  "type": "module",
+  "description": "A dependency-free, local-first segmented music source player for GitHub Pages.",
+  "scripts": {
+    "test": "node tools/validate-catalog.mjs && node tools/unit-test.mjs && node tools/smoke-test.mjs",
+    "links:check": "node tools/import-music-links.mjs --check",
+    "links:import": "node tools/import-music-links.mjs",
+    "serve": "python3 -m http.server 8080"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

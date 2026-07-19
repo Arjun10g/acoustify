@@ -1,0 +1,24 @@
+{
+  "links": [],
+  "templates": [
+    {
+      "url": "https://youtu.be/VIDEO_ID_HERE",
+      "title": "Song or source title",
+      "artist": "Artist name",
+      "duration": "4:12",
+      "tags": ["acoustic", "live"]
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=VIDEO_ID_HERE",
+      "title": "Long source title",
+      "artist": "Artist name",
+      "duration": "42:30",
+      "chapters": [
+        "0:00 First song",
+        "3:45 Second song",
+        "8:10 Third song"
+      ],
+      "tags": ["session"]
+    }
+  ]
+}

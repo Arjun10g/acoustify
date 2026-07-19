@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07110c">
+  <meta name="description" content="Acoustify turns long-form music sources into a personal, track-based listening library.">
+  <meta name="color-scheme" content="dark">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/icons/icon-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="./assets/css/app.css">
+  <title>Acoustify</title>
+</head>
+<body>
+  <noscript>
+    <div class="noscript">Acoustify needs JavaScript to build your local library and control segmented playback.</div>
+  </noscript>
+
+  <div class="app-shell" id="app-shell">
+    <aside class="sidebar" aria-label="Primary navigation">
+      <a class="brand" href="#/home" data-route aria-label="Acoustify home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" role="img"><path d="M9 39 24 8l15 31"/><path d="M12 29c4 4 7 4 10 0s6-4 10 0 6 4 8 1"/></svg>
+        </span>
+        <span>Acoustify</span>
+      </a>
+
+      <nav class="nav-group" aria-label="Browse">
+        <a href="#/home" data-route data-nav="home"><span class="nav-icon" aria-hidden="true">⌂</span><span>Home</span></a>
+        <a href="#/search" data-route data-nav="search"><span class="nav-icon" aria-hidden="true">⌕</span><span>Search</span></a>
+        <a href="#/library" data-route data-nav="library"><span class="nav-icon" aria-hidden="true">▥</span><span>Your Library</span></a>
+      </nav>
+
+      <nav class="nav-group secondary" aria-label="Personal library">
+        <a href="#/liked" data-route data-nav="liked"><span class="nav-icon liked-icon" aria-hidden="true">♥</span><span>Liked Tracks</span></a>
+        <a href="#/history" data-route data-nav="history"><span class="nav-icon" aria-hidden="true">↶</span><span>Listening History</span></a>
+        <a href="#/studio" data-route data-nav="studio"><span class="nav-icon" aria-hidden="true">＋</span><span>Catalog Studio</span></a>
+      </nav>
+
+      <div class="sidebar-section-head">
+        <span>Playlists</span>
+        <button class="icon-button compact" type="button" data-action="new-playlist" aria-label="Create playlist">＋</button>
+      </div>
+      <div class="playlist-nav" id="playlist-nav"></div>
+
+      <div class="sidebar-footer">
+        <a href="#/settings" data-route data-nav="settings"><span class="nav-icon" aria-hidden="true">⚙</span><span>Settings</span></a>
+        <div class="sync-pill" title="Your memory is stored in this browser">
+          <span class="status-dot"></span>
+          <span>Local memory</span>
+        </div>
+      </div>
+    </aside>
+
+    <header class="mobile-header">
+      <a class="brand" href="#/home" data-route aria-label="Acoustify home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M9 39 24 8l15 31"/><path d="M12 29c4 4 7 4 10 0s6-4 10 0 6 4 8 1"/></svg></span>
+        <span>Acoustify</span>
+      </a>
+      <button class="icon-button" type="button" data-action="open-player" aria-label="Open now playing">♫</button>
+    </header>
+
+    <main class="main-stage" id="main-stage">
+      <div class="topbar">
+        <div class="history-buttons" aria-label="Navigation history">
+          <button type="button" class="icon-button" data-action="history-back" aria-label="Go back">‹</button>
+          <button type="button" class="icon-button" data-action="history-forward" aria-label="Go forward">›</button>
+        </div>
+        <div class="topbar-spacer"></div>
+        <span class="network-pill" id="network-pill"><span class="status-dot"></span><span>Online</span></span>
+        <button type="button" class="profile-pill" data-action="open-settings" aria-label="Open settings">
+          <span class="profile-avatar">A</span>
+          <span>Personal archive</span>
+        </button>
+      </div>
+      <section class="view" id="view" aria-live="polite"></section>
+    </main>
+
+    <aside class="player-panel" id="player-panel" aria-label="Now playing panel">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Now playing</p>
+          <h2 id="panel-track-title">Choose a track</h2>
+        </div>
+        <button class="icon-button" type="button" data-action="close-player" aria-label="Close player panel">×</button>
+      </div>
+
+      <div class="media-stage" id="media-stage">
+        <div class="empty-player" id="empty-player">
+          <span class="empty-disc" aria-hidden="true">♫</span>
+          <p>Your source player will appear here.</p>
+        </div>
+        <div class="youtube-player-wrap" id="youtube-player-wrap" hidden>
+          <div id="youtube-player"></div>
+        </div>
+        <div class="local-player-wrap" id="local-player-wrap" hidden>
+          <img id="local-artwork" src="./assets/icons/icon-512.png" alt="">
+          <audio id="local-audio" preload="metadata"></audio>
+          <div class="local-format-badge">Original local file</div>
+        </div>
+      </div>
+
+      <div class="panel-meta">
+        <div class="panel-art-row">
+          <img id="panel-artwork" class="panel-artwork" src="./assets/icons/icon-512.png" alt="">
+          <div>
+            <h3 id="panel-title">Nothing playing</h3>
+            <p id="panel-artist">Select any separated track</p>
+          </div>
+        </div>
+        <div class="quality-readout" id="quality-readout">
+          <span class="quality-dot"></span>
+          <span>Playback idle</span>
+        </div>
+        <div class="source-note" id="source-note">YouTube sources play through the official visible player. Local masters remain in this browser.</div>
+      </div>
+
+      <div class="queue-section">
+        <div class="section-row">
+          <h3>Up next</h3>
+          <span id="queue-count">0 tracks</span>
+        </div>
+        <div class="queue-list" id="queue-list"></div>
+      </div>
+    </aside>
+
+    <footer class="player-bar" id="player-bar">
+      <div class="now-playing-mini">
+        <button class="mini-art-button" type="button" data-action="open-player" aria-label="Open now playing">
+          <img id="bar-artwork" src="./assets/icons/icon-192.png" alt="">
+        </button>
+        <div class="mini-copy">
+          <button type="button" class="text-button" data-action="open-current-source" id="bar-track-title">Choose a track</button>
+          <span id="bar-track-artist">Your personal listening archive</span>
+        </div>
+        <button class="icon-button like-control" type="button" data-action="like-current" id="bar-like" aria-label="Like current track">♡</button>
+      </div>
+
+      <div class="transport">
+        <div class="transport-buttons">
+          <button class="icon-button mode-button" type="button" data-action="toggle-shuffle" id="shuffle-button" aria-label="Toggle shuffle">⤨</button>
+          <button class="icon-button" type="button" data-action="previous" aria-label="Previous track">◀</button>
+          <button class="play-button" type="button" data-action="toggle-play" id="play-button" aria-label="Play">▶</button>
+          <button class="icon-button" type="button" data-action="next" aria-label="Next track">▶</button>
+          <button class="icon-button mode-button" type="button" data-action="cycle-repeat" id="repeat-button" aria-label="Change repeat mode">↻</button>
+        </div>
+        <div class="progress-row">
+          <span id="elapsed-time">0:00</span>
+          <input id="progress-control" type="range" min="0" max="1000" value="0" aria-label="Track position">
+          <span id="duration-time">0:00</span>
+        </div>
+      </div>
+
+      <div class="bar-extras">
+        <button class="icon-button" type="button" data-action="open-player" aria-label="Show queue and source player">▤</button>
+        <span class="volume-icon" aria-hidden="true">◖</span>
+        <input id="volume-control" type="range" min="0" max="100" value="86" aria-label="Volume">
+      </div>
+    </footer>
+
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <a href="#/home" data-route data-nav="home"><span>⌂</span><small>Home</small></a>
+      <a href="#/search" data-route data-nav="search"><span>⌕</span><small>Search</small></a>
+      <a href="#/library" data-route data-nav="library"><span>▥</span><small>Library</small></a>
+      <a href="#/studio" data-route data-nav="studio"><span>＋</span><small>Add</small></a>
+    </nav>
+  </div>
+
+  <dialog class="app-dialog" id="playlist-dialog">
+    <form method="dialog" id="playlist-form">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">Personal library</p>
+          <h2 id="playlist-dialog-title">Create playlist</h2>
+        </div>
+        <button type="button" class="icon-button" data-action="close-playlist-dialog" aria-label="Close">×</button>
+      </div>
+      <label class="field">
+        <span>Name</span>
+        <input name="name" required maxlength="80" placeholder="Night drives">
+      </label>
+      <label class="field">
+        <span>Description</span>
+        <textarea name="description" rows="3" maxlength="220" placeholder="Optional note"></textarea>
+      </label>
+      <input type="hidden" name="trackKey">
+      <div class="dialog-actions">
+        <button type="button" class="button ghost" data-action="close-playlist-dialog">Cancel</button>
+        <button type="submit" class="button primary">Save playlist</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="app-dialog" id="add-to-playlist-dialog">
+    <div class="dialog-head">
+      <div>
+        <p class="eyebrow">Save track</p>
+        <h2>Add to playlist</h2>
+      </div>
+      <button type="button" class="icon-button" data-action="close-add-dialog" aria-label="Close">×</button>
+    </div>
+    <div class="dialog-list" id="add-to-playlist-list"></div>
+    <button type="button" class="button secondary full" data-action="new-playlist-for-track">＋ New playlist</button>
+  </dialog>
+
+  <dialog class="app-dialog compact-dialog" id="confirm-dialog">
+    <div class="dialog-head">
+      <div>
+        <p class="eyebrow">Please confirm</p>
+        <h2 id="confirm-title">Continue?</h2>
+      </div>
+    </div>
+    <p id="confirm-message"></p>
+    <div class="dialog-actions">
+      <button type="button" class="button ghost" data-action="confirm-cancel">Cancel</button>
+      <button type="button" class="button danger" data-action="confirm-accept">Continue</button>
+    </div>
+  </dialog>
+
+  <input id="memory-import" type="file" accept="application/json" hidden>
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <script type="module" src="./assets/js/app.js"></script>
+</body>
+</html>

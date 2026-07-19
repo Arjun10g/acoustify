@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "generatedAt": "2026-07-19",
+  "sources": [
+    {
+      "id": "of-monsters-and-men-live-from-skarkali",
+      "title": "Live from Skarkali",
+      "artist": "Of Monsters and Men",
+      "year": 2025,
+      "provider": "youtube",
+      "youtubeId": "JoUq869LXeA",
+      "duration": 2233,
+      "artwork": "https://i.ytimg.com/vi/JoUq869LXeA/maxresdefault.jpg",
+      "fallbackArtwork": "https://i.ytimg.com/vi/JoUq869LXeA/hqdefault.jpg",
+      "description": "A live source film divided into seven individually playable songs.",
+      "timingStatus": "calibration-required",
+      "timingNote": "The seven-song setlist is seeded. These draft boundaries use the released song lengths, with the film’s remaining time distributed as inter-song padding. Use Catalog Studio once to capture the exact starts by ear.",
+      "tags": [
+        "live",
+        "iceland",
+        "rare"
+      ],
+      "tracks": [
+        {
+          "id": "ordinary-creature",
+          "title": "Ordinary Creature",
+          "start": 0,
+          "end": 264,
+          "timingConfidence": "draft"
+        },
+        {
+          "id": "dream-team",
+          "title": "Dream Team",
+          "start": 264,
+          "end": 497,
+          "timingConfidence": "draft"
+        },
+        {
+          "id": "towering-skyscraper",
+          "title": "The Towering Skyscraper at the End of the Road",
+          "start": 497,
+          "end": 755,
+          "timingConfidence": "draft"
+        },
+        {
+          "id": "fruit-bat",
+          "title": "Fruit Bat",
+          "start": 755,
+          "end": 1274,
+          "timingConfidence": "draft"
+        },
+        {
+          "id": "television-love",
+          "title": "Television Love",
+          "start": 1274,
+          "end": 1599,
+          "timingConfidence": "draft"
+        },
+        {
+          "id": "the-block",
+          "title": "The Block",
+          "start": 1599,
+          "end": 1910,
+          "timingConfidence": "draft"
+        },
+        {
+          "id": "mouse-parade",
+          "title": "Mouse Parade",
+          "start": 1910,
+          "end": 2233,
+          "timingConfidence": "draft"
+        }
+      ]
+    },
+    {
+      "id": "of-monsters-and-men-the-cabin-sessions",
+      "title": "The Cabin Sessions",
+      "artist": "Of Monsters and Men",
+      "year": 2022,
+      "provider": "youtube",
+      "youtubeId": "Y25LDO6OLzQ",
+      "duration": 3415,
+      "artwork": "https://i.ytimg.com/vi/Y25LDO6OLzQ/maxresdefault.jpg",
+      "fallbackArtwork": "https://i.ytimg.com/vi/Y25LDO6OLzQ/hqdefault.jpg",
+      "description": "The full Cabin Sessions performance divided into fourteen individual tracks.",
+      "timingStatus": "album-derived",
+      "timingNote": "Starts are derived from the released Cabin Sessions sequence and track lengths, with a six-second source lead-in. Catalog Studio can nudge any boundary without editing code.",
+      "tags": [
+        "acoustic",
+        "session",
+        "live"
+      ],
+      "tracks": [
+        {
+          "id": "dirty-paws",
+          "title": "Dirty Paws",
+          "start": 6,
+          "end": 275,
+          "timingConfidence": "high"
+        },
+        {
+          "id": "from-finner",
+          "title": "From Finner",
+          "start": 275,
+          "end": 480,
+          "timingConfidence": "high"
+        },
+        {
+          "id": "king-and-lionheart",
+          "title": "King and Lionheart",
+          "start": 480,
+          "end": 759,
+          "timingConfidence": "high"
+        },
+        {
+          "id": "mountain-sound",
+          "title": "Mountain Sound",
+          "start": 759,
+          "end": 972,
+          "timingConfidence": "high"
+        },
+        {
+          "id": "numb-bears",
+          "title": "Numb Bears",
+          "start": 972,
+          "end": 1126,
+          "timingConfidence": "high"
+        },
+        {
+          "id": "six-weeks",
+          "title": "Six Weeks",
+          "start": 1126,
+          "end": 1405,
+          "timingConfidence": "high"
+        },
+        {
+          "id": "sloom",
+          "title": "Sloom",
+          "start": 1405,
+          "end": 1658,
+          "timingConfidence": "high"
+        },
+        {
+          "id": "slow-and-steady",
+          "title": "Slow and Steady",
+          "start": 1658,
+          "end": 1952,
+          "timingConfidence": "high"
+        },
+        {
+          "id": "your-bones",
+          "title": "Your Bones",
+          "start": 1952,
+          "end": 2213,
+          "timingConfidence": "high"
+        },
+        {
+          "id": "lakehouse",
+          "title": "Lakehouse",
+          "start": 2213,
+          "end": 2473,
+          "timingConfidence": "high"
+        },
+        {
+          "id": "little-talks",
+          "title": "Little Talks",
+          "start": 2473,
+          "end": 2699,
+          "timingConfidence": "high"
+        },
+        {
+          "id": "love-love-love",
+          "title": "Love Love Love",
+          "start": 2699,
+          "end": 2953,
+          "timingConfidence": "high"
+        },
+        {
+          "id": "sinking-man",
+          "title": "Sinking Man",
+          "start": 2953,
+          "end": 3116,
+          "timingConfidence": "high"
+        },
+        {
+          "id": "yellow-light",
+          "title": "Yellow Light",
+          "start": 3116,
+          "end": 3415,
+          "timingConfidence": "high"
+        }
+      ]
+    }
+  ]
+}
