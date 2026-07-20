@@ -1,3 +1,7 @@
 _site/
 music-links.json
 .DS_Store
+local-audio/
+tools/audio-extractor/.venv/
+__pycache__/
+*.pyc

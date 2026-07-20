@@ -12,6 +12,7 @@ The project is designed to deploy as-is to **GitHub Pages**. There is no applica
 - Official, visible YouTube IFrame Player API playback.
 - Long-video segmentation: selecting a row seeks to the track start, while adjacent tracks from the same source continue without reloading the underlying media.
 - Local master mode for audio files you own. The Blob is stored in IndexedDB and played without Acoustify transcoding it.
+- Authorized-audio import that matches the extractor's `[YouTube ID]` filename to an existing source and keeps its saved track cuts.
 - Browser memory for:
   - likes;
   - listening history and play counts;
@@ -71,7 +72,7 @@ The included starts follow a highly rated timestamp list in the YouTube comments
 
 ### YouTube sources
 
-Acoustify uses the official embedded player. YouTube chooses an adaptive audio/video representation according to the source, device, connection, and its own player logic. Acoustify does not download, extract, remux, or transcode YouTube audio and cannot turn a YouTube stream into lossless audio.
+The Pages app uses the official embedded player. YouTube chooses an adaptive audio/video representation according to the source, device, connection, and its own player logic. The static site cannot run an extractor or turn a YouTube stream into lossless audio.
 
 The source player remains available for YouTube playback. For a true no-video path, use a local master source.
 
@@ -113,6 +114,34 @@ For the highest-fidelity path, add a FLAC, WAV, AIFF, ALAC/M4A, MP3, AAC, or oth
 The original file Blob is written to IndexedDB. Acoustify does not alter its bytes. Decoding support and the final device output path still depend on the browser and operating system.
 
 **Never commit master audio files into this repository.** Files imported through the app remain in that browser and are not included in the GitHub Pages artifact or JSON backup.
+
+### Extractor-assisted local playback
+
+The repository includes the root-level extractor under `tools/audio-extractor` and publishes its original ZIP from **Settings -> Local audio**. It runs on your computer, not inside GitHub Pages. Use it only for content you own, have permission to download, or are otherwise authorized to save.
+
+Set up the extractor with the installer for your operating system, then list the packaged sources:
+
+```bash
+npm run audio:list
+```
+
+For an authorized source, M4A is the most compatible choice for phone playback:
+
+```bash
+npm run audio:extract -- --source of-monsters-and-men-the-cabin-sessions --format m4a --confirm-rights
+```
+
+The wrapper saves into the ignored `local-audio/` folder by default. The extractor app can also be used directly and normally saves into `~/Music/YouTube Podcasts`.
+
+To attach the result:
+
+1. Open that source in Acoustify.
+2. Choose **Use local audio**.
+3. Select the generated file.
+
+The extractor puts `[VIDEO_ID]` at the end of every filename. **Settings -> Local audio -> Import extracted audio** can therefore match a file without first opening its source. Acoustify checks both the ID and duration, retains all saved song starts, stores the file in IndexedDB, and exposes **Use YouTube** as a reversible fallback.
+
+For a future music link, add/import the catalog entry first using the flow below, then run the wrapper with `--url` or the extractor desktop app. Once the source exists in Acoustify, the same filename matching applies.
 
 ## Deploy to GitHub Pages
 

@@ -61,6 +61,12 @@ export function parseYouTubeId(input = "") {
   return "";
 }
 
+export function parseExtractedYouTubeId(filename = "") {
+  const basename = String(filename).split(/[\\/]/).at(-1) || "";
+  const match = basename.match(/\[([\w-]{11})\](?=(?:\.[^.]+)+$)/);
+  return match?.[1] || "";
+}
+
 export function downloadJson(filename, data) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);

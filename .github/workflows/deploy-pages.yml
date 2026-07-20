@@ -43,6 +43,7 @@ jobs:
             --exclude='.git' \
             --exclude='.github' \
             --exclude='_site' \
+            --exclude='local-audio' \
             --exclude='music-links*.json' \
             --exclude='tools' \
             --exclude='package.json' \

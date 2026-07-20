@@ -89,6 +89,56 @@ export function normalizeSource(input) {
   return source;
 }
 
+export function sourceWithLocalAudio(sourceInput, { assetId, name, type, size, duration, lastModified } = {}) {
+  const source = normalizeSource(sourceInput);
+  const youtubeFallback = normalizeSource(source.youtubeFallback || source);
+  const parsedDuration = Number(duration);
+  const finalTrack = source.tracks.at(-1);
+  if (!source.youtubeId) throw new Error("This source does not have a YouTube ID to match against the extracted file.");
+  if (!assetId) throw new Error("A local audio asset id is required.");
+  if (!Number.isFinite(parsedDuration) || parsedDuration <= 0) throw new Error("The browser could not read a valid audio duration.");
+  if (!finalTrack || parsedDuration <= finalTrack.start + 0.25) throw new Error("The audio ends before the final saved track begins.");
+
+  const allowedDifference = Math.max(8, source.duration * 0.003);
+  if (Math.abs(parsedDuration - source.duration) > allowedDifference) {
+    throw new Error(
+      `This file is ${Math.round(Math.abs(parsedDuration - source.duration))} seconds different from the saved source. Choose audio extracted from the same video.`
+    );
+  }
+
+  source.provider = "local";
+  source.assetId = assetId;
+  source.assetMeta = {
+    name: name || "Extracted audio",
+    type: type || "audio/*",
+    size: Number(size) || 0,
+    duration: parsedDuration,
+    lastModified: Number(lastModified) || 0,
+    youtubeId: source.youtubeId,
+    importKind: "authorized-extract"
+  };
+  source.duration = parsedDuration;
+  finalTrack.end = parsedDuration;
+  source.localPlaybackFor = source.youtubeId;
+
+  for (const candidate of [source, youtubeFallback]) {
+    for (const track of candidate.tracks) {
+      delete track.sourceId;
+      delete track.key;
+      delete track.sourceTitle;
+      delete track.provider;
+      delete track.index;
+    }
+  }
+  youtubeFallback.provider = "youtube";
+  delete youtubeFallback.assetId;
+  delete youtubeFallback.assetMeta;
+  delete youtubeFallback.localPlaybackFor;
+  delete youtubeFallback.youtubeFallback;
+  source.youtubeFallback = youtubeFallback;
+  return source;
+}
+
 export function parseChapterLines(text, sourceDuration = 0) {
   const rows = String(text || "")
     .split(/\r?\n/)

@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildCatalogIndex, mergeCatalog, parseChapterLines } from "../assets/js/catalog.js";
+import { buildCatalogIndex, mergeCatalog, parseChapterLines, sourceWithLocalAudio } from "../assets/js/catalog.js";
 import { continuousRunEnd, continuousTrackIndexAtTime, isResumePosition } from "../assets/js/player.js";
-import { formatTime, parseTimecode, parseYouTubeId } from "../assets/js/utils.js";
+import { formatTime, parseExtractedYouTubeId, parseTimecode, parseYouTubeId } from "../assets/js/utils.js";
 import { applyMusicLinksToCatalog, getMusicLinkEntries, sourceFromMusicLink } from "./music-link-ingest.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -14,6 +14,9 @@ assert.equal(parseYouTubeId("https://youtu.be/Y25LDO6OLzQ?si=test"), "Y25LDO6OLz
 assert.equal(parseYouTubeId("https://www.youtube.com/watch?v=JoUq869LXeA"), "JoUq869LXeA");
 assert.equal(parseYouTubeId("https://www.youtube.com/live/Y25LDO6OLzQ?feature=share"), "Y25LDO6OLzQ");
 assert.equal(parseYouTubeId("https://youtu.be/not-valid"), "");
+assert.equal(parseExtractedYouTubeId("Artist - Session [Y25LDO6OLzQ].m4a"), "Y25LDO6OLzQ");
+assert.equal(parseExtractedYouTubeId("Artist - Session [Y25LDO6OLzQ].webm.opus"), "Y25LDO6OLzQ");
+assert.equal(parseExtractedYouTubeId("Artist - Session.m4a"), "");
 assert.equal(parseTimecode("1:02:03.5"), 3723.5);
 assert.equal(formatTime(3415), "56:55");
 
@@ -45,6 +48,25 @@ override.title = "Browser Override";
 const merged = mergeCatalog(base, [override]);
 assert.equal(merged.sources.length, base.sources.length);
 assert.equal(merged.sourceById.get(override.id).title, "Browser Override");
+
+const localOverride = sourceWithLocalAudio(base.sources[0], {
+  assetId: "audio-test",
+  name: "Session [JoUq869LXeA].m4a",
+  type: "audio/mp4",
+  size: 1024,
+  duration: base.sources[0].duration + 0.4,
+  lastModified: 123
+});
+assert.equal(localOverride.provider, "local");
+assert.equal(localOverride.youtubeId, base.sources[0].youtubeId);
+assert.equal(localOverride.tracks.at(-1).end, localOverride.duration);
+assert.equal(localOverride.assetMeta.importKind, "authorized-extract");
+assert.equal(localOverride.youtubeFallback.provider, "youtube");
+assert.equal(localOverride.youtubeFallback.duration, base.sources[0].duration);
+assert.throws(() => sourceWithLocalAudio(base.sources[0], {
+  assetId: "audio-wrong",
+  duration: base.sources[0].duration + 60
+}), /different from the saved source/);
 
 const singleLinkSource = sourceFromMusicLink({
   url: "https://youtu.be/dQw4w9WgXcQ",

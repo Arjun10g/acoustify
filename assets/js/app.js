@@ -13,6 +13,7 @@ import {
   mergeCatalog,
   parseChapterLines,
   sourceFromStudioForm,
+  sourceWithLocalAudio,
   validateCatalog
 } from "./catalog.js";
 import { PlaybackController } from "./player.js";
@@ -23,6 +24,7 @@ import {
   downloadJson,
   escapeHtml,
   formatTime,
+  parseExtractedYouTubeId,
   relativeDate,
   safeArtwork,
   slugify
@@ -89,6 +91,7 @@ const dom = {
   confirmTitle: document.getElementById("confirm-title"),
   confirmMessage: document.getElementById("confirm-message"),
   memoryImport: document.getElementById("memory-import"),
+  extractedAudioImport: document.getElementById("extracted-audio-import"),
   adBanner: document.getElementById("ad-banner")
 };
 
@@ -98,6 +101,7 @@ let catalog = null;
 let player = null;
 let viewQueues = new Map();
 let pendingLocalFile = null;
+let pendingExtractedSourceId = "";
 let pendingConfirm = null;
 let activeAddTrackKey = null;
 let userSeeking = false;
@@ -523,7 +527,8 @@ function renderSource(sourceId) {
     return;
   }
   const duration = formatTime(source.duration, source.duration >= 3600);
-  const canOpenYouTube = source.provider === "youtube" && source.youtubeId;
+  const canOpenYouTube = Boolean(source.youtubeId);
+  const canRestoreYouTube = source.provider === "local" && source.youtubeId && sourceIsUserOverride(source.id);
   dom.view.innerHTML = `
     <section class="collection-hero">
       <img class="collection-art" ${artworkAttrs(source)} alt="${escapeHtml(source.title)} artwork">
@@ -531,13 +536,15 @@ function renderSource(sourceId) {
         <p class="eyebrow">Source album</p>
         <h1>${escapeHtml(source.title)}</h1>
         <p>${escapeHtml(source.description || "A long-form source divided into individually playable tracks.")}</p>
-        <div class="collection-meta"><strong>${escapeHtml(source.artist)}</strong><span>•</span><span>${source.year || "Personal archive"}</span><span>•</span><span>${source.tracks.length} tracks</span><span>•</span><span>${duration}</span><span>•</span><span>${providerLabel(source)}</span></div>
+        <div class="collection-meta"><strong>${escapeHtml(source.artist)}</strong><span>•</span><span>${source.year || "Personal archive"}</span><span>•</span><span>${source.tracks.length} track${source.tracks.length === 1 ? "" : "s"}</span><span>•</span><span>${duration}</span><span>•</span><span>${providerLabel(source)}</span></div>
       </div>
     </section>
     <div class="collection-controls">
       <button class="play-button big-play" type="button" data-action="play-source" data-source-id="${escapeHtml(source.id)}" aria-label="Play source">▶</button>
       <button class="button ghost small-button" type="button" data-action="shuffle-source" data-source-id="${escapeHtml(source.id)}">⤨ Shuffle</button>
       <button class="button ghost small-button" type="button" data-action="edit-source" data-source-id="${escapeHtml(source.id)}">${source.timingStatus === "calibration-required" ? "Calibrate cuts" : "Edit timings"}</button>
+      ${source.youtubeId ? `<button class="button secondary small-button" type="button" data-action="attach-extracted-audio" data-source-id="${escapeHtml(source.id)}">${source.provider === "local" ? "Replace local audio" : "Use local audio"}</button>` : ""}
+      ${canRestoreYouTube ? `<button class="button ghost small-button" type="button" data-action="restore-youtube-source" data-source-id="${escapeHtml(source.id)}">Use YouTube</button>` : ""}
       ${canOpenYouTube ? `<a class="button ghost small-button" href="https://www.youtube.com/watch?v=${encodeURIComponent(source.youtubeId)}" target="_blank" rel="noopener noreferrer">Open original ↗</a>` : ""}
     </div>
     ${source.timingStatus === "calibration-required" ? `
@@ -703,8 +710,9 @@ function renderSettings() {
         <div class="device-status"><span>YouTube sources</span><strong>YouTube pauses embeds when the screen locks — use Keep screen awake, or a local master for true background audio</strong></div>
       </section>
       <section class="setting-card">
-        <h3>Audio quality</h3><p>YouTube determines the adaptive audio/video representation. Acoustify does not extract or transcode it. Local files are handed directly to the browser.</p>
-        <div class="info-banner"><span class="info-icon">◇</span><div><h3>Best-fidelity path</h3><p>Import a master file you own. The exact Blob is retained in IndexedDB; browser codec support still applies.</p></div></div>
+        <h3>Local audio</h3><p>The Pages app stores selected files unchanged. The optional desktop extractor runs locally and requires you to confirm that each download is authorized.</p>
+        <div class="setting-actions"><a class="button secondary small-button" href="./downloads/youtube_podcast_audio_extractor.zip" download>Download extractor</a><button class="button primary small-button" type="button" data-action="attach-extracted-audio">Import extracted audio</button></div>
+        <div class="info-banner"><span class="info-icon">◇</span><div><h3>Automatic matching</h3><p>Extractor filenames include the YouTube ID in brackets, so Acoustify can apply the existing track timestamps and switch to background-friendly local playback.</p></div></div>
       </section>
       <section class="setting-card">
         <h3>YouTube ads</h3><p>Ads come from YouTube and Acoustify cannot remove them. When one plays, a banner appears with a shortcut to the video so you can use YouTube's own Skip button. The player also avoids reloading the video between tracks, which reduces how often pre-roll ads can appear.</p>
@@ -729,7 +737,9 @@ function renderSettings() {
               <div><strong>${escapeHtml(source.title)}</strong><span>${escapeHtml(source.artist)} · ${timingLabel(source)}${sourceIsUserOverride(source.id) ? " · browser override" : " · packaged"}</span></div>
               <div class="page-actions">
                 <button class="button ghost small-button" type="button" data-action="edit-source" data-source-id="${escapeHtml(source.id)}">Edit</button>
-                ${sourceIsUserOverride(source.id) ? `<button class="button ghost small-button" type="button" data-action="delete-user-source" data-source-id="${escapeHtml(source.id)}">Remove override</button>` : ""}
+                ${sourceIsUserOverride(source.id) ? source.provider === "local" && source.youtubeId
+                  ? `<button class="button ghost small-button" type="button" data-action="restore-youtube-source" data-source-id="${escapeHtml(source.id)}">Use YouTube</button>`
+                  : `<button class="button ghost small-button" type="button" data-action="delete-user-source" data-source-id="${escapeHtml(source.id)}">Remove override</button>` : ""}
               </div>
             </div>`).join("")}
         </div>
@@ -1132,6 +1142,140 @@ function readAudioDuration(file) {
   });
 }
 
+function sourceForExtractedFile(filename, requestedSourceId = "") {
+  const fileYouTubeId = parseExtractedYouTubeId(filename);
+  const requestedSource = requestedSourceId ? catalog.sourceById.get(requestedSourceId) : null;
+  if (requestedSourceId && !requestedSource) throw new Error("That source is no longer in the catalog.");
+  if (requestedSource && !requestedSource.youtubeId) throw new Error("That source has no YouTube ID for audio matching.");
+  if (requestedSource && fileYouTubeId && requestedSource.youtubeId !== fileYouTubeId) {
+    throw new Error(`This file belongs to a different YouTube video (${fileYouTubeId}).`);
+  }
+  if (requestedSource) return requestedSource;
+  if (!fileYouTubeId) throw new Error("The filename must end with a YouTube ID in brackets, such as [Y25LDO6OLzQ].m4a.");
+
+  const matches = catalog.sources.filter((source) => source.youtubeId === fileYouTubeId);
+  if (!matches.length) throw new Error(`No catalog source matches YouTube ID ${fileYouTubeId}.`);
+  if (matches.length > 1) throw new Error("More than one source uses this YouTube ID. Import from the source page instead.");
+  return matches[0];
+}
+
+function activePlaybackForSource(sourceId) {
+  if (player?.currentTrack?.sourceId !== sourceId) return null;
+  return {
+    key: player.currentTrack.key,
+    position: player.currentTime,
+    playing: player.isPlaying,
+    queue: [...player.queue]
+  };
+}
+
+async function reloadActiveSource(playback) {
+  if (!playback || !catalog.trackByKey.has(playback.key)) return;
+  const queue = playback.queue.filter((key) => catalog.trackByKey.has(key));
+  await player.loadByKey(playback.key, {
+    autoplay: playback.playing,
+    resumePosition: playback.position,
+    queue
+  });
+}
+
+async function handleExtractedAudioFile(file, requestedSourceId = "") {
+  if (!file) return;
+  const source = sourceForExtractedFile(file.name, requestedSourceId);
+  const duration = await readAudioDuration(file);
+  const assetId = `audio-${crypto.randomUUID()}`;
+  const override = sourceWithLocalAudio(source, {
+    assetId,
+    name: file.name,
+    type: file.type,
+    size: file.size,
+    duration,
+    lastModified: file.lastModified
+  });
+  validateCatalog({ version: 1, sources: [override] });
+
+  const previousSources = deepClone(state.userSources);
+  const previousOverride = state.userSources.find((item) => item.id === source.id);
+  if (previousOverride?.provider !== "local") override.restorePackagedSource = !previousOverride;
+  const activePlayback = activePlaybackForSource(source.id);
+  await putAudioAsset({
+    id: assetId,
+    file,
+    name: file.name,
+    type: file.type,
+    size: file.size,
+    lastModified: file.lastModified
+  });
+
+  try {
+    const existingIndex = state.userSources.findIndex((item) => item.id === override.id);
+    if (existingIndex >= 0) state.userSources[existingIndex] = override;
+    else state.userSources.push(override);
+    await setValue(STATE_KEY, state);
+    rebuildCatalog();
+  } catch (error) {
+    state.userSources = previousSources;
+    rebuildCatalog();
+    await deleteAudioAsset(assetId).catch(() => {});
+    throw error;
+  }
+
+  let reloadFailed = false;
+  try {
+    await reloadActiveSource(activePlayback);
+  } catch (error) {
+    reloadFailed = true;
+    console.debug("The active source could not be reloaded after importing audio.", error);
+  }
+  if (previousOverride?.provider === "local" && previousOverride.assetId && previousOverride.assetId !== assetId) {
+    await deleteAudioAsset(previousOverride.assetId).catch(() => {});
+  }
+  requestPersistentStorage().catch(() => false);
+  refreshStorageEstimate();
+  toast(reloadFailed ? `${override.title} now uses local audio. Tap Play to reload it.` : `${override.title} now uses local audio.`, "success", 5200);
+  navigate(`source/${encodeURIComponent(override.id)}`);
+}
+
+async function restoreYouTubeSource(sourceId) {
+  const source = catalog.sourceById.get(sourceId);
+  const userSource = state.userSources.find((item) => item.id === sourceId);
+  if (!source?.youtubeId || userSource?.provider !== "local") return;
+  const previousSources = deepClone(state.userSources);
+  const activePlayback = activePlaybackForSource(sourceId);
+
+  if (userSource.restorePackagedSource && sourceIsPackaged(sourceId)) {
+    state.userSources = state.userSources.filter((item) => item.id !== sourceId);
+  } else {
+    const restored = deepClone(userSource.youtubeFallback || userSource);
+    restored.provider = "youtube";
+    delete restored.assetId;
+    delete restored.assetMeta;
+    delete restored.localPlaybackFor;
+    delete restored.youtubeFallback;
+    delete restored.restorePackagedSource;
+    validateCatalog({ version: 1, sources: [restored] });
+    state.userSources[state.userSources.findIndex((item) => item.id === sourceId)] = restored;
+  }
+
+  try {
+    await setValue(STATE_KEY, state);
+    rebuildCatalog();
+  } catch (error) {
+    state.userSources = previousSources;
+    rebuildCatalog();
+    throw error;
+  }
+  try {
+    await reloadActiveSource(activePlayback);
+  } catch (error) {
+    console.debug("The active source could not be reloaded after restoring YouTube.", error);
+  }
+  await deleteAudioAsset(userSource.assetId).catch(() => {});
+  refreshStorageEstimate();
+  toast(`${source.title} now uses YouTube playback.`, "success");
+  navigate(`source/${encodeURIComponent(sourceId)}`);
+}
+
 async function saveStudioForm(form) {
   const data = new FormData(form);
   const provider = data.get("provider");
@@ -1163,6 +1307,19 @@ async function saveStudioForm(form) {
     assetId,
     assetMeta
   });
+  if (provider === "local" && previousSource?.youtubeId) {
+    source.youtubeId = previousSource.youtubeId;
+    source.localPlaybackFor = previousSource.localPlaybackFor || previousSource.youtubeId;
+    if (!pendingLocalFile && previousSource.assetMeta) source.assetMeta = deepClone(previousSource.assetMeta);
+    source.youtubeFallback = deepClone(source);
+    source.youtubeFallback.provider = "youtube";
+    delete source.youtubeFallback.assetId;
+    delete source.youtubeFallback.assetMeta;
+    delete source.youtubeFallback.localPlaybackFor;
+    delete source.youtubeFallback.youtubeFallback;
+    delete source.youtubeFallback.restorePackagedSource;
+    source.restorePackagedSource = false;
+  }
   const year = Number(data.get("year"));
   if (Number.isFinite(year) && year > 0) source.year = year;
   validateCatalog({ version: 1, sources: [source] });
@@ -1413,6 +1570,17 @@ async function handleAction(action, element, event) {
       renderRoute();
     }); break;
     case "edit-source": navigate(`studio?source=${encodeURIComponent(sourceId)}`); break;
+    case "attach-extracted-audio":
+      pendingExtractedSourceId = sourceId || "";
+      dom.extractedAudioImport.value = "";
+      dom.extractedAudioImport.click();
+      break;
+    case "restore-youtube-source": {
+      const source = catalog.sourceById.get(sourceId);
+      if (!source) break;
+      confirmAction("Use YouTube playback?", `The local audio for “${source.title}” will be removed from this browser. Its saved timestamps will remain.`, () => restoreYouTubeSource(sourceId));
+      break;
+    }
     case "delete-user-source": {
       const source = catalog.sourceById.get(sourceId);
       confirmAction("Remove browser override?", sourceIsPackaged(sourceId)
@@ -1662,6 +1830,20 @@ function wireDomEvents() {
       toast("Memory backup imported. Local audio files must remain in this browser or be re-imported.", "success", 6000);
     } catch (error) {
       toast(`Import failed: ${error.message}`, "error", 6500);
+    }
+  });
+
+  dom.extractedAudioImport.addEventListener("change", async () => {
+    const file = dom.extractedAudioImport.files?.[0];
+    const requestedSourceId = pendingExtractedSourceId;
+    dom.extractedAudioImport.value = "";
+    pendingExtractedSourceId = "";
+    if (!file) return;
+    try {
+      await handleExtractedAudioFile(file, requestedSourceId);
+    } catch (error) {
+      console.error(error);
+      toast(`Audio import failed: ${error.message}`, "error", 7000);
     }
   });
 }

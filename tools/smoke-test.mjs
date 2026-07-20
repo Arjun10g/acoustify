@@ -19,6 +19,7 @@ const requiredFiles = [
   "assets/icons/icon-512.png",
   "assets/icons/maskable-512.png",
   "assets/icons/apple-touch-icon.png",
+  "downloads/youtube_podcast_audio_extractor.zip",
   "data/catalog.json"
 ];
 const errors = [];
@@ -29,7 +30,7 @@ for (const file of requiredFiles) {
 }
 
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-for (const id of ["view", "youtube-player", "local-audio", "player-bar", "progress-control", "volume-control"]) {
+for (const id of ["view", "youtube-player", "local-audio", "player-bar", "progress-control", "volume-control", "extracted-audio-import"]) {
   if (!html.includes(`id="${id}"`)) errors.push(`index.html is missing #${id}`);
 }
 for (const src of ["./assets/css/app.css", "./assets/js/app.js", "./manifest.webmanifest"]) {

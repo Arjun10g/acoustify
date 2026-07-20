@@ -475,7 +475,7 @@ input[type="range"]:hover::-webkit-slider-thumb, input[type="range"]:focus-visib
 .collection-copy > p { max-width: 750px; margin: 0 0 10px; color: #c0ccc4; }
 .collection-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; color: var(--muted); font-size: 12px; }
 .collection-meta strong { color: var(--text); }
-.collection-controls { display: flex; align-items: center; gap: 12px; padding: 22px 0 15px; }
+.collection-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 22px 0 15px; }
 .big-play { width: 53px; height: 53px; font-size: 17px; background: var(--accent); }
 .big-play:hover { background: var(--accent-strong); }
 
