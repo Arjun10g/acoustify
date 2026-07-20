@@ -77,18 +77,20 @@ export class PlaybackController extends EventTarget {
     this.repeat = "off";
     this.shuffle = false;
     this.autoplay = true;
-    this.segmentLeadIn = 1.5;
+    this.segmentLeadIn = 0.5;
     this.volume = 0.86;
     this.keepScreenAwake = false;
 
     this.youtubePlayer = null;
     this.youtubeReady = false;
     this.youtubeVideoId = null;
+    this.appliedYouTubeEnd = NaN;
     this.pendingYouTubeLoad = null;
     this.monitorTimer = null;
     this.localObjectUrl = null;
     this.segmentEndedLock = false;
     this.queueSnapshotCache = null;
+    this.adWatch = { lastTime: -1, stalledSince: 0, active: false };
     this.wakeLockSentinel = null;
     this.wakeLockPending = false;
     this.lastPositionState = { position: -1, duration: -1, at: 0 };
@@ -187,6 +189,7 @@ export class PlaybackController extends EventTarget {
     else this.queueIndex = this.queue.indexOf(track.key);
 
     this.segmentEndedLock = false;
+    this.#clearAdWatch();
     const hasResumePosition = isResumePosition(resumePosition);
     const requestedPosition = clamp(
       hasResumePosition ? Number(resumePosition) : track.start,
@@ -277,17 +280,28 @@ export class PlaybackController extends EventTarget {
     if (!this.youtubeReady || !this.pendingYouTubeLoad) return;
     const request = this.pendingYouTubeLoad;
     this.pendingYouTubeLoad = null;
+    // Every loadVideoById is a fresh ad opportunity, so seek inside the
+    // already-loaded upload whenever the segment monitor can guard the
+    // boundary itself: the tab is visible (timers unthrottled) and the new
+    // range fits inside the endSeconds bound from the last real load.
+    const canSeekInPlace = request.autoplay
+      && this.youtubeVideoId === request.videoId
+      && document.visibilityState === "visible"
+      && Number.isFinite(this.appliedYouTubeEnd)
+      && request.endAt <= this.appliedYouTubeEnd + 0.01;
     this.youtubeVideoId = request.videoId;
-    // Reload the bounded segment even when the next track belongs to the same
-    // upload. This preserves YouTube's native endSeconds guard in background
-    // tabs where JavaScript timers may be throttled.
-    if (request.autoplay) {
+    if (canSeekInPlace) {
+      this.youtubePlayer.seekTo(request.startAt, true);
+      this.youtubePlayer.playVideo();
+    } else if (request.autoplay) {
+      this.appliedYouTubeEnd = request.endAt;
       this.youtubePlayer.loadVideoById({
         videoId: request.videoId,
         startSeconds: request.startAt,
         endSeconds: request.endAt
       });
     } else {
+      this.appliedYouTubeEnd = request.endAt;
       this.youtubePlayer.cueVideoById({
         videoId: request.videoId,
         startSeconds: request.startAt,
@@ -401,7 +415,10 @@ export class PlaybackController extends EventTarget {
     try {
       if (this.backend === "youtube" && this.youtubeReady) {
         const time = this.youtubePlayer.getCurrentTime?.();
-        if (Number.isFinite(time)) this.currentTime = time;
+        if (Number.isFinite(time)) {
+          this.currentTime = time;
+          this.#watchForAd(time, this.youtubePlayer.getPlayerState?.());
+        }
         const reportedQuality = this.youtubePlayer.getPlaybackQuality?.();
         if (reportedQuality && reportedQuality !== "unknown") {
           const quality = String(reportedQuality).replace("hd", "HD ").toUpperCase();
@@ -587,6 +604,65 @@ export class PlaybackController extends EventTarget {
     const parsed = Number(seconds);
     this.segmentLeadIn = Number.isFinite(parsed) ? clamp(parsed, 0, 5) : 0;
     this.emit("optionschange", this.snapshot());
+  }
+
+  // The IFrame API exposes no ad state, but during an ad break the content
+  // clock freezes while the player still reports PLAYING. Watching for that
+  // stall lets the UI tell the listener an ad is running so they can reach
+  // YouTube's own Skip button. Nothing here blocks or skips the ad itself.
+  #watchForAd(time, playerState) {
+    const watch = this.adWatch;
+    if (playerState !== window.YT?.PlayerState?.PLAYING) {
+      this.#clearAdWatch();
+      watch.lastTime = time;
+      return;
+    }
+    if (Math.abs(time - watch.lastTime) > 0.2) {
+      watch.lastTime = time;
+      watch.stalledSince = 0;
+      if (watch.active) {
+        watch.active = false;
+        this.emit("adbreak", { active: false });
+      }
+      return;
+    }
+    const now = Date.now();
+    if (!watch.stalledSince) {
+      watch.stalledSince = now;
+    } else if (!watch.active && now - watch.stalledSince > 3500) {
+      watch.active = true;
+      this.emit("adbreak", { active: true });
+    }
+  }
+
+  #clearAdWatch() {
+    this.adWatch.stalledSince = 0;
+    if (this.adWatch.active) {
+      this.adWatch.active = false;
+      this.emit("adbreak", { active: false });
+    }
+  }
+
+  // Fullscreen on the player wrap. On Android, swiping home from fullscreen
+  // moves the video into a system picture-in-picture window, which is the
+  // supported way to keep a YouTube source playing while using other apps.
+  async enterVideoFullscreen() {
+    if (this.backend !== "youtube" || !this.youtubeWrap) return false;
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else if (this.youtubeWrap.requestFullscreen) {
+        await this.youtubeWrap.requestFullscreen();
+      } else if (this.youtubeWrap.webkitRequestFullscreen) {
+        this.youtubeWrap.webkitRequestFullscreen();
+      } else {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      this.emit("error", { error: new Error("The browser blocked fullscreen for the video."), ...this.snapshot() });
+      return false;
+    }
   }
 
   setKeepScreenAwake(enabled) {

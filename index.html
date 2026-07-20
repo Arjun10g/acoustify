@@ -33,6 +33,7 @@
       <nav class="nav-group" aria-label="Browse">
         <a href="#/home" data-route data-nav="home"><span class="nav-icon" aria-hidden="true">⌂</span><span>Home</span></a>
         <a href="#/search" data-route data-nav="search"><span class="nav-icon" aria-hidden="true">⌕</span><span>Search</span></a>
+        <a href="#/songs" data-route data-nav="songs"><span class="nav-icon" aria-hidden="true">♫</span><span>Songs</span></a>
         <a href="#/library" data-route data-nav="library"><span class="nav-icon" aria-hidden="true">▥</span><span>Your Library</span></a>
       </nav>
 
@@ -90,7 +91,10 @@
           <p class="eyebrow">Now playing</p>
           <h2 id="panel-track-title">Choose a track</h2>
         </div>
-        <button class="icon-button" type="button" data-action="close-player" aria-label="Close player panel">×</button>
+        <div class="panel-header-actions">
+          <button class="icon-button" type="button" data-action="video-fullscreen" aria-label="Fullscreen video">⛶</button>
+          <button class="icon-button" type="button" data-action="close-player" aria-label="Close player panel">×</button>
+        </div>
       </div>
 
       <div class="media-stage" id="media-stage">
@@ -171,9 +175,18 @@
     <nav class="mobile-nav" aria-label="Mobile navigation">
       <a href="#/home" data-route data-nav="home"><span>⌂</span><small>Home</small></a>
       <a href="#/search" data-route data-nav="search"><span>⌕</span><small>Search</small></a>
+      <a href="#/songs" data-route data-nav="songs"><span>♫</span><small>Songs</small></a>
       <a href="#/library" data-route data-nav="library"><span>▥</span><small>Library</small></a>
       <a href="#/studio" data-route data-nav="studio"><span>＋</span><small>Add</small></a>
     </nav>
+  </div>
+
+  <div class="ad-banner" id="ad-banner" hidden>
+    <span class="ad-banner-copy"><strong>YouTube is playing an ad</strong><small>Open the video to use its Skip button when it appears.</small></span>
+    <div class="ad-banner-actions">
+      <button class="button secondary small-button" type="button" data-action="show-video-for-ad">Show video</button>
+      <button class="icon-button" type="button" data-action="video-fullscreen" aria-label="Fullscreen video">⛶</button>
+    </div>
   </div>
 
   <dialog class="app-dialog" id="playlist-dialog">

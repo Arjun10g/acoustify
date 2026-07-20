@@ -254,7 +254,7 @@
       "fallbackArtwork": "https://i.ytimg.com/vi/J1vTi9ycpiA/hqdefault.jpg",
       "description": "Imported from a provided YouTube link.",
       "timingStatus": "user-calibrated",
-      "timingNote": "Track starts follow the timestamped list in the YouTube comments. The first cut includes the spoken intro; refine in Catalog Studio if needed.",
+      "timingNote": "Track starts follow the timestamped list in the YouTube comments. By and By begins at 0:12, after the spoken intro.",
       "tags": [
         "session",
         "live",
@@ -264,7 +264,7 @@
         {
           "id": "by-and-by",
           "title": "By and By",
-          "start": 0,
+          "start": 12,
           "end": 312,
           "timingConfidence": "user"
         },

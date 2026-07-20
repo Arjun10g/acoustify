@@ -29,7 +29,7 @@ import {
 } from "./utils.js";
 
 const STATE_KEY = "app-state-v2";
-const APP_VERSION = 2;
+const APP_VERSION = 3;
 const DEFAULT_STATE = {
   version: APP_VERSION,
   liked: [],
@@ -43,7 +43,7 @@ const DEFAULT_STATE = {
     shuffle: false,
     autoplay: true,
     playerPanelOpen: false,
-    segmentLeadIn: 1.5,
+    segmentLeadIn: 0.5,
     keepScreenAwake: false
   },
   playback: {
@@ -88,7 +88,8 @@ const dom = {
   confirmDialog: document.getElementById("confirm-dialog"),
   confirmTitle: document.getElementById("confirm-title"),
   confirmMessage: document.getElementById("confirm-message"),
-  memoryImport: document.getElementById("memory-import")
+  memoryImport: document.getElementById("memory-import"),
+  adBanner: document.getElementById("ad-banner")
 };
 
 let state = deepClone(DEFAULT_STATE);
@@ -127,6 +128,12 @@ const persistState = debounce(async () => {
 
 function normalizeState(input) {
   const candidate = input && typeof input === "object" ? input : {};
+  const candidateSettings = { ...(candidate.settings || {}) };
+  // Cuts are song-start accurate now, so the old 1.5s default lead-in mostly
+  // replayed pre-song talk. Migrate only the untouched default.
+  if (Number(candidate.version) < 3 && Number(candidateSettings.segmentLeadIn) === 1.5) {
+    candidateSettings.segmentLeadIn = 0.5;
+  }
   return {
     ...deepClone(DEFAULT_STATE),
     ...candidate,
@@ -147,7 +154,7 @@ function normalizeState(input) {
     userSources: Array.isArray(candidate.userSources) ? candidate.userSources : [],
     settings: {
       ...DEFAULT_STATE.settings,
-      ...(candidate.settings || {})
+      ...candidateSettings
     },
     playback: {
       ...DEFAULT_STATE.playback,
@@ -459,6 +466,20 @@ function renderSearchResults(query) {
     <section class="view-section"><div class="section-heading"><h2>Tracks</h2></div>${tracks.length ? trackTable(tracks, { prefix: queueId, showSource: true }) : emptyState({ symbol: "⌕", title: "No matching tracks", copy: "Try fewer words or browse a source album." })}</section>`;
 }
 
+function allSongTracks() {
+  return [...catalog.tracks].sort((a, b) => a.title.localeCompare(b.title) || a.artist.localeCompare(b.artist));
+}
+
+function renderSongs() {
+  const tracks = allSongTracks();
+  dom.view.innerHTML = `
+    <div class="page-head">
+      <div><p class="eyebrow">Every separated cut</p><h1>Songs</h1><p>All ${tracks.length} track${tracks.length === 1 ? "" : "s"} from ${catalog.sources.length} source${catalog.sources.length === 1 ? "" : "s"} in one list.</p></div>
+      ${tracks.length ? '<div class="page-actions"><button class="button primary" type="button" data-action="play-songs">▶ Play all</button><button class="button secondary" type="button" data-action="shuffle-songs">⤨ Shuffle</button></div>' : ""}
+    </div>
+    ${trackTable(tracks, { prefix: "songs", showSource: true, emptyTitle: "No tracks yet", emptyCopy: "Add a source in Catalog Studio to build your song list." })}`;
+}
+
 function renderLibrary() {
   dom.view.innerHTML = `
     <div class="page-head">
@@ -686,6 +707,10 @@ function renderSettings() {
         <div class="info-banner"><span class="info-icon">◇</span><div><h3>Best-fidelity path</h3><p>Import a master file you own. The exact Blob is retained in IndexedDB; browser codec support still applies.</p></div></div>
       </section>
       <section class="setting-card">
+        <h3>YouTube ads</h3><p>Ads come from YouTube and Acoustify cannot remove them. When one plays, a banner appears with a shortcut to the video so you can use YouTube's own Skip button. The player also avoids reloading the video between tracks, which reduces how often pre-roll ads can appear.</p>
+        <div class="device-status"><span>Ad-free options</span><strong>A YouTube Premium account signed into this browser removes ads from embeds; local masters never have ads</strong></div>
+      </section>
+      <section class="setting-card">
         <h3>Browser storage</h3><p id="storage-description">Checking storage usage…</p>
         <div class="storage-meter"><span id="storage-meter-fill"></span></div>
         <div class="storage-copy"><span id="storage-used">—</span><span id="storage-quota">—</span></div>
@@ -735,6 +760,7 @@ function renderRoute() {
   switch (route.name) {
     case "home": renderHome(); break;
     case "search": renderSearch(route); break;
+    case "songs": renderSongs(); break;
     case "library": renderLibrary(); break;
     case "liked": renderLiked(); break;
     case "history": renderHistory(); break;
@@ -752,7 +778,7 @@ function renderRoute() {
 function pageTitle(route) {
   if (route.name === "source") return catalog.sourceById.get(route.segments[1])?.title || "Source";
   if (route.name === "playlist") return state.playlists.find((item) => item.id === route.segments[1])?.name || "Playlist";
-  const labels = { home: "Home", search: "Search", library: "Your Library", liked: "Liked Tracks", history: "History", studio: "Catalog Studio", settings: "Settings" };
+  const labels = { home: "Home", search: "Search", songs: "Songs", library: "Your Library", liked: "Liked Tracks", history: "History", studio: "Catalog Studio", settings: "Settings" };
   return labels[route.name] || "Acoustify";
 }
 
@@ -1250,6 +1276,9 @@ function wirePlayerEvents() {
     persistState();
   });
   player.addEventListener("segmentended", (event) => updatePlaybackMemory(event.detail));
+  player.addEventListener("adbreak", (event) => {
+    dom.adBanner.hidden = !event.detail.active;
+  });
   player.addEventListener("error", (event) => toast(event.detail.error?.message || "Playback failed.", "error", 6500));
 }
 
@@ -1302,6 +1331,21 @@ async function handleAction(action, element, event) {
     }
     case "previous": await player.previous(); break;
     case "next": await player.next(); break;
+    case "show-video-for-ad": setPanelOpen(true); break;
+    case "video-fullscreen": {
+      if (!(await player.enterVideoFullscreen())) toast("Fullscreen is available while a YouTube source is playing.", "info");
+      break;
+    }
+    case "play-songs": {
+      const tracks = allSongTracks();
+      if (tracks.length) await playTrack(tracks[0].key, tracks.map((track) => track.key));
+      break;
+    }
+    case "shuffle-songs": {
+      const tracks = shuffleArray(allSongTracks());
+      if (tracks.length) await playTrack(tracks[0].key, tracks.map((track) => track.key));
+      break;
+    }
     case "seek-back": if (player.currentTrack) await player.seekAbsolute(player.currentTime - 10); break;
     case "seek-forward": if (player.currentTrack) await player.seekAbsolute(player.currentTime + 10); break;
     case "jump-to-time": {

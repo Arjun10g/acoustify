@@ -639,6 +639,13 @@ input[type="range"]:hover::-webkit-slider-thumb, input[type="range"]:focus-visib
 .dialog-list img { width: 42px; height: 42px; border-radius: 5px; object-fit: cover; }
 .dialog-list strong, .dialog-list span { display: block; }
 .dialog-list span { color: var(--muted); font-size: 10px; }
+.ad-banner { position: fixed; z-index: 95; left: 50%; transform: translateX(-50%); bottom: calc(var(--bar-h) + 14px); display: flex; align-items: center; gap: 14px; width: min(430px, calc(100vw - 24px)); padding: 10px 12px 10px 16px; border: 1px solid rgba(255,196,86,.42); border-radius: 13px; background: rgba(43,32,12,.97); box-shadow: 0 13px 36px rgba(0,0,0,.45); animation: toast-in .18s ease-out; }
+.ad-banner-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ad-banner-copy strong { color: #ffd88f; font-size: 12.5px; }
+.ad-banner-copy small { color: var(--muted); font-size: 11px; }
+.ad-banner-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.panel-header-actions { display: flex; align-items: center; gap: 4px; }
+
 .toast-region { position: fixed; z-index: 100; right: 18px; bottom: calc(var(--bar-h) + 17px); display: grid; gap: 8px; pointer-events: none; }
 .toast { display: flex; align-items: center; gap: 10px; width: min(360px, calc(100vw - 36px)); padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 10px; color: #fff; background: rgba(23,35,27,.97); box-shadow: 0 13px 36px rgba(0,0,0,.4); animation: toast-in .18s ease-out; pointer-events: auto; }
 .toast.error { border-color: rgba(255,116,116,.4); background: rgba(52,20,20,.97); }
@@ -723,7 +730,8 @@ input[type="range"]:hover::-webkit-slider-thumb, input[type="range"]:focus-visib
   .text-button { font-size: 12px; }
   .like-control { display: none; }
   .play-button { width: 44px; height: 44px; }
-  .mobile-nav { grid-column: 1; grid-row: 4; display: grid; grid-template-columns: repeat(4,1fr); padding-bottom: env(safe-area-inset-bottom); background: #070b08; border-top: 1px solid var(--line); }
+  .mobile-nav { grid-column: 1; grid-row: 4; display: grid; grid-template-columns: repeat(5,1fr); padding-bottom: env(safe-area-inset-bottom); background: #070b08; border-top: 1px solid var(--line); }
+  .ad-banner { bottom: calc(var(--bar-h) + var(--mobile-nav-h) + 10px); }
   .mobile-nav a { display: grid; min-width: 0; min-height: 48px; place-items: center; align-content: center; gap: 3px; color: var(--subtle); }
   .mobile-nav a > span { font-size: 19px; line-height: 1; }
   .mobile-nav small { max-width: 100%; overflow: hidden; font-size: 10px; font-weight: 700; text-overflow: ellipsis; }

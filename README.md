@@ -88,6 +88,18 @@ Two settings help each path:
 - **Keep screen awake for YouTube** (Settings → Playback) holds a screen wake lock while a YouTube source is playing, so the phone does not auto-lock mid-session and playback runs hands-free. It has no effect on local masters, which do not need it.
 - Local masters declare a "playback" audio session where supported (Safari/iOS), so they keep playing with the Ring/Silent switch on and while the app is backgrounded.
 
+### YouTube ads
+
+Ads are served by YouTube inside the official embedded player, and Acoustify does not (and will not) block, mute, or auto-skip them. What it does instead:
+
+- **Ad banner with a skip shortcut.** The player watches for the tell-tale stall where the content clock freezes while the player reports "playing." When that happens, a banner appears with a one-tap **Show video** action (and a fullscreen shortcut) so YouTube's own Skip button is reachable even when the video panel is closed.
+- **Fewer ad opportunities.** Selecting another track from the same long source now seeks within the already-loaded video instead of reloading it. Reloads are what create fresh pre-roll slots, so staying inside one load means fewer ads across an album.
+- **Ad-free paths.** A YouTube Premium account signed into the same browser plays embeds without ads. Local master files never have ads.
+
+### Watching outside the app (Android picture-in-picture)
+
+Use the ⛶ button in the now-playing panel to take the video fullscreen. On Android, swiping home from fullscreen hands the video to the system picture-in-picture window, where it keeps playing while you use other apps. This is the supported way to keep a YouTube source audible outside the browser.
+
 ### Local master sources
 
 For the highest-fidelity path, add a FLAC, WAV, AIFF, ALAC/M4A, MP3, AAC, or other browser-supported file that you lawfully possess:
