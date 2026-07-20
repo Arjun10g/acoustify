@@ -139,7 +139,7 @@ To attach the result:
 2. Choose **Use local audio**.
 3. Select the generated file.
 
-The extractor puts `[VIDEO_ID]` at the end of every filename. **Settings -> Local audio -> Import extracted audio** can therefore match a file without first opening its source. Acoustify checks both the ID and duration, retains all saved song starts, stores the file in IndexedDB, and exposes **Use YouTube** as a reversible fallback.
+The extractor puts `[VIDEO_ID]` at the end of every filename. **Settings -> Local audio -> Import extracted audio** can therefore match one file or a whole batch without first opening each source. Acoustify checks both the ID and duration, retains all saved song starts, stores each file in IndexedDB, and exposes **Use YouTube** as a reversible fallback.
 
 For a future music link, add/import the catalog entry first using the flow below, then run the wrapper with `--url` or the extractor desktop app. Once the source exists in Acoustify, the same filename matching applies.
 

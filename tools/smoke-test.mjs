@@ -36,6 +36,7 @@ for (const id of ["view", "youtube-player", "local-audio", "player-bar", "progre
 for (const src of ["./assets/css/app.css", "./assets/js/app.js", "./manifest.webmanifest"]) {
   if (!html.includes(src)) errors.push(`index.html does not reference ${src}`);
 }
+if (!/id="extracted-audio-import"[^>]*\bmultiple\b/.test(html)) errors.push("Extracted audio import must support selecting multiple files.");
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, "manifest.webmanifest"), "utf8"));
 if (!String(manifest.start_url || "").startsWith("./")) errors.push("Manifest start_url must remain relative for project Pages sites.");

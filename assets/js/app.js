@@ -1179,7 +1179,7 @@ async function reloadActiveSource(playback) {
   });
 }
 
-async function handleExtractedAudioFile(file, requestedSourceId = "") {
+async function handleExtractedAudioFile(file, requestedSourceId = "", { quiet = false } = {}) {
   if (!file) return;
   const source = sourceForExtractedFile(file.name, requestedSourceId);
   const duration = await readAudioDuration(file);
@@ -1232,8 +1232,11 @@ async function handleExtractedAudioFile(file, requestedSourceId = "") {
   }
   requestPersistentStorage().catch(() => false);
   refreshStorageEstimate();
-  toast(reloadFailed ? `${override.title} now uses local audio. Tap Play to reload it.` : `${override.title} now uses local audio.`, "success", 5200);
-  navigate(`source/${encodeURIComponent(override.id)}`);
+  if (!quiet) {
+    toast(reloadFailed ? `${override.title} now uses local audio. Tap Play to reload it.` : `${override.title} now uses local audio.`, "success", 5200);
+    navigate(`source/${encodeURIComponent(override.id)}`);
+  }
+  return { override, reloadFailed };
 }
 
 async function restoreYouTubeSource(sourceId) {
@@ -1834,16 +1837,40 @@ function wireDomEvents() {
   });
 
   dom.extractedAudioImport.addEventListener("change", async () => {
-    const file = dom.extractedAudioImport.files?.[0];
+    const files = [...(dom.extractedAudioImport.files || [])];
     const requestedSourceId = pendingExtractedSourceId;
     dom.extractedAudioImport.value = "";
     pendingExtractedSourceId = "";
-    if (!file) return;
-    try {
-      await handleExtractedAudioFile(file, requestedSourceId);
-    } catch (error) {
-      console.error(error);
-      toast(`Audio import failed: ${error.message}`, "error", 7000);
+    if (!files.length) return;
+
+    if (files.length === 1) {
+      try {
+        await handleExtractedAudioFile(files[0], requestedSourceId);
+      } catch (error) {
+        console.error(error);
+        toast(`Audio import failed: ${error.message}`, "error", 7000);
+      }
+      return;
+    }
+
+    const imported = [];
+    const failures = [];
+    toast(`Importing ${files.length} extracted audio files...`, "info", 8000);
+    for (const file of files) {
+      try {
+        const result = await handleExtractedAudioFile(file, "", { quiet: true });
+        imported.push(result.override);
+      } catch (error) {
+        console.error(error);
+        failures.push({ file: file.name, error });
+      }
+    }
+    navigate("settings");
+    if (imported.length) {
+      toast(`${imported.length} source${imported.length === 1 ? "" : "s"} now use local audio.`, "success", 6000);
+    }
+    if (failures.length) {
+      toast(`${failures.length} file${failures.length === 1 ? "" : "s"} could not be imported. ${failures[0].file}: ${failures[0].error.message}`, "error", 9000);
     }
   });
 }
