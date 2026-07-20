@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#07110c">
-  <meta name="description" content="Acoustify turns long-form music sources into a personal, track-based listening library.">
+  <meta name="description" content="Your live sessions and acoustic sets, ready to play song by song.">
   <meta name="color-scheme" content="dark">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,7 +18,7 @@
 </head>
 <body>
   <noscript>
-    <div class="noscript">Acoustify needs JavaScript to build your local library and control segmented playback.</div>
+    <div class="noscript">Turn on JavaScript to use Acoustify.</div>
   </noscript>
 
   <div class="app-shell" id="app-shell">
@@ -38,9 +38,9 @@
       </nav>
 
       <nav class="nav-group secondary" aria-label="Personal library">
-        <a href="#/liked" data-route data-nav="liked"><span class="nav-icon liked-icon" aria-hidden="true">♥</span><span>Liked Tracks</span></a>
-        <a href="#/history" data-route data-nav="history"><span class="nav-icon" aria-hidden="true">↶</span><span>Listening History</span></a>
-        <a href="#/studio" data-route data-nav="studio"><span class="nav-icon" aria-hidden="true">＋</span><span>Catalog Studio</span></a>
+        <a href="#/liked" data-route data-nav="liked"><span class="nav-icon liked-icon" aria-hidden="true">♥</span><span>Liked Songs</span></a>
+        <a href="#/history" data-route data-nav="history"><span class="nav-icon" aria-hidden="true">↶</span><span>History</span></a>
+        <a href="#/studio" data-route data-nav="studio"><span class="nav-icon" aria-hidden="true">＋</span><span>Add Music</span></a>
       </nav>
 
       <div class="sidebar-section-head">
@@ -51,9 +51,9 @@
 
       <div class="sidebar-footer">
         <a href="#/settings" data-route data-nav="settings"><span class="nav-icon" aria-hidden="true">⚙</span><span>Settings</span></a>
-        <div class="sync-pill" title="Your memory is stored in this browser">
+        <div class="sync-pill" title="Saved on this device">
           <span class="status-dot"></span>
-          <span>Local memory</span>
+          <span>Saved here</span>
         </div>
       </div>
     </aside>
@@ -79,7 +79,7 @@
         <span class="network-pill" id="network-pill"><span class="status-dot"></span><span>Online</span></span>
         <button type="button" class="profile-pill" data-action="open-settings" aria-label="Open settings">
           <span class="profile-avatar">A</span>
-          <span>Personal archive</span>
+          <span>My music</span>
         </button>
       </div>
       <section class="view" id="view" aria-live="polite"></section>
@@ -89,7 +89,7 @@
       <div class="panel-header">
         <div>
           <p class="eyebrow">Now playing</p>
-          <h2 id="panel-track-title">Choose a track</h2>
+          <h2 id="panel-track-title">Choose a song</h2>
         </div>
         <div class="panel-header-actions">
           <button class="icon-button" type="button" data-action="video-fullscreen" aria-label="Fullscreen video">⛶</button>
@@ -100,7 +100,7 @@
       <div class="media-stage" id="media-stage">
         <div class="empty-player" id="empty-player">
           <span class="empty-disc" aria-hidden="true">♫</span>
-          <p>Your source player will appear here.</p>
+          <p>Pick something to play.</p>
         </div>
         <div class="youtube-player-wrap" id="youtube-player-wrap" hidden>
           <div id="youtube-player"></div>
@@ -117,20 +117,20 @@
           <img id="panel-artwork" class="panel-artwork" src="./assets/icons/icon-512.png" alt="">
           <div>
             <h3 id="panel-title">Nothing playing</h3>
-            <p id="panel-artist">Select any separated track</p>
+            <p id="panel-artist">Choose a song</p>
           </div>
         </div>
         <div class="quality-readout" id="quality-readout">
           <span class="quality-dot"></span>
-          <span>Playback idle</span>
+          <span>Ready to play</span>
         </div>
-        <div class="source-note" id="source-note">Included songs use native audio for background playback.</div>
+        <div class="source-note" id="source-note">Plays in the background.</div>
       </div>
 
       <div class="queue-section">
         <div class="section-row">
           <h3>Up next</h3>
-          <span id="queue-count">0 tracks</span>
+          <span id="queue-count">0 songs</span>
         </div>
         <div class="queue-list" id="queue-list"></div>
       </div>
@@ -142,31 +142,31 @@
           <img id="bar-artwork" src="./assets/icons/icon-192.png" alt="">
         </button>
         <div class="mini-copy">
-          <button type="button" class="text-button" data-action="open-current-source" id="bar-track-title">Choose a track</button>
-          <span id="bar-track-artist">Your personal listening archive</span>
+          <button type="button" class="text-button" data-action="open-current-source" id="bar-track-title">Choose a song</button>
+          <span id="bar-track-artist">Nothing playing</span>
         </div>
-        <button class="icon-button like-control" type="button" data-action="like-current" id="bar-like" aria-label="Like current track">♡</button>
+        <button class="icon-button like-control" type="button" data-action="like-current" id="bar-like" aria-label="Like current song">♡</button>
       </div>
 
       <div class="transport">
         <div class="transport-buttons">
           <button class="icon-button mode-button" type="button" data-action="toggle-shuffle" id="shuffle-button" aria-label="Toggle shuffle">⤨</button>
-          <button class="icon-button" type="button" data-action="previous" aria-label="Previous track">◀</button>
+          <button class="icon-button" type="button" data-action="previous" aria-label="Previous song">◀</button>
           <button class="icon-button seek-button" type="button" data-action="seek-back" aria-label="Back 10 seconds">−10</button>
           <button class="play-button" type="button" data-action="toggle-play" id="play-button" aria-label="Play">▶</button>
           <button class="icon-button seek-button" type="button" data-action="seek-forward" aria-label="Forward 10 seconds">+10</button>
-          <button class="icon-button" type="button" data-action="next" aria-label="Next track">▶</button>
+          <button class="icon-button" type="button" data-action="next" aria-label="Next song">▶</button>
           <button class="icon-button mode-button" type="button" data-action="cycle-repeat" id="repeat-button" aria-label="Change repeat mode">↻</button>
         </div>
         <div class="progress-row">
           <button id="elapsed-time" class="time-button" type="button" data-action="jump-to-time" title="Jump to a specific time">0:00</button>
-          <input id="progress-control" type="range" min="0" max="1000" value="0" aria-label="Track position">
+          <input id="progress-control" type="range" min="0" max="1000" value="0" aria-label="Song position">
           <span id="duration-time">0:00</span>
         </div>
       </div>
 
       <div class="bar-extras">
-        <button class="icon-button" type="button" data-action="open-player" aria-label="Show queue and source player">▤</button>
+        <button class="icon-button" type="button" data-action="open-player" aria-label="Show queue and now playing">▤</button>
         <span class="volume-icon" aria-hidden="true">◖</span>
         <input id="volume-control" type="range" min="0" max="100" value="86" aria-label="Volume">
       </div>
@@ -193,7 +193,7 @@
     <form method="dialog" id="playlist-form">
       <div class="dialog-head">
         <div>
-          <p class="eyebrow">Personal library</p>
+          <p class="eyebrow">Playlist</p>
           <h2 id="playlist-dialog-title">Create playlist</h2>
         </div>
         <button type="button" class="icon-button" data-action="close-playlist-dialog" aria-label="Close">×</button>
@@ -217,7 +217,7 @@
   <dialog class="app-dialog" id="add-to-playlist-dialog">
     <div class="dialog-head">
       <div>
-        <p class="eyebrow">Save track</p>
+        <p class="eyebrow">Playlist</p>
         <h2>Add to playlist</h2>
       </div>
       <button type="button" class="icon-button" data-action="close-add-dialog" aria-label="Close">×</button>
@@ -229,7 +229,7 @@
   <dialog class="app-dialog compact-dialog" id="confirm-dialog">
     <div class="dialog-head">
       <div>
-        <p class="eyebrow">Please confirm</p>
+        <p class="eyebrow">Are you sure?</p>
         <h2 id="confirm-title">Continue?</h2>
       </div>
     </div>

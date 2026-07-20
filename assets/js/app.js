@@ -126,7 +126,7 @@ const persistState = debounce(async () => {
   try {
     await setValue(STATE_KEY, state);
   } catch (error) {
-    toast(`Could not save local memory: ${error.message}`, "error");
+    toast(`Couldn't save your changes: ${error.message}`, "error");
   }
 }, 180);
 
@@ -212,17 +212,17 @@ function artworkAttrs(sourceOrTrack) {
 }
 
 function providerLabel(source) {
-  if (source.provider === "local" && source.assetId) return "Local master";
-  if (source.provider === "local" && source.audioUrl) return "Included audio";
-  return "YouTube source";
+  if (source.provider === "local" && source.assetId) return "My audio";
+  if (source.provider === "local" && source.audioUrl) return "Included";
+  return "YouTube";
 }
 
 function timingLabel(source) {
-  if (source.timingStatus === "calibration-required") return "Needs calibration";
-  if (source.timingStatus === "album-derived") return "Mapped chapters";
-  if (source.timingStatus === "comment-derived") return "Community timestamps";
-  if (source.timingStatus === "user-calibrated") return "Calibrated";
-  return "Track mapped";
+  if (source.timingStatus === "calibration-required") return "Check song times";
+  if (source.timingStatus === "album-derived") return "Album timings";
+  if (source.timingStatus === "comment-derived") return "Comment timings";
+  if (source.timingStatus === "user-calibrated") return "Edited timings";
+  return "Ready";
 }
 
 function sourceIsUserOverride(sourceId) {
@@ -263,15 +263,15 @@ function sourceCard(source) {
   return `
     <article class="card source-card" tabindex="0" data-action="open-source" data-source-id="${escapeHtml(source.id)}">
       <div class="card-badges">
-        <span class="badge ${source.provider === "local" ? "local" : ""}">${source.provider === "local" ? source.assetId ? "Original file" : "Included audio" : "Video source"}</span>
-        ${warning ? '<span class="badge warning">Draft cuts</span>' : ""}
+        <span class="badge ${source.provider === "local" ? "local" : ""}">${source.provider === "local" ? source.assetId ? "My audio" : "Included" : "YouTube"}</span>
+        ${warning ? '<span class="badge warning">Check times</span>' : ""}
       </div>
       <div class="card-art">
         <img ${artworkAttrs(source)} alt="${escapeHtml(source.title)} artwork" loading="lazy">
         <button class="card-play" type="button" data-action="play-source" data-source-id="${escapeHtml(source.id)}" aria-label="Play ${escapeHtml(source.title)}">▶</button>
       </div>
       <h3>${escapeHtml(source.title)}</h3>
-      <p>${escapeHtml(source.artist)} · ${source.tracks.length} separated track${source.tracks.length === 1 ? "" : "s"}</p>
+      <p>${escapeHtml(source.artist)} · ${source.tracks.length} song${source.tracks.length === 1 ? "" : "s"}</p>
     </article>`;
 }
 
@@ -289,7 +289,7 @@ function playlistCard(playlist) {
         <button class="card-play" type="button" data-action="play-playlist" data-playlist-id="${escapeHtml(playlist.id)}" aria-label="Play ${escapeHtml(playlist.name)}">▶</button>
       </div>
       <h3>${escapeHtml(playlist.name)}</h3>
-      <p>${playlist.trackKeys.length} track${playlist.trackKeys.length === 1 ? "" : "s"}${playlist.description ? ` · ${escapeHtml(playlist.description)}` : ""}</p>
+      <p>${playlist.trackKeys.length} song${playlist.trackKeys.length === 1 ? "" : "s"}${playlist.description ? ` · ${escapeHtml(playlist.description)}` : ""}</p>
     </article>`;
 }
 
@@ -309,10 +309,10 @@ function trackTable(tracks, {
   prefix = "tracks",
   showSource = false,
   playlistId = null,
-  emptyTitle = "No tracks here yet",
-  emptyCopy = "Add a source or save tracks to this collection."
+  emptyTitle = "No songs here yet",
+  emptyCopy = "Add some music or save songs here."
 } = {}) {
-  if (!tracks.length) return emptyState({ title: emptyTitle, copy: emptyCopy, action: "go-studio", actionLabel: "Open Catalog Studio" });
+  if (!tracks.length) return emptyState({ title: emptyTitle, copy: emptyCopy, action: "go-studio", actionLabel: "Add music" });
   const queueId = registerQueue(prefix, tracks);
   const currentKey = player?.currentTrack?.key;
   const body = tracks.map((track, index) => {
@@ -352,7 +352,7 @@ function trackTable(tracks, {
   return `
     <div class="track-table-wrap">
       <table class="track-list">
-        <thead><tr><th>#</th><th>Title</th>${showSource ? '<th class="source-col">Source</th>' : ""}<th class="duration-col">Time</th><th class="action-col"></th></tr></thead>
+        <thead><tr><th>#</th><th>Title</th>${showSource ? '<th class="source-col">Album</th>' : ""}<th class="duration-col">Time</th><th class="action-col"></th></tr></thead>
         <tbody>${body}</tbody>
       </table>
     </div>`;
@@ -360,7 +360,7 @@ function trackTable(tracks, {
 
 function renderPlaylistNav() {
   if (!state.playlists.length) {
-    dom.playlistNav.innerHTML = '<div class="empty-nav">Create a playlist to group favorite cuts.</div>';
+    dom.playlistNav.innerHTML = '<div class="empty-nav">Your playlists will show up here.</div>';
     return;
   }
   dom.playlistNav.innerHTML = state.playlists.map((playlist) => `
@@ -380,24 +380,24 @@ function renderHome() {
   dom.view.innerHTML = `
     <section class="home-hero">
       <div class="hero-copy">
-        <p class="eyebrow">Your rare-recording library</p>
-        <h1>Long sessions, finally split into songs.</h1>
-        <p>Acoustify remembers where you stopped, what you liked, and how every long-form source is divided—entirely in this browser.</p>
+        <p class="eyebrow">Your music</p>
+        <h1>${resumeTrack ? "Pick up where you left off." : "What do you want to hear?"}</h1>
+        <p>Live sessions and acoustic sets, ready to play song by song.</p>
         <div class="hero-actions">
           ${resumeTrack ? `<button class="button primary" type="button" data-action="resume-last">▶ Resume ${escapeHtml(resumeTrack.title)}</button>` : `<button class="button primary" type="button" data-action="play-source" data-source-id="${escapeHtml(sources[0]?.id || "")}">▶ Start listening</button>`}
-          <button class="button secondary" type="button" data-action="go-studio">＋ Add a source</button>
+          <button class="button secondary" type="button" data-action="go-studio">＋ Add music</button>
         </div>
         <div class="stat-strip">
-          <div class="stat-card"><strong>${sources.length}</strong><span>source albums</span></div>
-          <div class="stat-card"><strong>${catalog.tracks.length}</strong><span>separated tracks</span></div>
-          <div class="stat-card"><strong>${state.liked.length}</strong><span>liked tracks</span></div>
-          <div class="stat-card"><strong>${formatTime(totalDuration, totalDuration >= 3600)}</strong><span>mapped listening time</span></div>
+          <div class="stat-card"><strong>${sources.length}</strong><span>albums</span></div>
+          <div class="stat-card"><strong>${catalog.tracks.length}</strong><span>songs</span></div>
+          <div class="stat-card"><strong>${state.liked.length}</strong><span>liked</span></div>
+          <div class="stat-card"><strong>${formatTime(totalDuration, totalDuration >= 3600)}</strong><span>total time</span></div>
         </div>
       </div>
     </section>
 
     <section class="view-section">
-      <div class="section-heading"><div><h2>Jump back in</h2><p>Each source behaves like an album, even when it began as one long video.</p></div></div>
+      <div class="section-heading"><div><h2>Jump back in</h2></div></div>
       <div class="quick-grid">
         ${quick.map((source) => `
           <article class="quick-item" data-action="open-source" data-source-id="${escapeHtml(source.id)}">
@@ -409,23 +409,15 @@ function renderHome() {
     </section>
 
     <section class="view-section">
-      <div class="section-heading"><div><h2>Source albums</h2><p>Seeded sessions and anything you add in Catalog Studio.</p></div><a href="#/library" data-route>Show all</a></div>
+      <div class="section-heading"><div><h2>Albums and sessions</h2></div><a href="#/library" data-route>Show all</a></div>
       <div class="card-grid">${sources.map(sourceCard).join("")}</div>
     </section>
 
     ${recent.length ? `
       <section class="view-section">
-        <div class="section-heading"><div><h2>Recently played</h2><p>Stored locally, with no account or server.</p></div><a href="#/history" data-route>Full history</a></div>
+        <div class="section-heading"><div><h2>Recently played</h2></div><a href="#/history" data-route>See all</a></div>
         ${trackTable(recent, { prefix: recentQueueId, showSource: true })}
-      </section>` : ""}
-
-    <section class="view-section">
-      <div class="info-banner">
-        <span class="info-icon">◇</span>
-        <div><h3>Native audio library</h3><p>The included AAC sources and any local master you import play through the browser's native audio system without Acoustify re-encoding them.</p></div>
-        <button class="button ghost small-button" type="button" data-action="open-settings">Quality details</button>
-      </div>
-    </section>`;
+      </section>` : ""}`;
 }
 
 function renderSearch(route) {
@@ -433,7 +425,7 @@ function renderSearch(route) {
   const tags = [...new Set(catalog.sources.flatMap((source) => source.tags || []))].sort();
   dom.view.innerHTML = `
     <div class="page-head">
-      <div><p class="eyebrow">Find anything</p><h1>Search</h1><p>Search track titles, artists, source albums, and tags.</p></div>
+      <div><p class="eyebrow">Find a song</p><h1>Search</h1><p>Search by song, artist, album, or tag.</p></div>
     </div>
     <div class="search-box">
       <span class="search-symbol">⌕</span>
@@ -453,7 +445,7 @@ function renderSearchResults(query) {
   if (!needle) {
     container.innerHTML = `
       <section class="view-section">
-        <div class="section-heading"><div><h2>Browse every source</h2><p>${catalog.tracks.length} separated tracks are ready.</p></div></div>
+        <div class="section-heading"><div><h2>Browse all music</h2><p>${catalog.tracks.length} songs</p></div></div>
         <div class="card-grid">${catalog.sources.map(sourceCard).join("")}</div>
       </section>`;
     return;
@@ -467,9 +459,9 @@ function renderSearchResults(query) {
   });
   const queueId = registerQueue("search", tracks);
   container.innerHTML = `
-    <p class="search-summary">${tracks.length} track${tracks.length === 1 ? "" : "s"} and ${sources.length} source${sources.length === 1 ? "" : "s"} match “${escapeHtml(query)}”.</p>
-    ${sources.length ? `<section class="view-section"><div class="section-heading"><h2>Sources</h2></div><div class="card-grid">${sources.map(sourceCard).join("")}</div></section>` : ""}
-    <section class="view-section"><div class="section-heading"><h2>Tracks</h2></div>${tracks.length ? trackTable(tracks, { prefix: queueId, showSource: true }) : emptyState({ symbol: "⌕", title: "No matching tracks", copy: "Try fewer words or browse a source album." })}</section>`;
+    <p class="search-summary">${tracks.length} song${tracks.length === 1 ? "" : "s"} and ${sources.length} album${sources.length === 1 ? "" : "s"} found for “${escapeHtml(query)}”.</p>
+    ${sources.length ? `<section class="view-section"><div class="section-heading"><h2>Albums</h2></div><div class="card-grid">${sources.map(sourceCard).join("")}</div></section>` : ""}
+    <section class="view-section"><div class="section-heading"><h2>Songs</h2></div>${tracks.length ? trackTable(tracks, { prefix: queueId, showSource: true }) : emptyState({ symbol: "⌕", title: "Nothing found", copy: "Try a shorter search." })}</section>`;
 }
 
 function allSongTracks() {
@@ -480,25 +472,25 @@ function renderSongs() {
   const tracks = allSongTracks();
   dom.view.innerHTML = `
     <div class="page-head">
-      <div><p class="eyebrow">Every separated cut</p><h1>Songs</h1><p>All ${tracks.length} track${tracks.length === 1 ? "" : "s"} from ${catalog.sources.length} source${catalog.sources.length === 1 ? "" : "s"} in one list.</p></div>
+      <div><p class="eyebrow">All music</p><h1>Songs</h1><p>${tracks.length} song${tracks.length === 1 ? "" : "s"} from ${catalog.sources.length} album${catalog.sources.length === 1 ? "" : "s"}.</p></div>
       ${tracks.length ? '<div class="page-actions"><button class="button primary" type="button" data-action="play-songs">▶ Play all</button><button class="button secondary" type="button" data-action="shuffle-songs">⤨ Shuffle</button></div>' : ""}
     </div>
-    ${trackTable(tracks, { prefix: "songs", showSource: true, emptyTitle: "No tracks yet", emptyCopy: "Add a source in Catalog Studio to build your song list." })}`;
+    ${trackTable(tracks, { prefix: "songs", showSource: true, emptyTitle: "No songs yet", emptyCopy: "Add some music to get started." })}`;
 }
 
 function renderLibrary() {
   dom.view.innerHTML = `
     <div class="page-head">
-      <div><p class="eyebrow">Everything saved here</p><h1>Your Library</h1><p>Source albums, playlists, likes, and local masters live together in this browser.</p></div>
-      <div class="page-actions"><button class="button primary" type="button" data-action="go-studio">＋ Add source</button><button class="button secondary" type="button" data-action="new-playlist">＋ Playlist</button></div>
+      <div><p class="eyebrow">Your music</p><h1>Library</h1><p>Albums, playlists, and liked songs.</p></div>
+      <div class="page-actions"><button class="button primary" type="button" data-action="go-studio">＋ Add music</button><button class="button secondary" type="button" data-action="new-playlist">＋ Playlist</button></div>
     </div>
     <section class="view-section">
-      <div class="section-heading"><div><h2>Source albums</h2><p>${catalog.sources.length} long-form source${catalog.sources.length === 1 ? "" : "s"} mapped into ${catalog.tracks.length} tracks.</p></div></div>
+      <div class="section-heading"><div><h2>Albums and sessions</h2><p>${catalog.sources.length} albums · ${catalog.tracks.length} songs</p></div></div>
       <div class="card-grid">${catalog.sources.map(sourceCard).join("")}</div>
     </section>
     <section class="view-section">
-      <div class="section-heading"><div><h2>Playlists</h2><p>Your own groupings stay on this device.</p></div></div>
-      ${state.playlists.length ? `<div class="card-grid">${state.playlists.map(playlistCard).join("")}</div>` : emptyState({ symbol: "＋", title: "Build your first playlist", copy: "Group individual cuts from any source album.", action: "new-playlist", actionLabel: "Create playlist" })}
+      <div class="section-heading"><div><h2>Playlists</h2></div></div>
+      ${state.playlists.length ? `<div class="card-grid">${state.playlists.map(playlistCard).join("")}</div>` : emptyState({ symbol: "＋", title: "No playlists yet", copy: "Make one for whatever you're in the mood for.", action: "new-playlist", actionLabel: "Create playlist" })}
     </section>`;
 }
 
@@ -506,26 +498,26 @@ function renderLiked() {
   const tracks = state.liked.map((key) => catalog.trackByKey.get(key)).filter(Boolean);
   dom.view.innerHTML = `
     <div class="page-head">
-      <div><p class="eyebrow">Personal collection</p><h1>Liked Tracks</h1><p>${tracks.length} track${tracks.length === 1 ? "" : "s"} you marked for quick access.</p></div>
+      <div><p class="eyebrow">Your favorites</p><h1>Liked Songs</h1><p>${tracks.length} liked song${tracks.length === 1 ? "" : "s"}.</p></div>
       ${tracks.length ? '<div class="page-actions"><button class="button primary" type="button" data-action="play-liked">▶ Play all</button></div>' : ""}
     </div>
-    ${trackTable(tracks, { prefix: "liked", showSource: true, emptyTitle: "No liked tracks yet", emptyCopy: "Tap the heart beside any separated track to keep it here." })}`;
+    ${trackTable(tracks, { prefix: "liked", showSource: true, emptyTitle: "No liked songs yet", emptyCopy: "Tap the heart next to a song to save it here." })}`;
 }
 
 function renderHistory() {
   const tracks = uniqueHistoryTracks(100);
   dom.view.innerHTML = `
     <div class="page-head">
-      <div><p class="eyebrow">Browser memory</p><h1>Listening History</h1><p>Your most recent unique tracks. This history never leaves the browser unless you export it.</p></div>
+      <div><p class="eyebrow">Recently played</p><h1>History</h1><p>Your latest songs.</p></div>
       ${tracks.length ? '<div class="page-actions"><button class="button ghost" type="button" data-action="clear-history">Clear history</button></div>' : ""}
     </div>
-    ${trackTable(tracks, { prefix: "history", showSource: true, emptyTitle: "Nothing played yet", emptyCopy: "Start a source album and your recent listening will appear here." })}`;
+    ${trackTable(tracks, { prefix: "history", showSource: true, emptyTitle: "Nothing here yet", emptyCopy: "Songs you play will show up here." })}`;
 }
 
 function renderSource(sourceId) {
   const source = catalog.sourceById.get(sourceId);
   if (!source) {
-    dom.view.innerHTML = emptyState({ symbol: "?", title: "Source not found", copy: "It may have been removed from this browser.", action: "go-library", actionLabel: "Back to library" });
+    dom.view.innerHTML = emptyState({ symbol: "?", title: "Album not found", copy: "It may have been removed.", action: "go-library", actionLabel: "Back to library" });
     return;
   }
   const duration = formatTime(source.duration, source.duration >= 3600);
@@ -537,30 +529,26 @@ function renderSource(sourceId) {
     <section class="collection-hero">
       <img class="collection-art" ${artworkAttrs(source)} alt="${escapeHtml(source.title)} artwork">
       <div class="collection-copy">
-        <p class="eyebrow">Source album</p>
+        <p class="eyebrow">Album</p>
         <h1>${escapeHtml(source.title)}</h1>
-        <p>${escapeHtml(source.description || "A long-form source divided into individually playable tracks.")}</p>
-        <div class="collection-meta"><strong>${escapeHtml(source.artist)}</strong><span>•</span><span>${source.year || "Personal archive"}</span><span>•</span><span>${source.tracks.length} track${source.tracks.length === 1 ? "" : "s"}</span><span>•</span><span>${duration}</span><span>•</span><span>${providerLabel(source)}</span></div>
+        <p>${escapeHtml(source.description || `${source.tracks.length} songs by ${source.artist}.`)}</p>
+        <div class="collection-meta"><strong>${escapeHtml(source.artist)}</strong><span>•</span><span>${source.year || "Live session"}</span><span>•</span><span>${source.tracks.length} song${source.tracks.length === 1 ? "" : "s"}</span><span>•</span><span>${duration}</span><span>•</span><span>${providerLabel(source)}</span></div>
       </div>
     </section>
     <div class="collection-controls">
       <button class="play-button big-play" type="button" data-action="play-source" data-source-id="${escapeHtml(source.id)}" aria-label="Play source">▶</button>
       <button class="button ghost small-button" type="button" data-action="shuffle-source" data-source-id="${escapeHtml(source.id)}">⤨ Shuffle</button>
-      <button class="button ghost small-button" type="button" data-action="edit-source" data-source-id="${escapeHtml(source.id)}">${source.timingStatus === "calibration-required" ? "Calibrate cuts" : "Edit timings"}</button>
-      ${source.youtubeId ? `<button class="button secondary small-button" type="button" data-action="attach-extracted-audio" data-source-id="${escapeHtml(source.id)}">${source.provider === "local" ? "Replace local audio" : "Use local audio"}</button>` : ""}
+      <button class="button ghost small-button" type="button" data-action="edit-source" data-source-id="${escapeHtml(source.id)}">${source.timingStatus === "calibration-required" ? "Fix song times" : "Edit song times"}</button>
+      ${source.youtubeId ? `<button class="button secondary small-button" type="button" data-action="attach-extracted-audio" data-source-id="${escapeHtml(source.id)}">${source.provider === "local" ? "Change audio" : "Use my audio"}</button>` : ""}
       ${canRestoreYouTube ? `<button class="button ghost small-button" type="button" data-action="restore-youtube-source" data-source-id="${escapeHtml(source.id)}">${restoreLabel}</button>` : ""}
-      ${canOpenYouTube ? `<a class="button ghost small-button" href="https://www.youtube.com/watch?v=${encodeURIComponent(source.youtubeId)}" target="_blank" rel="noopener noreferrer">Open original ↗</a>` : ""}
+      ${canOpenYouTube ? `<a class="button ghost small-button" href="https://www.youtube.com/watch?v=${encodeURIComponent(source.youtubeId)}" target="_blank" rel="noopener noreferrer">View on YouTube ↗</a>` : ""}
     </div>
     ${source.timingStatus === "calibration-required" ? `
       <div class="info-banner warning-banner">
         <span class="info-icon">!</span>
-        <div><h3>One calibration pass recommended</h3><p>${escapeHtml(source.timingNote || "These boundaries are a first-pass map. Capture each song start while listening for precise cuts.")}</p></div>
-        <button class="button ghost small-button" type="button" data-action="edit-source" data-source-id="${escapeHtml(source.id)}">Open calibrator</button>
-      </div>` : `
-      <div class="info-banner">
-        <span class="info-icon">✓</span>
-        <div><h3>${escapeHtml(timingLabel(source))}</h3><p>${escapeHtml(source.timingNote || "Every row jumps to its own timestamp boundary in the source.")}</p></div>
-      </div>`}
+        <div><h3>Check the song times</h3><p>${escapeHtml(source.timingNote || "Listen through once and mark where each song starts.")}</p></div>
+        <button class="button ghost small-button" type="button" data-action="edit-source" data-source-id="${escapeHtml(source.id)}">Fix times</button>
+      </div>` : ""}
     <section class="view-section">
       ${trackTable(source.tracks, { prefix: `source-${source.id}`, showSource: false })}
     </section>`;
@@ -569,7 +557,7 @@ function renderSource(sourceId) {
 function renderPlaylist(playlistId) {
   const playlist = state.playlists.find((item) => item.id === playlistId);
   if (!playlist) {
-    dom.view.innerHTML = emptyState({ symbol: "?", title: "Playlist not found", copy: "It may have been deleted from local memory.", action: "go-library", actionLabel: "Back to library" });
+    dom.view.innerHTML = emptyState({ symbol: "?", title: "Playlist not found", copy: "It may have been deleted.", action: "go-library", actionLabel: "Back to library" });
     return;
   }
   const tracks = playlist.trackKeys.map((key) => catalog.trackByKey.get(key)).filter(Boolean);
@@ -580,15 +568,15 @@ function renderPlaylist(playlistId) {
       <div class="collection-copy">
         <p class="eyebrow">Playlist</p>
         <h1>${escapeHtml(playlist.name)}</h1>
-        <p>${escapeHtml(playlist.description || "A personal collection of separated tracks.")}</p>
-        <div class="collection-meta"><strong>Personal archive</strong><span>•</span><span>${tracks.length} tracks</span><span>•</span><span>${formatTime(total, total >= 3600)}</span><span>•</span><span>Updated ${relativeDate(playlist.updatedAt)}</span></div>
+        <p>${escapeHtml(playlist.description || "A playlist you made.")}</p>
+        <div class="collection-meta"><strong>My playlist</strong><span>•</span><span>${tracks.length} songs</span><span>•</span><span>${formatTime(total, total >= 3600)}</span><span>•</span><span>Updated ${relativeDate(playlist.updatedAt)}</span></div>
       </div>
     </section>
     <div class="collection-controls">
       ${tracks.length ? `<button class="play-button big-play" type="button" data-action="play-playlist" data-playlist-id="${escapeHtml(playlist.id)}">▶</button>` : ""}
       <button class="button ghost small-button" type="button" data-action="delete-playlist" data-playlist-id="${escapeHtml(playlist.id)}">Delete playlist</button>
     </div>
-    <section class="view-section">${trackTable(tracks, { prefix: `playlist-${playlist.id}`, showSource: true, playlistId: playlist.id, emptyTitle: "This playlist is empty", emptyCopy: "Use the plus button beside any track to add it here." })}</section>`;
+    <section class="view-section">${trackTable(tracks, { prefix: `playlist-${playlist.id}`, showSource: true, playlistId: playlist.id, emptyTitle: "This playlist is empty", emptyCopy: "Use the plus button next to a song to add it." })}</section>`;
 }
 
 function chapterTextForSource(source) {
@@ -599,21 +587,21 @@ function renderStudio(route) {
   const sourceId = route.params.get("source") || "";
   const source = sourceId ? catalog.sourceById.get(sourceId) : null;
   const provider = source?.provider || "youtube";
-  const chapters = source ? chapterTextForSource(source) : "0:00 First track\n3:42 Second track\n7:15 Third track";
+  const chapters = source ? chapterTextForSource(source) : "0:00 First song\n3:42 Second song\n7:15 Third song";
   const duration = source ? formatTime(source.duration, source.duration >= 3600) : "";
   const localMeta = source?.assetMeta || {};
   pendingLocalFile = null;
 
   dom.view.innerHTML = `
     <div class="page-head">
-      <div><p class="eyebrow">Catalog Studio</p><h1>${source ? "Tune a source" : "Add a source"}</h1><p>${source ? `Adjust the separated tracks for ${escapeHtml(source.title)}.` : "Turn another long YouTube upload or local master into a track-based source album."}</p></div>
-      ${source ? `<div class="page-actions"><button class="button ghost" type="button" data-action="studio-reset">＋ New source</button></div>` : ""}
+      <div><p class="eyebrow">${source ? "Edit music" : "New music"}</p><h1>${source ? "Edit album" : "Add music"}</h1><p>${source ? `Change the song times for ${escapeHtml(source.title)}.` : "Add a YouTube session or an audio file."}</p></div>
+      ${source ? `<div class="page-actions"><button class="button ghost" type="button" data-action="studio-reset">＋ Add something else</button></div>` : ""}
     </div>
 
     <div class="studio-layout">
       <section class="surface-card">
-        <h2>Source details</h2>
-        <p>Acoustify saves this catalog entry in IndexedDB. It does not upload files or mutate your GitHub repository.</p>
+        <h2>Details</h2>
+        <p>Anything you add here stays on this device.</p>
         <form id="studio-form">
           <input type="hidden" name="id" value="${escapeHtml(source?.id || "")}">
           <input type="hidden" name="assetId" value="${escapeHtml(source?.assetId || "")}">
@@ -623,36 +611,36 @@ function renderStudio(route) {
           <input type="hidden" name="assetSize" value="${escapeHtml(localMeta.size || "")}">
           <div class="form-grid">
             <fieldset class="field full provider-choice">
-              <legend>Playback source</legend>
-              <label class="provider-option"><input type="radio" name="provider" value="youtube" ${provider === "youtube" ? "checked" : ""}><span>▶ YouTube player</span></label>
-              <label class="provider-option"><input type="radio" name="provider" value="local" ${provider === "local" ? "checked" : ""}><span>◇ Local master file</span></label>
+              <legend>Where is the music?</legend>
+              <label class="provider-option"><input type="radio" name="provider" value="youtube" ${provider === "youtube" ? "checked" : ""}><span>▶ YouTube link</span></label>
+              <label class="provider-option"><input type="radio" name="provider" value="local" ${provider === "local" ? "checked" : ""}><span>◇ Audio file</span></label>
             </fieldset>
-            <label class="field"><span>Source title</span><input name="title" required maxlength="140" value="${escapeHtml(source?.title || "")}" placeholder="The Cabin Sessions"></label>
+            <label class="field"><span>Album or session name</span><input name="title" required maxlength="140" value="${escapeHtml(source?.title || "")}" placeholder="The Cabin Sessions"></label>
             <label class="field"><span>Artist</span><input name="artist" required maxlength="120" value="${escapeHtml(source?.artist || "")}" placeholder="Of Monsters and Men"></label>
-            <label class="field full youtube-field" ${provider !== "youtube" ? "hidden" : ""}><span>YouTube URL or video ID</span><input name="youtubeInput" value="${escapeHtml(source?.youtubeId || "")}" placeholder="https://youtu.be/…"><small>The video remains inside the official visible YouTube player.</small></label>
+            <label class="field full youtube-field" ${provider !== "youtube" ? "hidden" : ""}><span>YouTube link</span><input name="youtubeInput" value="${escapeHtml(source?.youtubeId || "")}" placeholder="https://youtu.be/…"><small>This will play through YouTube.</small></label>
             <div class="field full local-field" ${provider !== "local" ? "hidden" : ""}>
-              <span>Local audio master</span>
-              <label class="file-drop"><input id="local-file-input" type="file" accept="audio/*,.flac,.wav,.aiff,.aif,.m4a,.alac"><span id="local-file-label">${source?.assetId ? `<strong>${escapeHtml(localMeta.name || "File already stored")}</strong><br>Choose a replacement only when needed.` : source?.audioUrl ? `<strong>Included with Acoustify</strong><br>Choose a file only to replace the packaged audio in this browser.` : `<strong>Choose an audio file you own</strong><br>FLAC/WAV remain untouched; playback support depends on the browser.`}</span></label>
+              <span>Audio file</span>
+              <label class="file-drop"><input id="local-file-input" type="file" accept="audio/*,.flac,.wav,.aiff,.aif,.m4a,.alac"><span id="local-file-label">${source?.assetId ? `<strong>${escapeHtml(localMeta.name || "Audio saved")}</strong><br>Choose another file to replace it.` : source?.audioUrl ? `<strong>Audio included</strong><br>Choose another file to replace it on this device.` : `<strong>Choose an audio file</strong><br>Use a file you own or have permission to play.`}</span></label>
             </div>
-            <label class="field"><span>Full duration</span><input name="duration" required value="${escapeHtml(duration)}" placeholder="56:55"><small>Used to close the final track boundary.</small></label>
+            <label class="field"><span>Total length</span><input name="duration" required value="${escapeHtml(duration)}" placeholder="56:55"><small>For example, 56:55.</small></label>
             <label class="field"><span>Year</span><input name="year" inputmode="numeric" value="${escapeHtml(source?.year || "")}" placeholder="2026"></label>
-            <label class="field full"><span>Artwork URL</span><input name="artwork" value="${escapeHtml(source?.artwork || "")}" placeholder="Optional; YouTube thumbnail is automatic"></label>
-            <label class="field full"><span>Description</span><textarea name="description" rows="3" placeholder="What makes this source useful?">${escapeHtml(source?.description || "")}</textarea></label>
+            <label class="field full"><span>Cover image URL</span><input name="artwork" value="${escapeHtml(source?.artwork || "")}" placeholder="Optional"></label>
+            <label class="field full"><span>Description</span><textarea name="description" rows="3" placeholder="Optional note">${escapeHtml(source?.description || "")}</textarea></label>
             <label class="field full"><span>Tags</span><input name="tags" value="${escapeHtml((source?.tags || []).join(", "))}" placeholder="live, acoustic, rare"></label>
-            <label class="field full"><span>Track starts</span><textarea id="chapter-input" name="chapters" rows="${source ? Math.min(18, Math.max(7, source.tracks.length + 1)) : 8}" required>${escapeHtml(chapters)}</textarea><small>One line per track: <span class="mono">0:00 Song title</span>. The next start automatically becomes the current track’s end.</small></label>
+            <label class="field full"><span>Song start times</span><textarea id="chapter-input" name="chapters" rows="${source ? Math.min(18, Math.max(7, source.tracks.length + 1)) : 8}" required>${escapeHtml(chapters)}</textarea><small>One per line, like <span class="mono">0:00 Song title</span>.</small></label>
           </div>
           <div class="form-actions">
-            <button class="button ghost" type="button" data-action="preview-chapters">Preview cuts</button>
-            <button class="button primary" type="submit">${source ? "Save calibration" : "Add to library"}</button>
+            <button class="button ghost" type="button" data-action="preview-chapters">Check song list</button>
+            <button class="button primary" type="submit">${source ? "Save changes" : "Add to library"}</button>
           </div>
         </form>
       </section>
 
       <aside class="surface-card">
-        <h2>Track preview</h2>
-        <p>Confirm ordering and duration before saving.</p>
+        <h2>Songs</h2>
+        <p>Check the order and times before saving.</p>
         <div id="chapter-preview" class="preview-list"></div>
-        <div class="studio-tip">For seamless transitions, put the next track’s timestamp at the first audible moment of that track. Acoustify automatically advances when the current segment reaches that boundary.</div>
+        <div class="studio-tip">Set each time to the moment the song starts.</div>
       </aside>
 
       ${source ? renderCalibration(source) : ""}
@@ -665,10 +653,10 @@ function renderCalibration(source) {
   return `
     <section class="surface-card calibration-card" data-calibration-source="${escapeHtml(source.id)}">
       <div class="calibration-head">
-        <div><h2>Timestamp calibrator</h2><p>Play the uninterrupted source, then capture the exact start of each song. Saving the form above applies the updated cuts.</p></div>
+        <div><h2>Fix song times</h2><p>Play the full recording and mark the start of each song.</p></div>
         <div class="page-actions">
           <div class="calibration-clock"><span>Current</span><strong id="calibration-clock">0:00.0</strong></div>
-          <button class="button secondary small-button" type="button" data-action="play-calibration-source" data-source-id="${escapeHtml(source.id)}">▶ Play full source</button>
+          <button class="button secondary small-button" type="button" data-action="play-calibration-source" data-source-id="${escapeHtml(source.id)}">▶ Play full recording</button>
         </div>
       </div>
       <div class="calibration-table">
@@ -682,7 +670,7 @@ function renderCalibration(source) {
             <button class="icon-button" type="button" data-cal-action="plus" title="Move 0.5 seconds later">+.5</button>
           </div>`).join("")}
       </div>
-      <p class="calibration-help">Tip: pause at the first transient, tap ●, then use ±0.5 seconds for fine adjustment. Starts must remain strictly increasing.</p>
+      <p class="calibration-help">Pause when the song starts, tap ●, then nudge the time if needed.</p>
     </section>`;
 }
 
@@ -700,59 +688,58 @@ function renderSettings() {
   const youtubeSourceCount = catalog.sources.filter((source) => source.provider === "youtube").length;
   dom.view.innerHTML = `
     <div class="page-head">
-      <div><p class="eyebrow">Local-first controls</p><h1>Settings</h1><p>Manage playback behavior, browser memory, source overrides, and local audio storage.</p></div>
+      <div><p class="eyebrow">Acoustify</p><h1>Settings</h1></div>
     </div>
     <div class="settings-grid">
       <section class="setting-card">
-        <h3>Playback</h3><p>These choices are remembered across sessions.</p>
-        <div class="setting-row"><div><strong>Automatic next track</strong><div class="muted small">Advance at each timestamp boundary.</div></div><label class="toggle"><input id="setting-autoplay" type="checkbox" ${state.settings.autoplay ? "checked" : ""}><span></span></label></div>
+        <h3>Playback</h3>
+        <div class="setting-row"><div><strong>Play the next song</strong><div class="muted small">Keep playing through an album.</div></div><label class="toggle"><input id="setting-autoplay" type="checkbox" ${state.settings.autoplay ? "checked" : ""}><span></span></label></div>
         ${youtubeSourceCount ? `
-          <div class="setting-row"><div><strong>Open source video panel on desktop</strong><div class="muted small">Used only by custom YouTube sources.</div></div><label class="toggle"><input id="setting-panel" type="checkbox" ${state.settings.playerPanelOpen ? "checked" : ""}><span></span></label></div>
-          <label class="setting-row setting-number"><div><strong>Segment lead-in</strong><div class="muted small">Start YouTube cuts slightly before the saved timestamp.</div></div><input id="setting-lead-in" type="number" min="0" max="5" step="0.5" value="${escapeHtml(state.settings.segmentLeadIn)}" aria-label="Segment lead-in seconds"><span>sec</span></label>
-          <div class="setting-row"><div><strong>Keep screen awake for YouTube</strong><div class="muted small">${"wakeLock" in navigator ? "Stops the phone from auto-locking while a custom YouTube source plays." : "Not supported by this browser."}</div></div><label class="toggle"><input id="setting-keep-awake" type="checkbox" ${state.settings.keepScreenAwake ? "checked" : ""} ${"wakeLock" in navigator ? "" : "disabled"}><span></span></label></div>
+          <div class="setting-row"><div><strong>Show YouTube video</strong><div class="muted small">Open the video panel on desktop.</div></div><label class="toggle"><input id="setting-panel" type="checkbox" ${state.settings.playerPanelOpen ? "checked" : ""}><span></span></label></div>
+          <label class="setting-row setting-number"><div><strong>Start a little early</strong><div class="muted small">Helps avoid clipping the first note on YouTube.</div></div><input id="setting-lead-in" type="number" min="0" max="5" step="0.5" value="${escapeHtml(state.settings.segmentLeadIn)}" aria-label="Start early by this many seconds"><span>sec</span></label>
+          <div class="setting-row"><div><strong>Keep screen awake for YouTube</strong><div class="muted small">${"wakeLock" in navigator ? "Stops your phone from locking while YouTube plays." : "Not available in this browser."}</div></div><label class="toggle"><input id="setting-keep-awake" type="checkbox" ${state.settings.keepScreenAwake ? "checked" : ""} ${"wakeLock" in navigator ? "" : "disabled"}><span></span></label></div>
         ` : ""}
       </section>
       <section class="setting-card">
-        <h3>Phone app</h3><p id="install-status">${appInstalled ? "Installed on this device." : deferredInstallPrompt ? "Ready to install from Chrome." : "Running in a browser tab."}</p>
-        ${appInstalled ? "" : `<div class="setting-actions"><button id="install-app-button" class="button primary small-button" type="button" data-action="install-app" ${deferredInstallPrompt ? "" : "disabled"}>Install Acoustify</button></div>`}
-        <div class="device-status"><span>Included library</span><strong>${includedSourceCount} native-audio sources with lock-screen controls</strong></div>
-        <div class="device-status"><span>Background playback</span><strong>Continues when Chrome or the installed app is backgrounded</strong></div>
+        <h3>Install on your phone</h3><p id="install-status">${appInstalled ? "Installed on this device." : deferredInstallPrompt ? "Ready to install." : "Open Chrome's menu and choose Add to Home screen."}</p>
+        ${!appInstalled && deferredInstallPrompt ? `<div class="setting-actions"><button id="install-app-button" class="button primary small-button" type="button" data-action="install-app">Install Acoustify</button></div>` : ""}
+        <div class="device-status"><span>Included</span><strong>${includedSourceCount} albums and sessions</strong></div>
+        <div class="device-status"><span>Background play</span><strong>Keeps playing when you leave Chrome or lock your phone</strong></div>
       </section>
       <section class="setting-card">
-        <h3>Local audio</h3><p>The Pages app stores selected files unchanged. The optional desktop extractor runs locally and requires you to confirm that each download is authorized.</p>
-        <div class="setting-actions"><a class="button secondary small-button" href="./downloads/youtube_podcast_audio_extractor.zip" download>Download extractor</a><button class="button primary small-button" type="button" data-action="attach-extracted-audio">Import extracted audio</button></div>
-        <div class="info-banner"><span class="info-icon">◇</span><div><h3>Built-in native playback</h3><p>Every packaged song already uses included AAC audio. Import matching remains available for future links or personal replacements.</p></div></div>
+        <h3>Add audio files</h3><p>Import your own files or use the extractor for music you have permission to download.</p>
+        <div class="setting-actions"><a class="button secondary small-button" href="./downloads/youtube_podcast_audio_extractor.zip" download>Get extractor</a><button class="button primary small-button" type="button" data-action="attach-extracted-audio">Import audio</button></div>
       </section>
       ${youtubeSourceCount ? `<section class="setting-card">
-        <h3>YouTube ads</h3><p>Ads come from YouTube and Acoustify cannot remove them. When one plays, a banner appears with a shortcut to the video so you can use YouTube's own Skip button. The player also avoids reloading the video between tracks, which reduces how often pre-roll ads can appear.</p>
-        <div class="device-status"><span>Ad-free options</span><strong>A YouTube Premium account signed into this browser removes ads from embeds; local masters never have ads</strong></div>
+        <h3>YouTube ads</h3><p>YouTube may play ads. Open the video when you need its Skip button.</p>
+        <div class="device-status"><span>No ads</span><strong>Included audio and your own files never have YouTube ads</strong></div>
       </section>` : ""}
       <section class="setting-card">
-        <h3>Browser storage</h3><p id="storage-description">Checking storage usage…</p>
+        <h3>Storage on this device</h3><p id="storage-description">Checking storage…</p>
         <div class="storage-meter"><span id="storage-meter-fill"></span></div>
         <div class="storage-copy"><span id="storage-used">—</span><span id="storage-quota">—</span></div>
-        <div class="setting-actions" style="margin-top:15px"><button class="button secondary small-button" type="button" data-action="request-persistent">Request persistent storage</button><button class="button ghost small-button" type="button" data-action="clear-local-audio">Clear local audio</button></div>
+        <div class="setting-actions" style="margin-top:15px"><button class="button secondary small-button" type="button" data-action="request-persistent">Keep data on this device</button><button class="button ghost small-button" type="button" data-action="clear-local-audio">Clear imported audio</button></div>
       </section>
       <section class="setting-card">
-        <h3>Memory backup</h3><p>Export likes, history, playlists, settings, and catalog entries as JSON. Large local audio Blobs are intentionally not included.</p>
-        <div class="setting-actions"><button class="button secondary small-button" type="button" data-action="export-memory">Export memory</button><button class="button ghost small-button" type="button" data-action="import-memory">Import memory</button><button class="button danger small-button" type="button" data-action="reset-memory">Reset app memory</button></div>
+        <h3>Backup</h3><p>Save your likes, history, playlists, settings, and added music. Audio files are not included.</p>
+        <div class="setting-actions"><button class="button secondary small-button" type="button" data-action="export-memory">Export backup</button><button class="button ghost small-button" type="button" data-action="import-memory">Import backup</button><button class="button danger small-button" type="button" data-action="reset-memory">Reset Acoustify</button></div>
       </section>
       <section class="setting-card" style="grid-column:1/-1">
-        <h3>Catalog entries and overrides</h3><p>Editing a built-in source creates a browser override. Removing that override restores the packaged catalog. Custom entries disappear when their local override is removed.</p>
+        <h3>Albums and sessions</h3><p>Edit your music or reset anything you've changed.</p>
         <div class="source-manager">
           ${catalog.sources.map((source) => `
             <div class="source-manager-row">
               <img ${artworkAttrs(source)} alt="">
-              <div><strong>${escapeHtml(source.title)}</strong><span>${escapeHtml(source.artist)} · ${timingLabel(source)}${sourceIsUserOverride(source.id) ? " · browser override" : " · packaged"}</span></div>
+              <div><strong>${escapeHtml(source.title)}</strong><span>${escapeHtml(source.artist)} · ${timingLabel(source)}${sourceIsUserOverride(source.id) ? " · changed" : " · included"}</span></div>
               <div class="page-actions">
                 <button class="button ghost small-button" type="button" data-action="edit-source" data-source-id="${escapeHtml(source.id)}">Edit</button>
                 ${sourceIsUserOverride(source.id) ? source.provider === "local" && source.youtubeId
                   ? `<button class="button ghost small-button" type="button" data-action="restore-youtube-source" data-source-id="${escapeHtml(source.id)}">${baseCatalog.sources.find((item) => item.id === source.id)?.provider === "local" ? "Use included audio" : "Use YouTube"}</button>`
-                  : `<button class="button ghost small-button" type="button" data-action="delete-user-source" data-source-id="${escapeHtml(source.id)}">Remove override</button>` : ""}
+                  : `<button class="button ghost small-button" type="button" data-action="delete-user-source" data-source-id="${escapeHtml(source.id)}">Reset</button>` : ""}
               </div>
             </div>`).join("")}
         </div>
-        <div class="setting-actions" style="margin-top:15px"><button class="button secondary small-button" type="button" data-action="export-catalog">Export custom catalog</button><button class="button primary small-button" type="button" data-action="go-studio">＋ Add source</button></div>
+        <div class="setting-actions" style="margin-top:15px"><button class="button secondary small-button" type="button" data-action="export-catalog">Export music list</button><button class="button primary small-button" type="button" data-action="go-studio">＋ Add music</button></div>
       </section>
     </div>`;
   refreshStorageEstimate();
@@ -761,12 +748,12 @@ function renderSettings() {
 function updateInstallState() {
   const status = document.getElementById("install-status");
   const button = document.getElementById("install-app-button");
-  if (status) status.textContent = appInstalled ? "Installed on this device." : deferredInstallPrompt ? "Ready to install from Chrome." : "Running in a browser tab.";
+  if (status) status.textContent = appInstalled ? "Installed on this device." : deferredInstallPrompt ? "Ready to install." : "Open Chrome's menu and choose Add to Home screen.";
   if (button) button.disabled = !deferredInstallPrompt;
 }
 
 function renderNotFound() {
-  dom.view.innerHTML = emptyState({ symbol: "?", title: "Page not found", copy: "This route does not exist in Acoustify.", action: "go-home", actionLabel: "Go home" });
+  dom.view.innerHTML = emptyState({ symbol: "?", title: "Page not found", copy: "That page doesn't exist.", action: "go-home", actionLabel: "Go home" });
 }
 
 function renderRoute() {
@@ -795,9 +782,9 @@ function renderRoute() {
 }
 
 function pageTitle(route) {
-  if (route.name === "source") return catalog.sourceById.get(route.segments[1])?.title || "Source";
+  if (route.name === "source") return catalog.sourceById.get(route.segments[1])?.title || "Album";
   if (route.name === "playlist") return state.playlists.find((item) => item.id === route.segments[1])?.name || "Playlist";
-  const labels = { home: "Home", search: "Search", songs: "Songs", library: "Your Library", liked: "Liked Tracks", history: "History", studio: "Catalog Studio", settings: "Settings" };
+  const labels = { home: "Home", search: "Search", songs: "Songs", library: "Library", liked: "Liked Songs", history: "History", studio: "Add Music", settings: "Settings" };
   return labels[route.name] || "Acoustify";
 }
 
@@ -845,13 +832,13 @@ function renderPlayerSnapshot(snapshot = player?.snapshot()) {
   dom.barArtwork.src = art;
   dom.barArtwork.onerror = () => { dom.barArtwork.src = "./assets/icons/icon-192.png"; };
   dom.barTrackTitle.textContent = track.title;
-  dom.barTrackArtist.textContent = `${track.artist} · ${source?.title || track.sourceTitle || "Source"}`;
+  dom.barTrackArtist.textContent = `${track.artist} · ${source?.title || track.sourceTitle || "Album"}`;
   dom.panelTrackTitle.textContent = track.title;
   dom.panelArtwork.src = art;
   dom.panelArtwork.onerror = () => { dom.panelArtwork.src = "./assets/icons/icon-512.png"; };
   dom.panelTitle.textContent = track.title;
   dom.panelArtist.textContent = track.artist;
-  dom.sourceNote.textContent = source?.timingNote || "Playback is bounded by this track’s saved start and end timestamps.";
+  dom.sourceNote.textContent = source?.provider === "youtube" ? "Playing from YouTube." : "Plays in the background.";
   dom.qualityReadout.innerHTML = `<span class="quality-dot"></span><span>${escapeHtml(snapshot.qualityLabel || "Preparing playback")}</span>`;
   dom.playButton.textContent = snapshot.isPlaying ? "Ⅱ" : "▶";
   dom.playButton.setAttribute("aria-label", snapshot.isPlaying ? "Pause" : "Play");
@@ -910,9 +897,9 @@ function renderPersistedPlaybackPreview() {
 
 function renderQueue(snapshot) {
   const tracks = snapshot.queue.map((key) => catalog.trackByKey.get(key)).filter(Boolean);
-  dom.queueCount.textContent = `${tracks.length} track${tracks.length === 1 ? "" : "s"}`;
+  dom.queueCount.textContent = `${tracks.length} song${tracks.length === 1 ? "" : "s"}`;
   if (!tracks.length) {
-    dom.queueList.innerHTML = '<div class="muted small" style="padding:12px 5px">A queue appears when you start a source or playlist.</div>';
+    dom.queueList.innerHTML = '<div class="muted small" style="padding:12px 5px">Songs will show up here when you start playing.</div>';
     return;
   }
   dom.queueList.innerHTML = tracks.map((track, index) => `
@@ -938,7 +925,7 @@ function syncLikeButtons() {
     const liked = state.liked.includes(button.dataset.trackKey);
     button.classList.toggle("active", liked);
     button.textContent = liked ? "♥" : "♡";
-    button.setAttribute("aria-label", liked ? "Unlike track" : "Like track");
+    button.setAttribute("aria-label", liked ? "Unlike song" : "Like song");
   });
   const key = player?.currentTrack?.key || state.playback.trackKey;
   const liked = key ? state.liked.includes(key) : false;
@@ -948,7 +935,7 @@ function syncLikeButtons() {
 
 async function playTrack(trackKey, queue = null, { resume = false } = {}) {
   const track = catalog.trackByKey.get(trackKey);
-  if (!track) return toast("That track is no longer in the catalog.", "error");
+  if (!track) return toast("That song isn't in your library anymore.", "error");
   const resumePosition = resume && state.playback.trackKey === trackKey ? state.playback.absolutePosition : null;
   try {
     await player.loadByKey(trackKey, { autoplay: true, queue, resumePosition });
@@ -968,7 +955,7 @@ async function playSource(sourceId, { shuffle = false } = {}) {
 async function playPlaylist(playlistId) {
   const playlist = state.playlists.find((item) => item.id === playlistId);
   const keys = playlist?.trackKeys.filter((key) => catalog.trackByKey.has(key)) || [];
-  if (!keys.length) return toast("This playlist has no playable tracks yet.");
+  if (!keys.length) return toast("This playlist is empty.");
   await playTrack(keys[0], keys);
 }
 
@@ -993,7 +980,7 @@ function toggleLike(trackKey) {
 function openPlaylistDialog(trackKey = "") {
   dom.playlistForm.reset();
   dom.playlistForm.elements.trackKey.value = trackKey;
-  dom.playlistDialogTitle.textContent = trackKey ? "Create playlist and add track" : "Create playlist";
+  dom.playlistDialogTitle.textContent = trackKey ? "Create playlist and add song" : "Create playlist";
   dom.playlistDialog.showModal();
   setTimeout(() => dom.playlistForm.elements.name.focus(), 20);
 }
@@ -1007,7 +994,7 @@ function openAddToPlaylistDialog(trackKey) {
   dom.addDialogList.innerHTML = state.playlists.map((playlist) => `
     <button type="button" data-action="add-track-to-playlist" data-playlist-id="${escapeHtml(playlist.id)}">
       <span class="playlist-placeholder" style="display:grid;place-items:center;width:42px;height:42px;border-radius:5px;background:#173d25;color:#49e683">♫</span>
-      <span><strong>${escapeHtml(playlist.name)}</strong><span>${playlist.trackKeys.length} track${playlist.trackKeys.length === 1 ? "" : "s"}</span></span>
+      <span><strong>${escapeHtml(playlist.name)}</strong><span>${playlist.trackKeys.length} song${playlist.trackKeys.length === 1 ? "" : "s"}</span></span>
       <span>＋</span>
     </button>`).join("");
   dom.addDialog.showModal();
@@ -1099,7 +1086,7 @@ async function playCalibrationSource(sourceId) {
     id: "calibration-stream",
     key: `${source.id}::__calibration-stream`,
     sourceId: source.id,
-    title: `${source.title} — full calibration stream`,
+    title: `${source.title} — full recording`,
     artist: source.artist,
     sourceTitle: source.title,
     artwork: source.artwork,
@@ -1110,7 +1097,7 @@ async function playCalibrationSource(sourceId) {
   try {
     await player.load(calibrationTrack, source, { autoplay: true, queue: [], preciseStart: true });
     setPanelOpen(true);
-    toast("Full source is playing. Capture each boundary with ●.", "success");
+    toast("Full recording is playing. Tap ● when each song starts.", "success");
   } catch (error) {
     toast(error.message, "error", 6500);
   }
@@ -1128,7 +1115,7 @@ async function handleLocalFile(file) {
     if (form && !form.elements.title.value.trim()) form.elements.title.value = file.name.replace(/\.[^.]+$/, "");
     previewStudioChapters(false);
   } catch (error) {
-    toast(`File selected, but duration could not be read: ${error.message}`, "error");
+    toast(`Couldn't read the length of that file: ${error.message}`, "error");
   }
 }
 
@@ -1242,7 +1229,7 @@ async function handleExtractedAudioFile(file, requestedSourceId = "", { quiet = 
   requestPersistentStorage().catch(() => false);
   refreshStorageEstimate();
   if (!quiet) {
-    toast(reloadFailed ? `${override.title} now uses local audio. Tap Play to reload it.` : `${override.title} now uses local audio.`, "success", 5200);
+    toast(reloadFailed ? `${override.title} now uses your audio. Tap Play to reload it.` : `${override.title} now uses your audio.`, "success", 5200);
     navigate(`source/${encodeURIComponent(override.id)}`);
   }
   return { override, reloadFailed };
@@ -1297,7 +1284,7 @@ async function restoreYouTubeSource(sourceId) {
   if (userSource.assetId) await deleteAudioAsset(userSource.assetId).catch(() => {});
   refreshStorageEstimate();
   const restoredSource = catalog.sourceById.get(sourceId);
-  toast(`${source.title} now uses ${providerLabel(restoredSource).toLowerCase()} playback.`, "success");
+  toast(`${source.title} now uses ${providerLabel(restoredSource).toLowerCase()}.`, "success");
   navigate(`source/${encodeURIComponent(sourceId)}`);
 }
 
@@ -1380,7 +1367,7 @@ async function saveStudioForm(form) {
   await setValue(STATE_KEY, state);
   rebuildCatalog();
   pendingLocalFile = null;
-  toast(`${source.title} saved to this browser.`, "success");
+  toast(`${source.title} saved.`, "success");
   navigate(`source/${encodeURIComponent(source.id)}`);
 }
 
@@ -1399,7 +1386,7 @@ async function refreshStorageEstimate() {
     fill.style.width = `${clamp(percentage, 0, 100)}%`;
     used.textContent = `${formatBytes(usage)} used`;
     quota.textContent = `${formatBytes(available)} available quota`;
-    description.textContent = "Includes app memory, cached shell files, and any local masters stored by this origin.";
+    description.textContent = "Includes Acoustify data and any audio files you've imported.";
   } catch (error) {
     description.textContent = error.message;
   }
@@ -1523,7 +1510,7 @@ async function handleAction(action, element, event) {
     case "next": await player.next(); break;
     case "show-video-for-ad": setPanelOpen(true); break;
     case "video-fullscreen": {
-      if (!(await player.enterVideoFullscreen())) toast("Fullscreen is available while a YouTube source is playing.", "info");
+      if (!(await player.enterVideoFullscreen())) toast("Play something from YouTube first.", "info");
       break;
     }
     case "play-songs": {
@@ -1550,7 +1537,7 @@ async function handleAction(action, element, event) {
     case "cycle-repeat": player.cycleRepeat(); break;
     case "install-app": {
       if (!deferredInstallPrompt) {
-        toast("Chrome has not offered installation on this device yet.", "info");
+        toast("Use Chrome's menu and choose Add to Home screen.", "info");
         break;
       }
       const prompt = deferredInstallPrompt;
@@ -1579,7 +1566,7 @@ async function handleAction(action, element, event) {
     case "delete-playlist": {
       const playlist = state.playlists.find((item) => item.id === playlistId);
       if (!playlist) break;
-      confirmAction("Delete playlist?", `“${playlist.name}” will be removed from this browser. Its source tracks stay in the library.`, () => {
+      confirmAction("Delete playlist?", `“${playlist.name}” will be deleted. The songs will stay in your library.`, () => {
         state.playlists = state.playlists.filter((item) => item.id !== playlistId);
         persistState();
         renderPlaylistNav();
@@ -1597,7 +1584,7 @@ async function handleAction(action, element, event) {
       await callback?.();
       break;
     }
-    case "clear-history": confirmAction("Clear listening history?", "Likes, playlists, and sources will remain. This only removes recently played entries.", () => {
+    case "clear-history": confirmAction("Clear history?", "Your liked songs, playlists, and albums will stay.", () => {
       state.history = [];
       persistState();
       renderRoute();
@@ -1612,14 +1599,14 @@ async function handleAction(action, element, event) {
       const source = catalog.sourceById.get(sourceId);
       if (!source) break;
       const restoresIncludedAudio = baseCatalog.sources.find((item) => item.id === sourceId)?.provider === "local";
-      confirmAction(restoresIncludedAudio ? "Use included audio?" : "Use YouTube playback?", `The imported audio for “${source.title}” will be removed from this browser. Its saved timestamps will remain.`, () => restoreYouTubeSource(sourceId));
+      confirmAction(restoresIncludedAudio ? "Use included audio?" : "Use YouTube?", `Your imported audio for “${source.title}” will be removed. The song times will stay the same.`, () => restoreYouTubeSource(sourceId));
       break;
     }
     case "delete-user-source": {
       const source = catalog.sourceById.get(sourceId);
-      confirmAction("Remove browser override?", sourceIsPackaged(sourceId)
-        ? `Your changes to “${source?.title || sourceId}” will be removed and the packaged version will return.`
-        : `“${source?.title || sourceId}” will be removed from this browser.`, async () => {
+      confirmAction(sourceIsPackaged(sourceId) ? "Reset changes?" : "Remove this album?", sourceIsPackaged(sourceId)
+        ? `“${source?.title || sourceId}” will go back to the included version.`
+        : `“${source?.title || sourceId}” will be removed from Acoustify.`, async () => {
           const userSource = state.userSources.find((item) => item.id === sourceId);
           if (userSource?.provider === "local" && userSource.assetId) await deleteAudioAsset(userSource.assetId).catch(() => {});
           state.userSources = state.userSources.filter((item) => item.id !== sourceId);
@@ -1649,26 +1636,26 @@ async function handleAction(action, element, event) {
         note: "Local audio file Blobs are not included.",
         state
       });
-      toast("Memory backup exported.", "success");
+      toast("Backup downloaded.", "success");
       break;
     }
     case "import-memory": dom.memoryImport.click(); break;
     case "export-catalog": {
       downloadJson(`acoustify-custom-catalog-${new Date().toISOString().slice(0,10)}.json`, { version: 1, sources: state.userSources });
-      toast("Custom catalog exported.", "success");
+      toast("Music list downloaded.", "success");
       break;
     }
     case "request-persistent": {
       const granted = await requestPersistentStorage();
-      toast(granted ? "Browser granted persistent storage." : "Persistent storage was not granted; exports remain your safest backup.", granted ? "success" : "info");
+      toast(granted ? "Your browser will keep Acoustify's data on this device." : "Your browser could not promise to keep the data. Download a backup to be safe.", granted ? "success" : "info");
       break;
     }
-    case "clear-local-audio": confirmAction("Clear local audio files?", "Stored audio Blobs will be deleted. Local catalog entries will remain but cannot play until their files are re-imported.", async () => {
+    case "clear-local-audio": confirmAction("Clear imported audio?", "Your imported files will be deleted. Add them again if you want to play them later.", async () => {
       await clearAudioAssets();
-      toast("Local audio storage cleared.", "success");
+      toast("Imported audio cleared.", "success");
       refreshStorageEstimate();
     }); break;
-    case "reset-memory": confirmAction("Reset Acoustify memory?", "This clears likes, history, playlists, settings, and browser catalog overrides. Local audio files are cleared too.", async () => {
+    case "reset-memory": confirmAction("Reset Acoustify?", "This clears your likes, history, playlists, settings, changes, and imported audio.", async () => {
       await player.pause().catch(() => {});
       await clearAudioAssets();
       state = deepClone(DEFAULT_STATE);
@@ -1853,7 +1840,7 @@ function wireDomEvents() {
       const parsed = JSON.parse(await file.text());
       const imported = parsed.state || parsed;
       const normalized = normalizeState(imported);
-      if (!Array.isArray(normalized.userSources)) throw new Error("The file does not contain valid Acoustify memory.");
+      if (!Array.isArray(normalized.userSources)) throw new Error("That does not look like an Acoustify backup.");
       for (const source of normalized.userSources) validateCatalog({ version: 1, sources: [source] });
       state = normalized;
       await setValue(STATE_KEY, state);
@@ -1861,7 +1848,7 @@ function wireDomEvents() {
       player.configure(state.settings);
       renderRoute();
       renderPersistedPlaybackPreview();
-      toast("Memory backup imported. Local audio files must remain in this browser or be re-imported.", "success", 6000);
+      toast("Backup restored. You may need to import your audio files again.", "success", 6000);
     } catch (error) {
       toast(`Import failed: ${error.message}`, "error", 6500);
     }
@@ -1879,14 +1866,14 @@ function wireDomEvents() {
         await handleExtractedAudioFile(files[0], requestedSourceId);
       } catch (error) {
         console.error(error);
-        toast(`Audio import failed: ${error.message}`, "error", 7000);
+        toast(`Couldn't import that audio: ${error.message}`, "error", 7000);
       }
       return;
     }
 
     const imported = [];
     const failures = [];
-    toast(`Importing ${files.length} extracted audio files...`, "info", 8000);
+    toast(`Importing ${files.length} audio files...`, "info", 8000);
     for (const file of files) {
       try {
         const result = await handleExtractedAudioFile(file, "", { quiet: true });
@@ -1898,7 +1885,7 @@ function wireDomEvents() {
     }
     navigate("settings");
     if (imported.length) {
-      toast(`${imported.length} source${imported.length === 1 ? "" : "s"} now use local audio.`, "success", 6000);
+      toast(`${imported.length} album${imported.length === 1 ? "" : "s"} now use your audio.`, "success", 6000);
     }
     if (failures.length) {
       toast(`${failures.length} file${failures.length === 1 ? "" : "s"} could not be imported. ${failures[0].file}: ${failures[0].error.message}`, "error", 9000);
@@ -1927,7 +1914,7 @@ async function registerServiceWorker() {
 }
 
 async function init() {
-  dom.view.innerHTML = '<div class="loading-view"><div><div class="loading-disc"></div><p>Opening your archive…</p></div></div>';
+  dom.view.innerHTML = '<div class="loading-view"><div><div class="loading-disc"></div><p>Loading your music…</p></div></div>';
   try {
     [baseCatalog, state] = await Promise.all([
       loadBaseCatalog(),
@@ -1953,7 +1940,7 @@ async function init() {
     registerServiceWorker();
   } catch (error) {
     console.error(error);
-    dom.view.innerHTML = `<div class="error-view"><p class="eyebrow">Startup error</p><h1>Acoustify could not open</h1><p>${escapeHtml(error.message)}</p><button class="button primary" type="button" onclick="location.reload()">Try again</button></div>`;
+    dom.view.innerHTML = `<div class="error-view"><p class="eyebrow">Something went wrong</p><h1>Couldn't open Acoustify</h1><p>${escapeHtml(error.message)}</p><button class="button primary" type="button" onclick="location.reload()">Try again</button></div>`;
   }
 }
 

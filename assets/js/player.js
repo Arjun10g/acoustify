@@ -176,14 +176,14 @@ export class PlaybackController extends EventTarget {
 
   async loadByKey(trackKey, options = {}) {
     const track = this.resolveTrack(trackKey);
-    if (!track) throw new Error("That track is no longer in the catalog.");
+    if (!track) throw new Error("That song isn't in your library anymore.");
     const source = this.resolveSource(track.sourceId);
-    if (!source) throw new Error("The track source could not be found.");
+    if (!source) throw new Error("That album could not be found.");
     return this.load(track, source, options);
   }
 
   async load(track, source, { autoplay = true, resumePosition = null, queue = null, preciseStart = false } = {}) {
-    if (!track || !source) throw new Error("A track and source are required.");
+    if (!track || !source) throw new Error("Choose a song to play.");
     if (queue) this.setQueue(queue, track.key);
     else if (!this.queue.includes(track.key)) this.setQueue(source.tracks.map((item) => item.key), track.key);
     else this.queueIndex = this.queue.indexOf(track.key);
@@ -249,7 +249,7 @@ export class PlaybackController extends EventTarget {
           onStateChange: (event) => this.#onYouTubeState(event),
           onPlaybackQualityChange: (event) => {
             const quality = String(event.data || "auto").replace("hd", "HD ").toUpperCase();
-            this.qualityLabel = `YouTube adaptive · ${quality}`;
+            this.qualityLabel = `YouTube · ${quality}`;
             this.emit("qualitychange", this.snapshot());
           },
           onError: (event) => {
@@ -261,7 +261,7 @@ export class PlaybackController extends EventTarget {
     } else if (this.youtubeReady) {
       this.#applyPendingYouTubeLoad();
     }
-    this.qualityLabel = "YouTube adaptive · highest available chosen by YouTube";
+    this.qualityLabel = "Playing from YouTube";
     this.emit("qualitychange", this.snapshot());
   }
 
@@ -338,16 +338,16 @@ export class PlaybackController extends EventTarget {
       if (this.localObjectUrl) URL.revokeObjectURL(this.localObjectUrl);
       this.localObjectUrl = URL.createObjectURL(asset.blob);
       this.localAudio.src = this.localObjectUrl;
-      this.qualityLabel = `Original local file · ${asset.type || "audio"} · no app re-encoding`;
+      this.qualityLabel = "Your audio file";
     } else if (source.audioUrl) {
       if (this.localObjectUrl) URL.revokeObjectURL(this.localObjectUrl);
       this.localObjectUrl = null;
       const packagedUrl = new URL(source.audioUrl, document.baseURI).href;
       shouldLoad = this.localAudio.src !== packagedUrl || this.localAudio.readyState === 0;
       if (shouldLoad) this.localAudio.src = packagedUrl;
-      this.qualityLabel = "Included AAC audio · native background playback";
+      this.qualityLabel = "Included audio · background play";
     } else {
-      throw new Error("This local audio file is not stored in this browser. Re-import it in Catalog Studio.");
+      throw new Error("That audio file isn't on this device. Import it again from Settings.");
     }
     this.localAudio.volume = this.volume;
     this.localArtwork.src = safeArtwork(source);
@@ -435,7 +435,7 @@ export class PlaybackController extends EventTarget {
         const reportedQuality = this.youtubePlayer.getPlaybackQuality?.();
         if (reportedQuality && reportedQuality !== "unknown") {
           const quality = String(reportedQuality).replace("hd", "HD ").toUpperCase();
-          const label = `YouTube adaptive · ${quality}`;
+          const label = `YouTube · ${quality}`;
           if (label !== this.qualityLabel) {
             this.qualityLabel = label;
             this.emit("qualitychange", this.snapshot());

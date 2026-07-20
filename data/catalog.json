@@ -12,9 +12,9 @@
       "duration": 2233,
       "artwork": "./assets/artwork/JoUq869LXeA.jpg",
       "fallbackArtwork": "./assets/artwork/JoUq869LXeA.jpg",
-      "description": "A live source film divided into seven individually playable songs.",
+      "description": "Seven songs from Of Monsters and Men's Live from Skarkali set.",
       "timingStatus": "comment-derived",
-      "timingNote": "Starts follow a highly rated timestamp list in the YouTube comments. Where two credible lists differed, the earlier start was chosen to preserve the full opening of each song.",
+      "timingNote": "Song times come from two timestamped comments. The earlier time is used when they differ.",
       "tags": [
         "live",
         "iceland",
@@ -83,9 +83,9 @@
       "duration": 3416,
       "artwork": "./assets/artwork/Y25LDO6OLzQ.jpg",
       "fallbackArtwork": "./assets/artwork/Y25LDO6OLzQ.jpg",
-      "description": "The full Cabin Sessions performance divided into fourteen individual tracks.",
+      "description": "Fourteen songs from Of Monsters and Men's Cabin Sessions.",
       "timingStatus": "comment-derived",
-      "timingNote": "Starts follow the complete timestamp list in the top YouTube comment, endorsed by about 8,200 viewers when checked. Catalog Studio can still nudge any boundary without editing code.",
+      "timingNote": "Song times come from the top timestamped comment on YouTube.",
       "tags": [
         "acoustic",
         "session",
@@ -202,9 +202,9 @@
       "duration": 221,
       "artwork": "./assets/artwork/BuUkI05OLHQ.jpg",
       "fallbackArtwork": "./assets/artwork/BuUkI05OLHQ.jpg",
-      "description": "Imported from a provided YouTube link.",
+      "description": "Lord Huron performing The Night We Met at Austin City Limits Radio.",
       "timingStatus": "single-track",
-      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "timingNote": "Single-song performance.",
       "tags": [
         "live",
         "acoustic"
@@ -229,9 +229,9 @@
       "duration": 185,
       "artwork": "./assets/artwork/nuUVSzwAE0A.jpg",
       "fallbackArtwork": "./assets/artwork/nuUVSzwAE0A.jpg",
-      "description": "Imported from a provided YouTube link.",
+      "description": "Chance Peña performing Sleep Deprivation at Austin City Limits Radio.",
       "timingStatus": "single-track",
-      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "timingNote": "Single-song performance.",
       "tags": [
         "live",
         "acoustic"
@@ -256,9 +256,9 @@
       "duration": 1172,
       "artwork": "./assets/artwork/J1vTi9ycpiA.jpg",
       "fallbackArtwork": "./assets/artwork/J1vTi9ycpiA.jpg",
-      "description": "Imported from a provided YouTube link.",
+      "description": "Caamp's four-song Tiny Desk concert.",
       "timingStatus": "user-calibrated",
-      "timingNote": "Track starts follow the timestamped list in the YouTube comments. By and By begins at 0:12, after the spoken intro.",
+      "timingNote": "Song times come from a timestamped comment. By and By starts after the spoken intro.",
       "tags": [
         "session",
         "live",
@@ -305,9 +305,9 @@
       "duration": 1341,
       "artwork": "./assets/artwork/uJ3Pusp6R_s.jpg",
       "fallbackArtwork": "./assets/artwork/uJ3Pusp6R_s.jpg",
-      "description": "Imported from a provided YouTube link.",
+      "description": "The Red Clay Strays' five-song Tiny Desk concert.",
       "timingStatus": "user-calibrated",
-      "timingNote": "Track starts follow a timestamped comment. Between-song talk lands at the end of the preceding cut; refine in Catalog Studio if needed.",
+      "timingNote": "Song times come from a timestamped comment. Between-song talk stays with the song before it.",
       "tags": [
         "session",
         "live",
@@ -361,9 +361,9 @@
       "duration": 239,
       "artwork": "./assets/artwork/HbYhMAI4tL4.jpg",
       "fallbackArtwork": "./assets/artwork/HbYhMAI4tL4.jpg",
-      "description": "Imported from a provided YouTube link.",
+      "description": "Kodaline performing Brother on the streets of Warsaw.",
       "timingStatus": "single-track",
-      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "timingNote": "Single-song performance.",
       "tags": [
         "acoustic"
       ],
@@ -387,9 +387,9 @@
       "duration": 529,
       "artwork": "./assets/artwork/jGUASAxXwg4.jpg",
       "fallbackArtwork": "./assets/artwork/jGUASAxXwg4.jpg",
-      "description": "Imported from a provided YouTube link.",
+      "description": "A live performance of All I Want by Kodaline.",
       "timingStatus": "single-track",
-      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "timingNote": "Single-song performance.",
       "tags": [
         "live"
       ],
@@ -413,9 +413,9 @@
       "duration": 243,
       "artwork": "./assets/artwork/kTlaky9zzhw.jpg",
       "fallbackArtwork": "./assets/artwork/kTlaky9zzhw.jpg",
-      "description": "Imported from a provided YouTube link.",
+      "description": "The Red Clay Strays performing Wondering Why at Austin City Limits Radio.",
       "timingStatus": "single-track",
-      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "timingNote": "Single-song performance.",
       "tags": [
         "live"
       ],
@@ -439,9 +439,9 @@
       "duration": 263,
       "artwork": "./assets/artwork/RdF2zb3KjZE.jpg",
       "fallbackArtwork": "./assets/artwork/RdF2zb3KjZE.jpg",
-      "description": "Imported from a provided YouTube link.",
+      "description": "The White Buffalo performing Oh Darlin' What Have I Done at Audiotree Live.",
       "timingStatus": "single-track",
-      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "timingNote": "Single-song performance.",
       "tags": [
         "live",
         "session"
