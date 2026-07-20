@@ -148,12 +148,14 @@
         <div class="transport-buttons">
           <button class="icon-button mode-button" type="button" data-action="toggle-shuffle" id="shuffle-button" aria-label="Toggle shuffle">⤨</button>
           <button class="icon-button" type="button" data-action="previous" aria-label="Previous track">◀</button>
+          <button class="icon-button seek-button" type="button" data-action="seek-back" aria-label="Back 10 seconds">−10</button>
           <button class="play-button" type="button" data-action="toggle-play" id="play-button" aria-label="Play">▶</button>
+          <button class="icon-button seek-button" type="button" data-action="seek-forward" aria-label="Forward 10 seconds">+10</button>
           <button class="icon-button" type="button" data-action="next" aria-label="Next track">▶</button>
           <button class="icon-button mode-button" type="button" data-action="cycle-repeat" id="repeat-button" aria-label="Change repeat mode">↻</button>
         </div>
         <div class="progress-row">
-          <span id="elapsed-time">0:00</span>
+          <button id="elapsed-time" class="time-button" type="button" data-action="jump-to-time" title="Jump to a specific time">0:00</button>
           <input id="progress-control" type="range" min="0" max="1000" value="0" aria-label="Track position">
           <span id="duration-time">0:00</span>
         </div>

@@ -25,8 +25,9 @@ const repeatedTitles = parseChapterLines("0:00 Intro\n1:00 Intro\n2:00 Intro", 1
 assert.deepEqual(repeatedTitles.map((track) => track.id), ["intro", "intro-2", "intro-3"]);
 
 const indexed = buildCatalogIndex(base);
-assert.equal(indexed.sources.length, 2);
-assert.equal(indexed.tracks.length, 21);
+assert.ok(indexed.sources.length >= 2);
+assert.equal(indexed.sources.length, base.sources.length);
+assert.equal(indexed.tracks.length, base.sources.reduce((total, source) => total + source.tracks.length, 0));
 assert.equal(indexed.trackByKey.get("of-monsters-and-men-the-cabin-sessions::six-weeks").start, 1130);
 
 const cabinQueue = indexed.sourceById.get("of-monsters-and-men-the-cabin-sessions").tracks.map((track) => track.key);
@@ -42,7 +43,7 @@ assert.equal(isResumePosition(120.5), true);
 const override = structuredClone(base.sources[0]);
 override.title = "Browser Override";
 const merged = mergeCatalog(base, [override]);
-assert.equal(merged.sources.length, 2);
+assert.equal(merged.sources.length, base.sources.length);
 assert.equal(merged.sourceById.get(override.id).title, "Browser Override");
 
 const singleLinkSource = sourceFromMusicLink({

@@ -286,7 +286,9 @@ img { display: block; max-width: 100%; }
 .transport { min-width: 0; }
 .transport-buttons { display: flex; align-items: center; justify-content: center; gap: 12px; }
 .progress-row { display: grid; grid-template-columns: 38px minmax(90px, 1fr) 38px; align-items: center; gap: 8px; margin-top: 6px; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 10px; }
-.progress-row span:first-child { text-align: right; }
+.seek-button { font-size: 10px; font-weight: 680; letter-spacing: 0.02em; }
+.time-button { padding: 0; border: 0; background: transparent; color: var(--muted); font: inherit; font-variant-numeric: tabular-nums; text-align: right; cursor: pointer; }
+.time-button:hover { color: var(--text); text-decoration: underline; }
 .bar-extras { display: flex; justify-content: flex-end; align-items: center; gap: 9px; }
 .volume-icon { color: var(--muted); }
 .bar-extras input { width: min(110px, 40%); }
@@ -710,7 +712,7 @@ input[type="range"]:hover::-webkit-slider-thumb, input[type="range"]:focus-visib
   .transport-buttons .mode-button { display: none; }
   .transport-buttons .icon-button { width: 40px; height: 44px; background: transparent; }
   .transport .progress-row { position: absolute; left: 0; right: 0; bottom: 0; display: block; margin: 0; }
-  .progress-row span { display: none; }
+  .progress-row span, .progress-row .time-button { display: none; }
   .progress-row input { height: 5px; display: block; }
   .progress-row input::-webkit-slider-runnable-track { height: 2px; }
   .progress-row input::-webkit-slider-thumb { display: none; }

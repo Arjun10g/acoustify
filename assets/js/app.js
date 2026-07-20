@@ -43,7 +43,8 @@ const DEFAULT_STATE = {
     shuffle: false,
     autoplay: true,
     playerPanelOpen: false,
-    segmentLeadIn: 1.5
+    segmentLeadIn: 1.5,
+    keepScreenAwake: false
   },
   playback: {
     trackKey: null,
@@ -672,12 +673,13 @@ function renderSettings() {
         <div class="setting-row"><div><strong>Automatic next track</strong><div class="muted small">Advance at each timestamp boundary.</div></div><label class="toggle"><input id="setting-autoplay" type="checkbox" ${state.settings.autoplay ? "checked" : ""}><span></span></label></div>
         <div class="setting-row"><div><strong>Open source video panel on desktop</strong><div class="muted small">Leave this off for a cleaner listening layout.</div></div><label class="toggle"><input id="setting-panel" type="checkbox" ${state.settings.playerPanelOpen ? "checked" : ""}><span></span></label></div>
         <label class="setting-row setting-number"><div><strong>Segment lead-in</strong><div class="muted small">Start YouTube cuts slightly before the saved timestamp.</div></div><input id="setting-lead-in" type="number" min="0" max="5" step="0.5" value="${escapeHtml(state.settings.segmentLeadIn)}" aria-label="Segment lead-in seconds"><span>sec</span></label>
+        <div class="setting-row"><div><strong>Keep screen awake for YouTube</strong><div class="muted small">${"wakeLock" in navigator ? "Stops the phone from auto-locking while a YouTube source plays, so long sessions run hands-free." : "Not supported by this browser."}</div></div><label class="toggle"><input id="setting-keep-awake" type="checkbox" ${state.settings.keepScreenAwake ? "checked" : ""} ${"wakeLock" in navigator ? "" : "disabled"}><span></span></label></div>
       </section>
       <section class="setting-card">
         <h3>Phone app</h3><p id="install-status">${appInstalled ? "Installed on this device." : deferredInstallPrompt ? "Ready to install from Chrome." : "Running in a browser tab."}</p>
         ${appInstalled ? "" : `<div class="setting-actions"><button id="install-app-button" class="button primary small-button" type="button" data-action="install-app" ${deferredInstallPrompt ? "" : "disabled"}>Install Acoustify</button></div>`}
-        <div class="device-status"><span>Local masters</span><strong>Background audio supported</strong></div>
-        <div class="device-status"><span>YouTube sources</span><strong>Subject to Chrome and YouTube</strong></div>
+        <div class="device-status"><span>Local masters</span><strong>Play with the screen off, with lock-screen controls</strong></div>
+        <div class="device-status"><span>YouTube sources</span><strong>YouTube pauses embeds when the screen locks — use Keep screen awake, or a local master for true background audio</strong></div>
       </section>
       <section class="setting-card">
         <h3>Audio quality</h3><p>YouTube determines the adaptive audio/video representation. Acoustify does not extract or transcode it. Local files are handed directly to the browser.</p>
@@ -821,6 +823,20 @@ function renderPlayerSnapshot(snapshot = player?.snapshot()) {
   dom.repeatButton.classList.toggle("active", snapshot.repeat !== "off");
   dom.repeatButton.textContent = snapshot.repeat === "one" ? "↻¹" : "↻";
   renderQueue(snapshot);
+  updateCalibrationClock(snapshot.currentTime);
+}
+
+// Runs on every playback tick, so it only touches the time-dependent nodes.
+// Track, queue, artwork, and option state re-render through their own events.
+function renderPlaybackProgress(snapshot) {
+  if (!snapshot?.track) return;
+  dom.elapsedTime.textContent = formatTime(snapshot.elapsed);
+  dom.durationTime.textContent = formatTime(snapshot.duration);
+  if (!userSeeking) {
+    const value = Math.round(clamp(snapshot.progress, 0, 1) * 1000);
+    dom.progress.value = String(value);
+    setRangeFill(dom.progress, value / 10);
+  }
   updateCalibrationClock(snapshot.currentTime);
 }
 
@@ -1216,7 +1232,7 @@ function wirePlayerEvents() {
   });
   player.addEventListener("progress", (event) => {
     updatePlaybackMemory(event.detail);
-    renderPlayerSnapshot(event.detail);
+    renderPlaybackProgress(event.detail);
   });
   player.addEventListener("qualitychange", (event) => renderPlayerSnapshot(event.detail));
   player.addEventListener("queuechange", (event) => renderQueue(event.detail));
@@ -1225,6 +1241,7 @@ function wirePlayerEvents() {
     state.settings.shuffle = event.detail.shuffle;
     state.settings.autoplay = event.detail.autoplay;
     state.settings.segmentLeadIn = event.detail.segmentLeadIn;
+    state.settings.keepScreenAwake = event.detail.keepScreenAwake;
     persistState();
     renderPlayerSnapshot(event.detail);
   });
@@ -1285,6 +1302,16 @@ async function handleAction(action, element, event) {
     }
     case "previous": await player.previous(); break;
     case "next": await player.next(); break;
+    case "seek-back": if (player.currentTrack) await player.seekAbsolute(player.currentTime - 10); break;
+    case "seek-forward": if (player.currentTrack) await player.seekAbsolute(player.currentTime + 10); break;
+    case "jump-to-time": {
+      if (!player.currentTrack) break;
+      const snapshot = player.snapshot();
+      const input = window.prompt(`Jump to a time in “${snapshot.track.title}” (0:00 – ${formatTime(snapshot.duration)})`, formatTime(snapshot.elapsed));
+      if (input === null || !input.trim()) break;
+      await player.seekRelative(parsePreciseTime(input));
+      break;
+    }
     case "toggle-shuffle": player.setShuffle(!player.shuffle); break;
     case "cycle-repeat": player.cycleRepeat(); break;
     case "install-app": {
@@ -1481,6 +1508,11 @@ function wireDomEvents() {
       event.preventDefault();
       navigate("search");
     }
+    if (!typing && player?.currentTrack && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+      event.preventDefault();
+      const step = event.shiftKey ? 30 : 5;
+      await player.seekAbsolute(player.currentTime + (event.key === "ArrowRight" ? step : -step));
+    }
   });
 
   document.addEventListener("input", (event) => {
@@ -1520,6 +1552,11 @@ function wireDomEvents() {
       state.settings.playerPanelOpen = target.checked;
       persistState();
       if (!matchMedia("(max-width: 1120px)").matches) setPanelOpen(target.checked);
+    }
+    if (target.id === "setting-keep-awake") {
+      state.settings.keepScreenAwake = target.checked;
+      player.setKeepScreenAwake(target.checked);
+      persistState();
     }
     if (target.id === "setting-lead-in") {
       const parsedLeadIn = Number(target.value);

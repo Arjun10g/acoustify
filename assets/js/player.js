@@ -79,6 +79,7 @@ export class PlaybackController extends EventTarget {
     this.autoplay = true;
     this.segmentLeadIn = 1.5;
     this.volume = 0.86;
+    this.keepScreenAwake = false;
 
     this.youtubePlayer = null;
     this.youtubeReady = false;
@@ -87,6 +88,10 @@ export class PlaybackController extends EventTarget {
     this.monitorTimer = null;
     this.localObjectUrl = null;
     this.segmentEndedLock = false;
+    this.queueSnapshotCache = null;
+    this.wakeLockSentinel = null;
+    this.wakeLockPending = false;
+    this.lastPositionState = { position: -1, duration: -1, at: 0 };
 
     this.youtubeWrap = document.getElementById("youtube-player-wrap");
     this.localWrap = document.getElementById("local-player-wrap");
@@ -96,18 +101,34 @@ export class PlaybackController extends EventTarget {
 
     this.#bindLocalAudio();
     this.#configureMediaSession();
+    this.#configureAudioSession();
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") this.#syncWakeLock();
+    });
+  }
+
+  // Safari exposes navigator.audioSession; declaring "playback" keeps local
+  // audio running with the Ring/Silent switch on and while backgrounded.
+  #configureAudioSession() {
+    try {
+      if (navigator.audioSession) navigator.audioSession.type = "playback";
+    } catch { /* unsupported */ }
   }
 
   emit(type, detail = {}) {
     this.dispatchEvent(new CustomEvent(type, { detail }));
   }
 
-  configure({ volume, repeat, shuffle, autoplay, segmentLeadIn } = {}) {
+  configure({ volume, repeat, shuffle, autoplay, segmentLeadIn, keepScreenAwake } = {}) {
     if (Number.isFinite(Number(volume))) this.setVolume(Number(volume), false);
     if (["off", "all", "one"].includes(repeat)) this.repeat = repeat;
     if (typeof shuffle === "boolean") this.shuffle = shuffle;
     if (typeof autoplay === "boolean") this.autoplay = autoplay;
     if (Number.isFinite(Number(segmentLeadIn))) this.segmentLeadIn = clamp(Number(segmentLeadIn), 0, 5);
+    if (typeof keepScreenAwake === "boolean") {
+      this.keepScreenAwake = keepScreenAwake;
+      this.#syncWakeLock();
+    }
     this.emit("optionschange", this.snapshot());
   }
 
@@ -125,18 +146,27 @@ export class PlaybackController extends EventTarget {
       isPlaying: this.isPlaying,
       backend: this.backend,
       qualityLabel: this.qualityLabel,
-      queue: [...this.queue],
+      queue: this.#queueCopy(),
       queueIndex: this.queueIndex,
       repeat: this.repeat,
       shuffle: this.shuffle,
       autoplay: this.autoplay,
       segmentLeadIn: this.segmentLeadIn,
+      keepScreenAwake: this.keepScreenAwake,
       volume: this.volume
     };
   }
 
+  // Snapshots are emitted several times per second while playing; reuse one
+  // queue copy until the queue actually changes instead of reallocating.
+  #queueCopy() {
+    if (!this.queueSnapshotCache) this.queueSnapshotCache = [...this.queue];
+    return this.queueSnapshotCache;
+  }
+
   setQueue(trackKeys, activeKey = null) {
     this.queue = [...new Set((trackKeys || []).filter((key) => this.resolveTrack(key)))];
+    this.queueSnapshotCache = null;
     const key = activeKey || this.currentTrack?.key;
     this.queueIndex = key ? this.queue.indexOf(key) : -1;
     this.emit("queuechange", this.snapshot());
@@ -269,7 +299,12 @@ export class PlaybackController extends EventTarget {
 
   #onYouTubeState(event) {
     if (!window.YT) return;
-    if (event.data === window.YT.PlayerState.PLAYING) this.isPlaying = true;
+    if (event.data === window.YT.PlayerState.PLAYING) {
+      this.isPlaying = true;
+      // Re-assert our metadata as playback starts so the media notification
+      // shows the segmented track, not the iframe's own video title.
+      this.#updateMediaMetadata();
+    }
     if ([window.YT.PlayerState.PAUSED, window.YT.PlayerState.CUED, window.YT.PlayerState.ENDED].includes(event.data)) this.isPlaying = false;
     if (event.data === window.YT.PlayerState.ENDED && this.currentTrack) {
       const time = this.youtubePlayer?.getCurrentTime?.();
@@ -316,6 +351,7 @@ export class PlaybackController extends EventTarget {
   #bindLocalAudio() {
     this.localAudio.addEventListener("play", () => {
       this.isPlaying = true;
+      this.#updateMediaMetadata();
       this.#updateMediaPlaybackState();
       this.emit("statechange", this.snapshot());
     });
@@ -344,8 +380,20 @@ export class PlaybackController extends EventTarget {
   }
 
   #startMonitor() {
-    clearInterval(this.monitorTimer);
-    this.monitorTimer = setInterval(() => this.#monitor(), 250);
+    clearTimeout(this.monitorTimer);
+    const tick = () => {
+      this.#monitor();
+      this.monitorTimer = setTimeout(tick, this.#monitorDelay());
+    };
+    this.monitorTimer = setTimeout(tick, this.#monitorDelay());
+  }
+
+  // Poll quickly only when a segment boundary is close; otherwise a slower
+  // cadence keeps the UI current at a fraction of the wake-ups.
+  #monitorDelay() {
+    if (!this.isPlaying) return 1500;
+    const remaining = this.currentTrack ? this.currentTrack.end - this.currentTime : Infinity;
+    return remaining <= 3 ? 250 : 600;
   }
 
   #monitor() {
@@ -357,7 +405,11 @@ export class PlaybackController extends EventTarget {
         const reportedQuality = this.youtubePlayer.getPlaybackQuality?.();
         if (reportedQuality && reportedQuality !== "unknown") {
           const quality = String(reportedQuality).replace("hd", "HD ").toUpperCase();
-          this.qualityLabel = `YouTube adaptive · ${quality}`;
+          const label = `YouTube adaptive · ${quality}`;
+          if (label !== this.qualityLabel) {
+            this.qualityLabel = label;
+            this.emit("qualitychange", this.snapshot());
+          }
         }
       } else if (this.backend === "local") {
         this.currentTime = this.localAudio.currentTime || this.currentTrack.start;
@@ -537,6 +589,40 @@ export class PlaybackController extends EventTarget {
     this.emit("optionschange", this.snapshot());
   }
 
+  setKeepScreenAwake(enabled) {
+    this.keepScreenAwake = Boolean(enabled);
+    this.#syncWakeLock();
+    this.emit("optionschange", this.snapshot());
+  }
+
+  // Holds a screen wake lock while a YouTube source plays so the phone does
+  // not auto-lock mid-session. Local audio does not need it: the native audio
+  // element keeps playing with the screen off.
+  async #syncWakeLock() {
+    if (!("wakeLock" in navigator) || this.wakeLockPending) return;
+    const wanted = this.keepScreenAwake && this.isPlaying && this.backend === "youtube" && document.visibilityState === "visible";
+    if (wanted === Boolean(this.wakeLockSentinel)) return;
+    this.wakeLockPending = true;
+    try {
+      if (wanted) {
+        const sentinel = await navigator.wakeLock.request("screen");
+        sentinel.addEventListener("release", () => {
+          if (this.wakeLockSentinel === sentinel) this.wakeLockSentinel = null;
+        });
+        this.wakeLockSentinel = sentinel;
+      } else {
+        const sentinel = this.wakeLockSentinel;
+        this.wakeLockSentinel = null;
+        await sentinel.release();
+      }
+    } catch (error) {
+      console.debug("Screen wake lock unavailable.", error);
+      if (wanted) this.wakeLockSentinel = null;
+    } finally {
+      this.wakeLockPending = false;
+    }
+  }
+
   syncPlaybackState() {
     if (this.backend === "youtube" && this.youtubeReady && window.YT) {
       const state = this.youtubePlayer?.getPlayerState?.();
@@ -552,13 +638,16 @@ export class PlaybackController extends EventTarget {
   #updateMediaMetadata() {
     if (!("mediaSession" in navigator) || !this.currentTrack || !this.currentSource) return;
     try {
+      // Sized artwork entries let Android/desktop media notifications pick a
+      // resolution instead of dropping the image; the app icon is the floor.
+      const artwork = [{ src: safeArtwork(this.currentSource), sizes: "1280x720" }];
+      if (this.currentSource.fallbackArtwork) artwork.push({ src: this.currentSource.fallbackArtwork, sizes: "480x360" });
+      artwork.push({ src: new URL("../icons/icon-512.png", import.meta.url).href, sizes: "512x512", type: "image/png" });
       navigator.mediaSession.metadata = new MediaMetadata({
         title: this.currentTrack.title,
         artist: this.currentTrack.artist || this.currentSource.artist,
         album: this.currentSource.title,
-        artwork: [
-          { src: safeArtwork(this.currentSource) }
-        ]
+        artwork
       });
       this.#updateMediaPlaybackState();
     } catch (error) {
@@ -587,6 +676,7 @@ export class PlaybackController extends EventTarget {
   }
 
   #updateMediaPlaybackState(forcedState = null) {
+    this.#syncWakeLock();
     if (!("mediaSession" in navigator)) return;
     try {
       navigator.mediaSession.playbackState = forcedState || (this.isPlaying ? "playing" : "paused");
@@ -597,15 +687,23 @@ export class PlaybackController extends EventTarget {
     if (!("mediaSession" in navigator) || !navigator.mediaSession.setPositionState || !this.currentTrack) return;
     const duration = Math.max(1, this.currentTrack.end - this.currentTrack.start);
     const position = clamp(this.currentTime - this.currentTrack.start, 0, duration - 0.01);
+    // Lock screens interpolate between reports; once a second is enough
+    // unless the duration changed (new track) or the position jumped (seek).
+    const last = this.lastPositionState;
+    const now = Date.now();
+    if (last.duration === duration && Math.abs(position - last.position) < 2 && now - last.at < 1000) return;
     try {
       navigator.mediaSession.setPositionState({ duration, position, playbackRate: 1 });
+      this.lastPositionState = { position, duration, at: now };
       this.#updateMediaPlaybackState();
     } catch { /* transient invalid position */ }
   }
 
   destroy() {
-    clearInterval(this.monitorTimer);
+    clearTimeout(this.monitorTimer);
     this.localAudio.pause();
     if (this.localObjectUrl) URL.revokeObjectURL(this.localObjectUrl);
+    this.keepScreenAwake = false;
+    this.#syncWakeLock();
   }
 }

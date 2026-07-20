@@ -1,4 +1,4 @@
-const CACHE_VERSION = "acoustify-shell-v1.1.0";
+const CACHE_VERSION = "acoustify-shell-v1.2.0";
 const APP_SHELL = [
   "./",
   "./index.html",

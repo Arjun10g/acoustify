@@ -83,6 +83,11 @@ On Android Chrome, install Acoustify from **Settings → Phone app** for a stand
 
 Adjacent songs from one long source play as one uninterrupted stream, avoiding a media reload at every timestamp. This materially improves background continuity. YouTube and Chrome can still pause an embedded YouTube player when the browser is backgrounded or the screen is locked; a web app cannot override that provider policy. A local master played through the native audio element is the reliable background-audio path.
 
+Two settings help each path:
+
+- **Keep screen awake for YouTube** (Settings → Playback) holds a screen wake lock while a YouTube source is playing, so the phone does not auto-lock mid-session and playback runs hands-free. It has no effect on local masters, which do not need it.
+- Local masters declare a "playback" audio session where supported (Safari/iOS), so they keep playing with the Ring/Silent switch on and while the app is backgrounded.
+
 ### Local master sources
 
 For the highest-fidelity path, add a FLAC, WAV, AIFF, ALAC/M4A, MP3, AAC, or other browser-supported file that you lawfully possess:

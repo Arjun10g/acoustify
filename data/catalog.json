@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-19",
+  "generatedAt": "2026-07-20",
   "sources": [
     {
       "id": "of-monsters-and-men-live-from-skarkali",
@@ -188,6 +188,262 @@
           "start": 3123,
           "end": 3416,
           "timingConfidence": "community"
+        }
+      ]
+    },
+    {
+      "id": "lord-huron-the-night-we-met-live-at-austin-city-limits-radio",
+      "title": "The Night We Met (Live at Austin City Limits Radio)",
+      "artist": "Lord Huron",
+      "provider": "youtube",
+      "youtubeId": "BuUkI05OLHQ",
+      "duration": 221,
+      "artwork": "https://i.ytimg.com/vi/BuUkI05OLHQ/maxresdefault.jpg",
+      "fallbackArtwork": "https://i.ytimg.com/vi/BuUkI05OLHQ/hqdefault.jpg",
+      "description": "Imported from a provided YouTube link.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live",
+        "acoustic"
+      ],
+      "tracks": [
+        {
+          "id": "the-night-we-met-live-at-austin-city-limits-radio",
+          "title": "The Night We Met (Live at Austin City Limits Radio)",
+          "start": 0,
+          "end": 221,
+          "timingConfidence": "user"
+        }
+      ]
+    },
+    {
+      "id": "chance-pena-sleep-deprivation-live-at-austin-city-limits-radio",
+      "title": "Sleep Deprivation (Live at Austin City Limits Radio)",
+      "artist": "Chance Peña",
+      "provider": "youtube",
+      "youtubeId": "nuUVSzwAE0A",
+      "duration": 185,
+      "artwork": "https://i.ytimg.com/vi/nuUVSzwAE0A/maxresdefault.jpg",
+      "fallbackArtwork": "https://i.ytimg.com/vi/nuUVSzwAE0A/hqdefault.jpg",
+      "description": "Imported from a provided YouTube link.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live",
+        "acoustic"
+      ],
+      "tracks": [
+        {
+          "id": "sleep-deprivation-live-at-austin-city-limits-radio",
+          "title": "Sleep Deprivation (Live at Austin City Limits Radio)",
+          "start": 0,
+          "end": 185,
+          "timingConfidence": "user"
+        }
+      ]
+    },
+    {
+      "id": "caamp-tiny-desk-concert",
+      "title": "Tiny Desk Concert",
+      "artist": "Caamp",
+      "provider": "youtube",
+      "youtubeId": "J1vTi9ycpiA",
+      "duration": 1172,
+      "artwork": "https://i.ytimg.com/vi/J1vTi9ycpiA/maxresdefault.jpg",
+      "fallbackArtwork": "https://i.ytimg.com/vi/J1vTi9ycpiA/hqdefault.jpg",
+      "description": "Imported from a provided YouTube link.",
+      "timingStatus": "user-calibrated",
+      "timingNote": "Track starts follow the timestamped list in the YouTube comments. The first cut includes the spoken intro; refine in Catalog Studio if needed.",
+      "tags": [
+        "session",
+        "live",
+        "tiny desk"
+      ],
+      "tracks": [
+        {
+          "id": "by-and-by",
+          "title": "By and By",
+          "start": 0,
+          "end": 312,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "millions",
+          "title": "Millions",
+          "start": 312,
+          "end": 692,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "so-cool",
+          "title": "So Cool",
+          "start": 692,
+          "end": 958,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "all-the-debts-i-owe",
+          "title": "All the Debts I Owe",
+          "start": 958,
+          "end": 1172,
+          "timingConfidence": "user"
+        }
+      ]
+    },
+    {
+      "id": "the-red-clay-strays-tiny-desk-concert",
+      "title": "Tiny Desk Concert",
+      "artist": "The Red Clay Strays",
+      "provider": "youtube",
+      "youtubeId": "uJ3Pusp6R_s",
+      "duration": 1341,
+      "artwork": "https://i.ytimg.com/vi/uJ3Pusp6R_s/maxresdefault.jpg",
+      "fallbackArtwork": "https://i.ytimg.com/vi/uJ3Pusp6R_s/hqdefault.jpg",
+      "description": "Imported from a provided YouTube link.",
+      "timingStatus": "user-calibrated",
+      "timingNote": "Track starts follow a timestamped comment. Between-song talk lands at the end of the preceding cut; refine in Catalog Studio if needed.",
+      "tags": [
+        "session",
+        "live",
+        "tiny desk"
+      ],
+      "tracks": [
+        {
+          "id": "ramblin",
+          "title": "Ramblin'",
+          "start": 0,
+          "end": 211,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "wanna-be-loved",
+          "title": "Wanna Be Loved",
+          "start": 211,
+          "end": 482,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "i-m-still-fine",
+          "title": "I'm Still Fine",
+          "start": 482,
+          "end": 761,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "god-does",
+          "title": "God Does",
+          "start": 761,
+          "end": 1052,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "moments",
+          "title": "Moments",
+          "start": 1052,
+          "end": 1341,
+          "timingConfidence": "user"
+        }
+      ]
+    },
+    {
+      "id": "kodaline-brother-acoustic-from-the-streets-of-warsaw",
+      "title": "Brother (Acoustic from the streets of Warsaw)",
+      "artist": "Kodaline",
+      "provider": "youtube",
+      "youtubeId": "HbYhMAI4tL4",
+      "duration": 239,
+      "artwork": "https://i.ytimg.com/vi/HbYhMAI4tL4/maxresdefault.jpg",
+      "fallbackArtwork": "https://i.ytimg.com/vi/HbYhMAI4tL4/hqdefault.jpg",
+      "description": "Imported from a provided YouTube link.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "acoustic"
+      ],
+      "tracks": [
+        {
+          "id": "brother-acoustic-from-the-streets-of-warsaw",
+          "title": "Brother (Acoustic from the streets of Warsaw)",
+          "start": 0,
+          "end": 239,
+          "timingConfidence": "user"
+        }
+      ]
+    },
+    {
+      "id": "kodaline-all-i-want-official-live-video",
+      "title": "All I Want (Official Live Video)",
+      "artist": "Kodaline",
+      "provider": "youtube",
+      "youtubeId": "jGUASAxXwg4",
+      "duration": 529,
+      "artwork": "https://i.ytimg.com/vi/jGUASAxXwg4/maxresdefault.jpg",
+      "fallbackArtwork": "https://i.ytimg.com/vi/jGUASAxXwg4/hqdefault.jpg",
+      "description": "Imported from a provided YouTube link.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live"
+      ],
+      "tracks": [
+        {
+          "id": "all-i-want-official-live-video",
+          "title": "All I Want (Official Live Video)",
+          "start": 0,
+          "end": 529,
+          "timingConfidence": "user"
+        }
+      ]
+    },
+    {
+      "id": "the-red-clay-strays-wondering-why-live-at-austin-city-limits-radio",
+      "title": "Wondering Why (Live at Austin City Limits Radio)",
+      "artist": "The Red Clay Strays",
+      "provider": "youtube",
+      "youtubeId": "kTlaky9zzhw",
+      "duration": 243,
+      "artwork": "https://i.ytimg.com/vi/kTlaky9zzhw/maxresdefault.jpg",
+      "fallbackArtwork": "https://i.ytimg.com/vi/kTlaky9zzhw/hqdefault.jpg",
+      "description": "Imported from a provided YouTube link.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live"
+      ],
+      "tracks": [
+        {
+          "id": "wondering-why-live-at-austin-city-limits-radio",
+          "title": "Wondering Why (Live at Austin City Limits Radio)",
+          "start": 0,
+          "end": 243,
+          "timingConfidence": "user"
+        }
+      ]
+    },
+    {
+      "id": "the-white-buffalo-oh-darlin-what-have-i-done-audiotree-live",
+      "title": "Oh Darlin' What Have I Done (Audiotree Live)",
+      "artist": "The White Buffalo",
+      "provider": "youtube",
+      "youtubeId": "RdF2zb3KjZE",
+      "duration": 263,
+      "artwork": "https://i.ytimg.com/vi/RdF2zb3KjZE/maxresdefault.jpg",
+      "fallbackArtwork": "https://i.ytimg.com/vi/RdF2zb3KjZE/hqdefault.jpg",
+      "description": "Imported from a provided YouTube link.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live",
+        "session"
+      ],
+      "tracks": [
+        {
+          "id": "oh-darlin-what-have-i-done-audiotree-live",
+          "title": "Oh Darlin' What Have I Done (Audiotree Live)",
+          "start": 0,
+          "end": 263,
+          "timingConfidence": "user"
         }
       ]
     }
