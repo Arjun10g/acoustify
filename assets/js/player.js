@@ -332,32 +332,45 @@ export class PlaybackController extends EventTarget {
 
   async #loadLocal(source, startAt, autoplay) {
     this.youtubePlayer?.pauseVideo?.();
-    const asset = await this.getAudioAsset(source.assetId);
-    if (!asset?.blob) throw new Error("This local audio file is not stored in this browser. Re-import it in Catalog Studio.");
-    if (this.localObjectUrl) URL.revokeObjectURL(this.localObjectUrl);
-    this.localObjectUrl = URL.createObjectURL(asset.blob);
-    this.localAudio.src = this.localObjectUrl;
+    const asset = source.assetId ? await this.getAudioAsset(source.assetId) : null;
+    let shouldLoad = true;
+    if (asset?.blob) {
+      if (this.localObjectUrl) URL.revokeObjectURL(this.localObjectUrl);
+      this.localObjectUrl = URL.createObjectURL(asset.blob);
+      this.localAudio.src = this.localObjectUrl;
+      this.qualityLabel = `Original local file · ${asset.type || "audio"} · no app re-encoding`;
+    } else if (source.audioUrl) {
+      if (this.localObjectUrl) URL.revokeObjectURL(this.localObjectUrl);
+      this.localObjectUrl = null;
+      const packagedUrl = new URL(source.audioUrl, document.baseURI).href;
+      shouldLoad = this.localAudio.src !== packagedUrl || this.localAudio.readyState === 0;
+      if (shouldLoad) this.localAudio.src = packagedUrl;
+      this.qualityLabel = "Included AAC audio · native background playback";
+    } else {
+      throw new Error("This local audio file is not stored in this browser. Re-import it in Catalog Studio.");
+    }
     this.localAudio.volume = this.volume;
     this.localArtwork.src = safeArtwork(source);
-    this.qualityLabel = `Original local file · ${asset.type || "audio"} · no app re-encoding`;
     this.emit("qualitychange", this.snapshot());
-    await new Promise((resolve, reject) => {
-      const ready = () => {
-        cleanup();
-        resolve();
-      };
-      const fail = () => {
-        cleanup();
-        reject(new Error("The browser could not decode this local audio file."));
-      };
-      const cleanup = () => {
-        this.localAudio.removeEventListener("loadedmetadata", ready);
-        this.localAudio.removeEventListener("error", fail);
-      };
-      this.localAudio.addEventListener("loadedmetadata", ready, { once: true });
-      this.localAudio.addEventListener("error", fail, { once: true });
-      this.localAudio.load();
-    });
+    if (shouldLoad) {
+      await new Promise((resolve, reject) => {
+        const ready = () => {
+          cleanup();
+          resolve();
+        };
+        const fail = () => {
+          cleanup();
+          reject(new Error("The browser could not decode this local audio file."));
+        };
+        const cleanup = () => {
+          this.localAudio.removeEventListener("loadedmetadata", ready);
+          this.localAudio.removeEventListener("error", fail);
+        };
+        this.localAudio.addEventListener("loadedmetadata", ready, { once: true });
+        this.localAudio.addEventListener("error", fail, { once: true });
+        this.localAudio.load();
+      });
+    }
     this.localAudio.currentTime = startAt;
     if (autoplay) await this.localAudio.play();
   }

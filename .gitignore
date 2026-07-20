@@ -1,4 +1,6 @@
 _site/
+node_modules/
+test-results/
 music-links.json
 .DS_Store
 local-audio/

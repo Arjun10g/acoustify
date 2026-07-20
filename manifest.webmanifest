@@ -1,7 +1,7 @@
 {
-  "name": "Acoustify — Personal Source Library",
+  "name": "Acoustify — Installed Music Library",
   "short_name": "Acoustify",
-  "description": "Turn long-form music sources into a personal, track-based listening library.",
+  "description": "An installable music library with included native audio and background playback.",
   "id": "./",
   "start_url": "./#/home",
   "scope": "./",

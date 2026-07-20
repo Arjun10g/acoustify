@@ -18,7 +18,21 @@ for (const source of catalog.sources || []) {
   if (sourceIds.has(source.id)) errors.push(`${label}: duplicate source id ${source.id}.`);
   sourceIds.add(source.id);
   if (source.provider === "youtube" && !/^[\w-]{11}$/.test(source.youtubeId || "")) errors.push(`${label}: invalid YouTube id.`);
-  if (source.provider === "local" && !source.assetId) errors.push(`${label}: local source needs assetId.`);
+  if (source.provider === "local" && !source.assetId && !source.audioUrl) errors.push(`${label}: local source needs assetId or audioUrl.`);
+  if (source.audioUrl) {
+    const relativeAudioPath = source.audioUrl.startsWith("./") ? source.audioUrl.slice(2) : "";
+    if (!relativeAudioPath.startsWith("media/") || relativeAudioPath.includes("..")) {
+      errors.push(`${label}: packaged audio must use a safe ./media/ path.`);
+    } else if (!fs.existsSync(path.join(root, relativeAudioPath))) {
+      errors.push(`${label}: packaged audio file is missing (${source.audioUrl}).`);
+    }
+  }
+  if (source.artwork?.startsWith("./")) {
+    const relativeArtworkPath = source.artwork.slice(2);
+    if (relativeArtworkPath.includes("..") || !fs.existsSync(path.join(root, relativeArtworkPath))) {
+      errors.push(`${label}: packaged artwork file is missing or unsafe (${source.artwork}).`);
+    }
+  }
   if (!Number.isFinite(source.duration) || source.duration <= 0) errors.push(`${label}: duration must be positive.`);
   if (!Array.isArray(source.tracks) || source.tracks.length === 0) {
     errors.push(`${label}: at least one track is required.`);

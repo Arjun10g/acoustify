@@ -44,6 +44,22 @@ if (manifest.scope !== "./") errors.push("Manifest scope must be ./ for reposito
 if (manifest.display !== "standalone") errors.push("Manifest display must support an installed mobile app.");
 if (!manifest.icons?.some((icon) => icon.sizes === "192x192") || !manifest.icons?.some((icon) => icon.sizes === "512x512")) errors.push("Manifest needs 192px and 512px install icons.");
 
+const catalog = JSON.parse(fs.readFileSync(path.join(root, "data", "catalog.json"), "utf8"));
+for (const source of catalog.sources || []) {
+  for (const assetPath of [source.audioUrl, source.artwork]) {
+    if (!assetPath?.startsWith("./")) {
+      errors.push(`${source.title}: packaged asset path must be relative (${assetPath || "missing"}).`);
+      continue;
+    }
+    const fullPath = path.join(root, assetPath.slice(2));
+    if (!fs.existsSync(fullPath) || fs.statSync(fullPath).size === 0) errors.push(`${source.title}: missing packaged asset ${assetPath}.`);
+  }
+}
+
+const serviceWorker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
+if (!serviceWorker.includes('url.pathname.includes("/media/")')) errors.push("Service worker must bypass packaged media range requests.");
+if (serviceWorker.includes('"./media/')) errors.push("Service worker install shell must not pre-download packaged media.");
+
 for (const file of ["app.js", "catalog.js", "db.js", "player.js", "utils.js"]) {
   const source = fs.readFileSync(path.join(root, "assets", "js", file), "utf8");
   if (/\b(eval|new Function)\s*\(/.test(source)) errors.push(`${file} uses dynamic code evaluation.`);

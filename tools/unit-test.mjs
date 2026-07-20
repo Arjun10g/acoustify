@@ -10,6 +10,14 @@ import { applyMusicLinksToCatalog, getMusicLinkEntries, sourceFromMusicLink } fr
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const base = JSON.parse(fs.readFileSync(path.join(root, "data", "catalog.json"), "utf8"));
 
+assert.equal(base.sources.length, 10);
+for (const source of base.sources) {
+  assert.equal(source.provider, "local");
+  assert.match(source.audioUrl, /^\.\/media\/[\w-]{11}\.m4a$/);
+  assert.match(source.artwork, /^\.\/assets\/artwork\/[\w-]{11}\.jpg$/);
+  assert.equal(source.fallbackArtwork, source.artwork);
+}
+
 assert.equal(parseYouTubeId("https://youtu.be/Y25LDO6OLzQ?si=test"), "Y25LDO6OLzQ");
 assert.equal(parseYouTubeId("https://www.youtube.com/watch?v=JoUq869LXeA"), "JoUq869LXeA");
 assert.equal(parseYouTubeId("https://www.youtube.com/live/Y25LDO6OLzQ?feature=share"), "Y25LDO6OLzQ");
@@ -62,6 +70,7 @@ assert.equal(localOverride.youtubeId, base.sources[0].youtubeId);
 assert.equal(localOverride.tracks.at(-1).end, localOverride.duration);
 assert.equal(localOverride.assetMeta.importKind, "authorized-extract");
 assert.equal(localOverride.youtubeFallback.provider, "youtube");
+assert.equal(localOverride.youtubeFallback.audioUrl, undefined);
 assert.equal(localOverride.youtubeFallback.duration, base.sources[0].duration);
 assert.throws(() => sourceWithLocalAudio(base.sources[0], {
   assetId: "audio-wrong",

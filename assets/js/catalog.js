@@ -17,7 +17,7 @@ export function validateCatalog(data) {
     sourceIds.add(source.id);
     if (!Number.isFinite(source.duration) || source.duration <= 0) throw new Error(`${source.title} needs a positive duration.`);
     if (source.provider === "youtube" && !/^[\w-]{11}$/.test(source.youtubeId || "")) throw new Error(`${source.title} needs a valid YouTube id.`);
-    if (source.provider === "local" && !source.assetId) throw new Error(`${source.title} needs a local asset id.`);
+    if (source.provider === "local" && !source.assetId && !source.audioUrl) throw new Error(`${source.title} needs a local asset id or packaged audio URL.`);
     if (!Array.isArray(source.tracks) || source.tracks.length === 0) throw new Error(`${source.title} needs at least one track.`);
     let lastEnd = -1;
     const trackIds = new Set();
@@ -133,6 +133,7 @@ export function sourceWithLocalAudio(sourceInput, { assetId, name, type, size, d
   youtubeFallback.provider = "youtube";
   delete youtubeFallback.assetId;
   delete youtubeFallback.assetMeta;
+  delete youtubeFallback.audioUrl;
   delete youtubeFallback.localPlaybackFor;
   delete youtubeFallback.youtubeFallback;
   source.youtubeFallback = youtubeFallback;
@@ -183,10 +184,10 @@ export function parseChapterLines(text, sourceDuration = 0) {
   });
 }
 
-export function sourceFromStudioForm({ id, title, artist, provider, youtubeInput, duration, artwork, description, tags, chapters, assetId, assetMeta }) {
+export function sourceFromStudioForm({ id, title, artist, provider, youtubeInput, duration, artwork, description, tags, chapters, assetId, assetMeta, audioUrl }) {
   const youtubeId = provider === "youtube" ? parseYouTubeId(youtubeInput) : "";
   if (provider === "youtube" && !youtubeId) throw new Error("Enter a valid YouTube URL or 11-character video id.");
-  if (provider === "local" && !assetId) throw new Error("Choose a local audio file.");
+  if (provider === "local" && !assetId && !audioUrl) throw new Error("Choose a local audio file.");
   const parsedDuration = parseTimecode(duration);
   if (!Number.isFinite(parsedDuration) || parsedDuration <= 0) throw new Error("Enter the full source duration, such as 56:55.");
   const tracks = parseChapterLines(chapters, parsedDuration);
@@ -199,6 +200,7 @@ export function sourceFromStudioForm({ id, title, artist, provider, youtubeInput
     youtubeId,
     assetId: provider === "local" ? assetId : undefined,
     assetMeta: provider === "local" ? assetMeta : undefined,
+    audioUrl: provider === "local" ? audioUrl : undefined,
     duration: parsedDuration,
     artwork: artwork.trim() || (youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/maxresdefault.jpg` : "./assets/icons/icon-512.png"),
     fallbackArtwork: youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg` : "./assets/icons/icon-512.png",

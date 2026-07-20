@@ -212,7 +212,9 @@ function artworkAttrs(sourceOrTrack) {
 }
 
 function providerLabel(source) {
-  return source.provider === "local" ? "Local master" : "YouTube source";
+  if (source.provider === "local" && source.assetId) return "Local master";
+  if (source.provider === "local" && source.audioUrl) return "Included audio";
+  return "YouTube source";
 }
 
 function timingLabel(source) {
@@ -261,7 +263,7 @@ function sourceCard(source) {
   return `
     <article class="card source-card" tabindex="0" data-action="open-source" data-source-id="${escapeHtml(source.id)}">
       <div class="card-badges">
-        <span class="badge ${source.provider === "local" ? "local" : ""}">${source.provider === "local" ? "Original file" : "Video source"}</span>
+        <span class="badge ${source.provider === "local" ? "local" : ""}">${source.provider === "local" ? source.assetId ? "Original file" : "Included audio" : "Video source"}</span>
         ${warning ? '<span class="badge warning">Draft cuts</span>' : ""}
       </div>
       <div class="card-art">
@@ -420,7 +422,7 @@ function renderHome() {
     <section class="view-section">
       <div class="info-banner">
         <span class="info-icon">◇</span>
-        <div><h3>Two quality paths</h3><p>YouTube playback uses the official adaptive player. A local FLAC, WAV, ALAC, or other master you own is read directly from browser storage without Acoustify re-encoding it.</p></div>
+        <div><h3>Native audio library</h3><p>The included AAC sources and any local master you import play through the browser's native audio system without Acoustify re-encoding them.</p></div>
         <button class="button ghost small-button" type="button" data-action="open-settings">Quality details</button>
       </div>
     </section>`;
@@ -529,6 +531,8 @@ function renderSource(sourceId) {
   const duration = formatTime(source.duration, source.duration >= 3600);
   const canOpenYouTube = Boolean(source.youtubeId);
   const canRestoreYouTube = source.provider === "local" && source.youtubeId && sourceIsUserOverride(source.id);
+  const packagedSource = baseCatalog.sources.find((item) => item.id === source.id);
+  const restoreLabel = packagedSource?.provider === "local" ? "Use included audio" : "Use YouTube";
   dom.view.innerHTML = `
     <section class="collection-hero">
       <img class="collection-art" ${artworkAttrs(source)} alt="${escapeHtml(source.title)} artwork">
@@ -544,7 +548,7 @@ function renderSource(sourceId) {
       <button class="button ghost small-button" type="button" data-action="shuffle-source" data-source-id="${escapeHtml(source.id)}">⤨ Shuffle</button>
       <button class="button ghost small-button" type="button" data-action="edit-source" data-source-id="${escapeHtml(source.id)}">${source.timingStatus === "calibration-required" ? "Calibrate cuts" : "Edit timings"}</button>
       ${source.youtubeId ? `<button class="button secondary small-button" type="button" data-action="attach-extracted-audio" data-source-id="${escapeHtml(source.id)}">${source.provider === "local" ? "Replace local audio" : "Use local audio"}</button>` : ""}
-      ${canRestoreYouTube ? `<button class="button ghost small-button" type="button" data-action="restore-youtube-source" data-source-id="${escapeHtml(source.id)}">Use YouTube</button>` : ""}
+      ${canRestoreYouTube ? `<button class="button ghost small-button" type="button" data-action="restore-youtube-source" data-source-id="${escapeHtml(source.id)}">${restoreLabel}</button>` : ""}
       ${canOpenYouTube ? `<a class="button ghost small-button" href="https://www.youtube.com/watch?v=${encodeURIComponent(source.youtubeId)}" target="_blank" rel="noopener noreferrer">Open original ↗</a>` : ""}
     </div>
     ${source.timingStatus === "calibration-required" ? `
@@ -613,6 +617,7 @@ function renderStudio(route) {
         <form id="studio-form">
           <input type="hidden" name="id" value="${escapeHtml(source?.id || "")}">
           <input type="hidden" name="assetId" value="${escapeHtml(source?.assetId || "")}">
+          <input type="hidden" name="audioUrl" value="${escapeHtml(source?.audioUrl || "")}">
           <input type="hidden" name="assetName" value="${escapeHtml(localMeta.name || "")}">
           <input type="hidden" name="assetType" value="${escapeHtml(localMeta.type || "")}">
           <input type="hidden" name="assetSize" value="${escapeHtml(localMeta.size || "")}">
@@ -627,7 +632,7 @@ function renderStudio(route) {
             <label class="field full youtube-field" ${provider !== "youtube" ? "hidden" : ""}><span>YouTube URL or video ID</span><input name="youtubeInput" value="${escapeHtml(source?.youtubeId || "")}" placeholder="https://youtu.be/…"><small>The video remains inside the official visible YouTube player.</small></label>
             <div class="field full local-field" ${provider !== "local" ? "hidden" : ""}>
               <span>Local audio master</span>
-              <label class="file-drop"><input id="local-file-input" type="file" accept="audio/*,.flac,.wav,.aiff,.aif,.m4a,.alac"><span id="local-file-label">${source?.assetId ? `<strong>${escapeHtml(localMeta.name || "File already stored")}</strong><br>Choose a replacement only when needed.` : `<strong>Choose an audio file you own</strong><br>FLAC/WAV remain untouched; playback support depends on the browser.`}</span></label>
+              <label class="file-drop"><input id="local-file-input" type="file" accept="audio/*,.flac,.wav,.aiff,.aif,.m4a,.alac"><span id="local-file-label">${source?.assetId ? `<strong>${escapeHtml(localMeta.name || "File already stored")}</strong><br>Choose a replacement only when needed.` : source?.audioUrl ? `<strong>Included with Acoustify</strong><br>Choose a file only to replace the packaged audio in this browser.` : `<strong>Choose an audio file you own</strong><br>FLAC/WAV remain untouched; playback support depends on the browser.`}</span></label>
             </div>
             <label class="field"><span>Full duration</span><input name="duration" required value="${escapeHtml(duration)}" placeholder="56:55"><small>Used to close the final track boundary.</small></label>
             <label class="field"><span>Year</span><input name="year" inputmode="numeric" value="${escapeHtml(source?.year || "")}" placeholder="2026"></label>
@@ -691,6 +696,8 @@ function formatPreciseTime(seconds) {
 
 function renderSettings() {
   const userSources = state.userSources;
+  const includedSourceCount = baseCatalog.sources.filter((source) => source.provider === "local" && source.audioUrl).length;
+  const youtubeSourceCount = catalog.sources.filter((source) => source.provider === "youtube").length;
   dom.view.innerHTML = `
     <div class="page-head">
       <div><p class="eyebrow">Local-first controls</p><h1>Settings</h1><p>Manage playback behavior, browser memory, source overrides, and local audio storage.</p></div>
@@ -699,25 +706,27 @@ function renderSettings() {
       <section class="setting-card">
         <h3>Playback</h3><p>These choices are remembered across sessions.</p>
         <div class="setting-row"><div><strong>Automatic next track</strong><div class="muted small">Advance at each timestamp boundary.</div></div><label class="toggle"><input id="setting-autoplay" type="checkbox" ${state.settings.autoplay ? "checked" : ""}><span></span></label></div>
-        <div class="setting-row"><div><strong>Open source video panel on desktop</strong><div class="muted small">Leave this off for a cleaner listening layout.</div></div><label class="toggle"><input id="setting-panel" type="checkbox" ${state.settings.playerPanelOpen ? "checked" : ""}><span></span></label></div>
-        <label class="setting-row setting-number"><div><strong>Segment lead-in</strong><div class="muted small">Start YouTube cuts slightly before the saved timestamp.</div></div><input id="setting-lead-in" type="number" min="0" max="5" step="0.5" value="${escapeHtml(state.settings.segmentLeadIn)}" aria-label="Segment lead-in seconds"><span>sec</span></label>
-        <div class="setting-row"><div><strong>Keep screen awake for YouTube</strong><div class="muted small">${"wakeLock" in navigator ? "Stops the phone from auto-locking while a YouTube source plays, so long sessions run hands-free." : "Not supported by this browser."}</div></div><label class="toggle"><input id="setting-keep-awake" type="checkbox" ${state.settings.keepScreenAwake ? "checked" : ""} ${"wakeLock" in navigator ? "" : "disabled"}><span></span></label></div>
+        ${youtubeSourceCount ? `
+          <div class="setting-row"><div><strong>Open source video panel on desktop</strong><div class="muted small">Used only by custom YouTube sources.</div></div><label class="toggle"><input id="setting-panel" type="checkbox" ${state.settings.playerPanelOpen ? "checked" : ""}><span></span></label></div>
+          <label class="setting-row setting-number"><div><strong>Segment lead-in</strong><div class="muted small">Start YouTube cuts slightly before the saved timestamp.</div></div><input id="setting-lead-in" type="number" min="0" max="5" step="0.5" value="${escapeHtml(state.settings.segmentLeadIn)}" aria-label="Segment lead-in seconds"><span>sec</span></label>
+          <div class="setting-row"><div><strong>Keep screen awake for YouTube</strong><div class="muted small">${"wakeLock" in navigator ? "Stops the phone from auto-locking while a custom YouTube source plays." : "Not supported by this browser."}</div></div><label class="toggle"><input id="setting-keep-awake" type="checkbox" ${state.settings.keepScreenAwake ? "checked" : ""} ${"wakeLock" in navigator ? "" : "disabled"}><span></span></label></div>
+        ` : ""}
       </section>
       <section class="setting-card">
         <h3>Phone app</h3><p id="install-status">${appInstalled ? "Installed on this device." : deferredInstallPrompt ? "Ready to install from Chrome." : "Running in a browser tab."}</p>
         ${appInstalled ? "" : `<div class="setting-actions"><button id="install-app-button" class="button primary small-button" type="button" data-action="install-app" ${deferredInstallPrompt ? "" : "disabled"}>Install Acoustify</button></div>`}
-        <div class="device-status"><span>Local masters</span><strong>Play with the screen off, with lock-screen controls</strong></div>
-        <div class="device-status"><span>YouTube sources</span><strong>YouTube pauses embeds when the screen locks — use Keep screen awake, or a local master for true background audio</strong></div>
+        <div class="device-status"><span>Included library</span><strong>${includedSourceCount} native-audio sources with lock-screen controls</strong></div>
+        <div class="device-status"><span>Background playback</span><strong>Continues when Chrome or the installed app is backgrounded</strong></div>
       </section>
       <section class="setting-card">
         <h3>Local audio</h3><p>The Pages app stores selected files unchanged. The optional desktop extractor runs locally and requires you to confirm that each download is authorized.</p>
         <div class="setting-actions"><a class="button secondary small-button" href="./downloads/youtube_podcast_audio_extractor.zip" download>Download extractor</a><button class="button primary small-button" type="button" data-action="attach-extracted-audio">Import extracted audio</button></div>
-        <div class="info-banner"><span class="info-icon">◇</span><div><h3>Automatic matching</h3><p>Extractor filenames include the YouTube ID in brackets, so Acoustify can apply the existing track timestamps and switch to background-friendly local playback.</p></div></div>
+        <div class="info-banner"><span class="info-icon">◇</span><div><h3>Built-in native playback</h3><p>Every packaged song already uses included AAC audio. Import matching remains available for future links or personal replacements.</p></div></div>
       </section>
-      <section class="setting-card">
+      ${youtubeSourceCount ? `<section class="setting-card">
         <h3>YouTube ads</h3><p>Ads come from YouTube and Acoustify cannot remove them. When one plays, a banner appears with a shortcut to the video so you can use YouTube's own Skip button. The player also avoids reloading the video between tracks, which reduces how often pre-roll ads can appear.</p>
         <div class="device-status"><span>Ad-free options</span><strong>A YouTube Premium account signed into this browser removes ads from embeds; local masters never have ads</strong></div>
-      </section>
+      </section>` : ""}
       <section class="setting-card">
         <h3>Browser storage</h3><p id="storage-description">Checking storage usage…</p>
         <div class="storage-meter"><span id="storage-meter-fill"></span></div>
@@ -738,7 +747,7 @@ function renderSettings() {
               <div class="page-actions">
                 <button class="button ghost small-button" type="button" data-action="edit-source" data-source-id="${escapeHtml(source.id)}">Edit</button>
                 ${sourceIsUserOverride(source.id) ? source.provider === "local" && source.youtubeId
-                  ? `<button class="button ghost small-button" type="button" data-action="restore-youtube-source" data-source-id="${escapeHtml(source.id)}">Use YouTube</button>`
+                  ? `<button class="button ghost small-button" type="button" data-action="restore-youtube-source" data-source-id="${escapeHtml(source.id)}">${baseCatalog.sources.find((item) => item.id === source.id)?.provider === "local" ? "Use included audio" : "Use YouTube"}</button>`
                   : `<button class="button ghost small-button" type="button" data-action="delete-user-source" data-source-id="${escapeHtml(source.id)}">Remove override</button>` : ""}
               </div>
             </div>`).join("")}
@@ -1245,9 +1254,21 @@ async function restoreYouTubeSource(sourceId) {
   if (!source?.youtubeId || userSource?.provider !== "local") return;
   const previousSources = deepClone(state.userSources);
   const activePlayback = activePlaybackForSource(sourceId);
+  const packagedSource = baseCatalog.sources.find((item) => item.id === sourceId);
 
   if (userSource.restorePackagedSource && sourceIsPackaged(sourceId)) {
     state.userSources = state.userSources.filter((item) => item.id !== sourceId);
+  } else if (packagedSource?.provider === "local" && packagedSource.audioUrl) {
+    const restored = deepClone(userSource);
+    restored.provider = "local";
+    restored.audioUrl = packagedSource.audioUrl;
+    delete restored.assetId;
+    delete restored.assetMeta;
+    delete restored.localPlaybackFor;
+    delete restored.youtubeFallback;
+    delete restored.restorePackagedSource;
+    validateCatalog({ version: 1, sources: [restored] });
+    state.userSources[state.userSources.findIndex((item) => item.id === sourceId)] = restored;
   } else {
     const restored = deepClone(userSource.youtubeFallback || userSource);
     restored.provider = "youtube";
@@ -1271,11 +1292,12 @@ async function restoreYouTubeSource(sourceId) {
   try {
     await reloadActiveSource(activePlayback);
   } catch (error) {
-    console.debug("The active source could not be reloaded after restoring YouTube.", error);
+    console.debug("The active source could not be reloaded after restoring its packaged playback source.", error);
   }
-  await deleteAudioAsset(userSource.assetId).catch(() => {});
+  if (userSource.assetId) await deleteAudioAsset(userSource.assetId).catch(() => {});
   refreshStorageEstimate();
-  toast(`${source.title} now uses YouTube playback.`, "success");
+  const restoredSource = catalog.sourceById.get(sourceId);
+  toast(`${source.title} now uses ${providerLabel(restoredSource).toLowerCase()} playback.`, "success");
   navigate(`source/${encodeURIComponent(sourceId)}`);
 }
 
@@ -1308,20 +1330,28 @@ async function saveStudioForm(form) {
     tags: String(data.get("tags") || ""),
     chapters: String(data.get("chapters") || ""),
     assetId,
-    assetMeta
+    assetMeta,
+    audioUrl: String(data.get("audioUrl") || "")
   });
   if (provider === "local" && previousSource?.youtubeId) {
     source.youtubeId = previousSource.youtubeId;
     source.localPlaybackFor = previousSource.localPlaybackFor || previousSource.youtubeId;
     if (!pendingLocalFile && previousSource.assetMeta) source.assetMeta = deepClone(previousSource.assetMeta);
-    source.youtubeFallback = deepClone(source);
-    source.youtubeFallback.provider = "youtube";
-    delete source.youtubeFallback.assetId;
-    delete source.youtubeFallback.assetMeta;
-    delete source.youtubeFallback.localPlaybackFor;
-    delete source.youtubeFallback.youtubeFallback;
-    delete source.youtubeFallback.restorePackagedSource;
-    source.restorePackagedSource = false;
+    const packagedSource = baseCatalog.sources.find((item) => item.id === source.id);
+    if (packagedSource?.provider === "local") {
+      delete source.youtubeFallback;
+      source.restorePackagedSource = true;
+    } else {
+      source.youtubeFallback = deepClone(source);
+      source.youtubeFallback.provider = "youtube";
+      delete source.youtubeFallback.assetId;
+      delete source.youtubeFallback.assetMeta;
+      delete source.youtubeFallback.audioUrl;
+      delete source.youtubeFallback.localPlaybackFor;
+      delete source.youtubeFallback.youtubeFallback;
+      delete source.youtubeFallback.restorePackagedSource;
+      source.restorePackagedSource = false;
+    }
   }
   const year = Number(data.get("year"));
   if (Number.isFinite(year) && year > 0) source.year = year;
@@ -1581,7 +1611,8 @@ async function handleAction(action, element, event) {
     case "restore-youtube-source": {
       const source = catalog.sourceById.get(sourceId);
       if (!source) break;
-      confirmAction("Use YouTube playback?", `The local audio for “${source.title}” will be removed from this browser. Its saved timestamps will remain.`, () => restoreYouTubeSource(sourceId));
+      const restoresIncludedAudio = baseCatalog.sources.find((item) => item.id === sourceId)?.provider === "local";
+      confirmAction(restoresIncludedAudio ? "Use included audio?" : "Use YouTube playback?", `The imported audio for “${source.title}” will be removed from this browser. Its saved timestamps will remain.`, () => restoreYouTubeSource(sourceId));
       break;
     }
     case "delete-user-source": {

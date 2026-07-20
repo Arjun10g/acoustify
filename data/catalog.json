@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "generatedAt": "2026-07-20",
   "sources": [
     {
@@ -7,11 +7,11 @@
       "title": "Live from Skarkali",
       "artist": "Of Monsters and Men",
       "year": 2025,
-      "provider": "youtube",
+      "provider": "local",
       "youtubeId": "JoUq869LXeA",
       "duration": 2233,
-      "artwork": "https://i.ytimg.com/vi/JoUq869LXeA/maxresdefault.jpg",
-      "fallbackArtwork": "https://i.ytimg.com/vi/JoUq869LXeA/hqdefault.jpg",
+      "artwork": "./assets/artwork/JoUq869LXeA.jpg",
+      "fallbackArtwork": "./assets/artwork/JoUq869LXeA.jpg",
       "description": "A live source film divided into seven individually playable songs.",
       "timingStatus": "comment-derived",
       "timingNote": "Starts follow a highly rated timestamp list in the YouTube comments. Where two credible lists differed, the earlier start was chosen to preserve the full opening of each song.",
@@ -70,18 +70,19 @@
           "end": 2233,
           "timingConfidence": "community"
         }
-      ]
+      ],
+      "audioUrl": "./media/JoUq869LXeA.m4a"
     },
     {
       "id": "of-monsters-and-men-the-cabin-sessions",
       "title": "The Cabin Sessions",
       "artist": "Of Monsters and Men",
       "year": 2022,
-      "provider": "youtube",
+      "provider": "local",
       "youtubeId": "Y25LDO6OLzQ",
       "duration": 3416,
-      "artwork": "https://i.ytimg.com/vi/Y25LDO6OLzQ/maxresdefault.jpg",
-      "fallbackArtwork": "https://i.ytimg.com/vi/Y25LDO6OLzQ/hqdefault.jpg",
+      "artwork": "./assets/artwork/Y25LDO6OLzQ.jpg",
+      "fallbackArtwork": "./assets/artwork/Y25LDO6OLzQ.jpg",
       "description": "The full Cabin Sessions performance divided into fourteen individual tracks.",
       "timingStatus": "comment-derived",
       "timingNote": "Starts follow the complete timestamp list in the top YouTube comment, endorsed by about 8,200 viewers when checked. Catalog Studio can still nudge any boundary without editing code.",
@@ -189,17 +190,18 @@
           "end": 3416,
           "timingConfidence": "community"
         }
-      ]
+      ],
+      "audioUrl": "./media/Y25LDO6OLzQ.m4a"
     },
     {
       "id": "lord-huron-the-night-we-met-live-at-austin-city-limits-radio",
       "title": "The Night We Met (Live at Austin City Limits Radio)",
       "artist": "Lord Huron",
-      "provider": "youtube",
+      "provider": "local",
       "youtubeId": "BuUkI05OLHQ",
       "duration": 221,
-      "artwork": "https://i.ytimg.com/vi/BuUkI05OLHQ/maxresdefault.jpg",
-      "fallbackArtwork": "https://i.ytimg.com/vi/BuUkI05OLHQ/hqdefault.jpg",
+      "artwork": "./assets/artwork/BuUkI05OLHQ.jpg",
+      "fallbackArtwork": "./assets/artwork/BuUkI05OLHQ.jpg",
       "description": "Imported from a provided YouTube link.",
       "timingStatus": "single-track",
       "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
@@ -215,17 +217,18 @@
           "end": 221,
           "timingConfidence": "user"
         }
-      ]
+      ],
+      "audioUrl": "./media/BuUkI05OLHQ.m4a"
     },
     {
       "id": "chance-pena-sleep-deprivation-live-at-austin-city-limits-radio",
       "title": "Sleep Deprivation (Live at Austin City Limits Radio)",
       "artist": "Chance Peña",
-      "provider": "youtube",
+      "provider": "local",
       "youtubeId": "nuUVSzwAE0A",
       "duration": 185,
-      "artwork": "https://i.ytimg.com/vi/nuUVSzwAE0A/maxresdefault.jpg",
-      "fallbackArtwork": "https://i.ytimg.com/vi/nuUVSzwAE0A/hqdefault.jpg",
+      "artwork": "./assets/artwork/nuUVSzwAE0A.jpg",
+      "fallbackArtwork": "./assets/artwork/nuUVSzwAE0A.jpg",
       "description": "Imported from a provided YouTube link.",
       "timingStatus": "single-track",
       "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
@@ -241,17 +244,18 @@
           "end": 185,
           "timingConfidence": "user"
         }
-      ]
+      ],
+      "audioUrl": "./media/nuUVSzwAE0A.m4a"
     },
     {
       "id": "caamp-tiny-desk-concert",
       "title": "Tiny Desk Concert",
       "artist": "Caamp",
-      "provider": "youtube",
+      "provider": "local",
       "youtubeId": "J1vTi9ycpiA",
       "duration": 1172,
-      "artwork": "https://i.ytimg.com/vi/J1vTi9ycpiA/maxresdefault.jpg",
-      "fallbackArtwork": "https://i.ytimg.com/vi/J1vTi9ycpiA/hqdefault.jpg",
+      "artwork": "./assets/artwork/J1vTi9ycpiA.jpg",
+      "fallbackArtwork": "./assets/artwork/J1vTi9ycpiA.jpg",
       "description": "Imported from a provided YouTube link.",
       "timingStatus": "user-calibrated",
       "timingNote": "Track starts follow the timestamped list in the YouTube comments. By and By begins at 0:12, after the spoken intro.",
@@ -289,17 +293,18 @@
           "end": 1172,
           "timingConfidence": "user"
         }
-      ]
+      ],
+      "audioUrl": "./media/J1vTi9ycpiA.m4a"
     },
     {
       "id": "the-red-clay-strays-tiny-desk-concert",
       "title": "Tiny Desk Concert",
       "artist": "The Red Clay Strays",
-      "provider": "youtube",
+      "provider": "local",
       "youtubeId": "uJ3Pusp6R_s",
       "duration": 1341,
-      "artwork": "https://i.ytimg.com/vi/uJ3Pusp6R_s/maxresdefault.jpg",
-      "fallbackArtwork": "https://i.ytimg.com/vi/uJ3Pusp6R_s/hqdefault.jpg",
+      "artwork": "./assets/artwork/uJ3Pusp6R_s.jpg",
+      "fallbackArtwork": "./assets/artwork/uJ3Pusp6R_s.jpg",
       "description": "Imported from a provided YouTube link.",
       "timingStatus": "user-calibrated",
       "timingNote": "Track starts follow a timestamped comment. Between-song talk lands at the end of the preceding cut; refine in Catalog Studio if needed.",
@@ -344,17 +349,18 @@
           "end": 1341,
           "timingConfidence": "user"
         }
-      ]
+      ],
+      "audioUrl": "./media/uJ3Pusp6R_s.m4a"
     },
     {
       "id": "kodaline-brother-acoustic-from-the-streets-of-warsaw",
       "title": "Brother (Acoustic from the streets of Warsaw)",
       "artist": "Kodaline",
-      "provider": "youtube",
+      "provider": "local",
       "youtubeId": "HbYhMAI4tL4",
       "duration": 239,
-      "artwork": "https://i.ytimg.com/vi/HbYhMAI4tL4/maxresdefault.jpg",
-      "fallbackArtwork": "https://i.ytimg.com/vi/HbYhMAI4tL4/hqdefault.jpg",
+      "artwork": "./assets/artwork/HbYhMAI4tL4.jpg",
+      "fallbackArtwork": "./assets/artwork/HbYhMAI4tL4.jpg",
       "description": "Imported from a provided YouTube link.",
       "timingStatus": "single-track",
       "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
@@ -369,17 +375,18 @@
           "end": 239,
           "timingConfidence": "user"
         }
-      ]
+      ],
+      "audioUrl": "./media/HbYhMAI4tL4.m4a"
     },
     {
       "id": "kodaline-all-i-want-official-live-video",
       "title": "All I Want (Official Live Video)",
       "artist": "Kodaline",
-      "provider": "youtube",
+      "provider": "local",
       "youtubeId": "jGUASAxXwg4",
       "duration": 529,
-      "artwork": "https://i.ytimg.com/vi/jGUASAxXwg4/maxresdefault.jpg",
-      "fallbackArtwork": "https://i.ytimg.com/vi/jGUASAxXwg4/hqdefault.jpg",
+      "artwork": "./assets/artwork/jGUASAxXwg4.jpg",
+      "fallbackArtwork": "./assets/artwork/jGUASAxXwg4.jpg",
       "description": "Imported from a provided YouTube link.",
       "timingStatus": "single-track",
       "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
@@ -394,17 +401,18 @@
           "end": 529,
           "timingConfidence": "user"
         }
-      ]
+      ],
+      "audioUrl": "./media/jGUASAxXwg4.m4a"
     },
     {
       "id": "the-red-clay-strays-wondering-why-live-at-austin-city-limits-radio",
       "title": "Wondering Why (Live at Austin City Limits Radio)",
       "artist": "The Red Clay Strays",
-      "provider": "youtube",
+      "provider": "local",
       "youtubeId": "kTlaky9zzhw",
       "duration": 243,
-      "artwork": "https://i.ytimg.com/vi/kTlaky9zzhw/maxresdefault.jpg",
-      "fallbackArtwork": "https://i.ytimg.com/vi/kTlaky9zzhw/hqdefault.jpg",
+      "artwork": "./assets/artwork/kTlaky9zzhw.jpg",
+      "fallbackArtwork": "./assets/artwork/kTlaky9zzhw.jpg",
       "description": "Imported from a provided YouTube link.",
       "timingStatus": "single-track",
       "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
@@ -419,17 +427,18 @@
           "end": 243,
           "timingConfidence": "user"
         }
-      ]
+      ],
+      "audioUrl": "./media/kTlaky9zzhw.m4a"
     },
     {
       "id": "the-white-buffalo-oh-darlin-what-have-i-done-audiotree-live",
       "title": "Oh Darlin' What Have I Done (Audiotree Live)",
       "artist": "The White Buffalo",
-      "provider": "youtube",
+      "provider": "local",
       "youtubeId": "RdF2zb3KjZE",
       "duration": 263,
-      "artwork": "https://i.ytimg.com/vi/RdF2zb3KjZE/maxresdefault.jpg",
-      "fallbackArtwork": "https://i.ytimg.com/vi/RdF2zb3KjZE/hqdefault.jpg",
+      "artwork": "./assets/artwork/RdF2zb3KjZE.jpg",
+      "fallbackArtwork": "./assets/artwork/RdF2zb3KjZE.jpg",
       "description": "Imported from a provided YouTube link.",
       "timingStatus": "single-track",
       "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
@@ -445,7 +454,8 @@
           "end": 263,
           "timingConfidence": "user"
         }
-      ]
+      ],
+      "audioUrl": "./media/RdF2zb3KjZE.m4a"
     }
   ]
 }

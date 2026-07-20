@@ -44,6 +44,8 @@ jobs:
             --exclude='.github' \
             --exclude='_site' \
             --exclude='local-audio' \
+            --exclude='node_modules' \
+            --exclude='test-results' \
             --exclude='music-links*.json' \
             --exclude='tools' \
             --exclude='package.json' \

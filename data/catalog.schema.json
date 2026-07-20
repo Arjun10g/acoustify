@@ -18,6 +18,7 @@
           "provider": { "enum": ["youtube", "local"] },
           "youtubeId": { "type": "string" },
           "assetId": { "type": "string" },
+          "audioUrl": { "type": "string" },
           "duration": { "type": "number", "minimum": 0 },
           "tracks": {
             "type": "array",
