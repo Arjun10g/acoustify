@@ -35,6 +35,35 @@ export function continuousTrackIndexAtTime(queue, queueIndex, currentTime, resol
   return index;
 }
 
+export function queueWithAddedTrack(queue, queueIndex, trackKey, { next = false } = {}) {
+  const result = [...queue];
+  const existingIndex = result.indexOf(trackKey);
+  if (existingIndex >= 0 && (existingIndex === queueIndex || existingIndex > queueIndex)) return result;
+  let activeIndex = queueIndex;
+  if (existingIndex >= 0) {
+    result.splice(existingIndex, 1);
+    if (existingIndex < activeIndex) activeIndex -= 1;
+  }
+  result.splice(next && activeIndex >= 0 ? activeIndex + 1 : result.length, 0, trackKey);
+  return result;
+}
+
+export function queueWithoutTrack(queue, queueIndex, trackKey) {
+  const index = queue.indexOf(trackKey);
+  if (index < 0 || index === queueIndex) return [...queue];
+  return queue.filter((key) => key !== trackKey);
+}
+
+export function queueWithMovedTrack(queue, queueIndex, trackKey, direction) {
+  const result = [...queue];
+  const index = result.indexOf(trackKey);
+  if (index < 0 || index <= queueIndex) return result;
+  const target = index + Math.sign(Number(direction) || 0);
+  if (target <= queueIndex || target < 0 || target >= result.length) return result;
+  [result[index], result[target]] = [result[target], result[index]];
+  return result;
+}
+
 function loadYouTubeApi() {
   if (window.YT?.Player) return Promise.resolve(window.YT);
   if (youtubeApiPromise) return youtubeApiPromise;
@@ -172,6 +201,35 @@ export class PlaybackController extends EventTarget {
     const key = activeKey || this.currentTrack?.key;
     this.queueIndex = key ? this.queue.indexOf(key) : -1;
     this.emit("queuechange", this.snapshot());
+  }
+
+  addToQueue(trackKey, options = {}) {
+    if (!this.resolveTrack(trackKey) || trackKey === this.currentTrack?.key) return false;
+    const nextQueue = queueWithAddedTrack(this.queue, this.queueIndex, trackKey, options);
+    if (nextQueue.join("\n") === this.queue.join("\n")) return false;
+    this.setQueue(nextQueue, this.currentTrack?.key);
+    return true;
+  }
+
+  removeFromQueue(trackKey) {
+    const nextQueue = queueWithoutTrack(this.queue, this.queueIndex, trackKey);
+    if (nextQueue.join("\n") === this.queue.join("\n")) return false;
+    this.setQueue(nextQueue, this.currentTrack?.key);
+    return true;
+  }
+
+  moveInQueue(trackKey, direction) {
+    const nextQueue = queueWithMovedTrack(this.queue, this.queueIndex, trackKey, direction);
+    if (nextQueue.join("\n") === this.queue.join("\n")) return false;
+    this.setQueue(nextQueue, this.currentTrack?.key);
+    return true;
+  }
+
+  clearUpcoming() {
+    const nextQueue = this.queueIndex >= 0 ? this.queue.slice(0, this.queueIndex + 1) : [];
+    if (nextQueue.length === this.queue.length) return false;
+    this.setQueue(nextQueue, this.currentTrack?.key);
+    return true;
   }
 
   async loadByKey(trackKey, options = {}) {
@@ -371,8 +429,42 @@ export class PlaybackController extends EventTarget {
         this.localAudio.load();
       });
     }
-    this.localAudio.currentTime = startAt;
+    await this.#seekLocal(startAt);
     if (autoplay) await this.localAudio.play();
+  }
+
+  async #seekLocal(startAt) {
+    const target = Math.max(0, Number(startAt) || 0);
+    if (target < 0.05) {
+      this.localAudio.currentTime = target;
+      return;
+    }
+    if (Math.abs(this.localAudio.currentTime - target) < 0.5) return;
+
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      await new Promise((resolve, reject) => {
+        let timeout;
+        const finish = () => {
+          clearTimeout(timeout);
+          this.localAudio.removeEventListener("seeked", finish);
+          this.localAudio.removeEventListener("error", fail);
+          resolve();
+        };
+        const fail = () => {
+          clearTimeout(timeout);
+          this.localAudio.removeEventListener("seeked", finish);
+          this.localAudio.removeEventListener("error", fail);
+          reject(new Error("The browser could not seek to this song's saved start."));
+        };
+        this.localAudio.addEventListener("seeked", finish, { once: true });
+        this.localAudio.addEventListener("error", fail, { once: true });
+        timeout = setTimeout(finish, 8000);
+        this.localAudio.currentTime = target;
+      });
+      if (Math.abs(this.localAudio.currentTime - target) < 0.5) return;
+    }
+
+    throw new Error("The browser could not seek to this song's saved start.");
   }
 
   #bindLocalAudio() {

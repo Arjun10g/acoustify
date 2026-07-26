@@ -1,4 +1,4 @@
-const CACHE_VERSION = "acoustify-shell-v2.0.1";
+const CACHE_VERSION = "acoustify-shell-v2.1.0";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -25,7 +25,19 @@ const APP_SHELL = [
   "./assets/artwork/HbYhMAI4tL4.jpg",
   "./assets/artwork/jGUASAxXwg4.jpg",
   "./assets/artwork/kTlaky9zzhw.jpg",
-  "./assets/artwork/RdF2zb3KjZE.jpg"
+  "./assets/artwork/RdF2zb3KjZE.jpg",
+  "./assets/artwork/NVRK1xUumiY.jpg",
+  "./assets/artwork/wwEF1f6Wwj8.jpg",
+  "./assets/artwork/QVyMBdfrr-E.jpg",
+  "./assets/artwork/DUssNntYVCo.jpg",
+  "./assets/artwork/UDScdPrf4N8.jpg",
+  "./assets/artwork/dF8eU19tmWE.jpg",
+  "./assets/artwork/hli7lApCEXU.jpg",
+  "./assets/artwork/Os5fNYxPRwo.jpg",
+  "./assets/artwork/PdcwiATrJJk.jpg",
+  "./assets/artwork/efdKVloTeqg.jpg",
+  "./assets/artwork/YCDCFNDrdkE.jpg",
+  "./assets/artwork/S90ruG91Y_U.jpg"
 ];
 
 self.addEventListener("install", (event) => {

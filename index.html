@@ -130,7 +130,10 @@
       <div class="queue-section">
         <div class="section-row">
           <h3>Up next</h3>
-          <span id="queue-count">0 songs</span>
+          <div class="queue-heading-actions">
+            <span id="queue-count">0 queued</span>
+            <button id="queue-clear" class="icon-button compact" type="button" data-action="clear-queue" aria-label="Clear upcoming songs" title="Clear upcoming songs" disabled>×</button>
+          </div>
         </div>
         <div class="queue-list" id="queue-list"></div>
       </div>

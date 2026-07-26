@@ -3,14 +3,22 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildCatalogIndex, mergeCatalog, parseChapterLines, sourceWithLocalAudio } from "../assets/js/catalog.js";
-import { continuousRunEnd, continuousTrackIndexAtTime, isResumePosition } from "../assets/js/player.js";
+import {
+  continuousRunEnd,
+  continuousTrackIndexAtTime,
+  isResumePosition,
+  queueWithAddedTrack,
+  queueWithoutTrack,
+  queueWithMovedTrack
+} from "../assets/js/player.js";
 import { formatTime, parseExtractedYouTubeId, parseTimecode, parseYouTubeId } from "../assets/js/utils.js";
 import { applyMusicLinksToCatalog, getMusicLinkEntries, sourceFromMusicLink } from "./music-link-ingest.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const base = JSON.parse(fs.readFileSync(path.join(root, "data", "catalog.json"), "utf8"));
 
-assert.equal(base.sources.length, 10);
+assert.equal(base.sources.length, 22);
+assert.equal(base.sources.reduce((total, source) => total + source.tracks.length, 0), 62);
 for (const source of base.sources) {
   assert.equal(source.provider, "local");
   assert.match(source.audioUrl, /^\.\/media\/[\w-]{11}\.m4a$/);
@@ -50,6 +58,17 @@ assert.equal(isResumePosition(null), false);
 assert.equal(isResumePosition(undefined), false);
 assert.equal(isResumePosition(""), false);
 assert.equal(isResumePosition(120.5), true);
+
+const queue = ["played", "current", "next-a", "next-b"];
+assert.deepEqual(queueWithAddedTrack([], -1, "first-song"), ["first-song"]);
+assert.deepEqual(queueWithAddedTrack(queue, 1, "new-song"), [...queue, "new-song"]);
+assert.deepEqual(queueWithAddedTrack(queue, 1, "new-song", { next: true }), ["played", "current", "new-song", "next-a", "next-b"]);
+assert.deepEqual(queueWithAddedTrack(queue, 1, "next-a"), queue);
+assert.deepEqual(queueWithAddedTrack(queue, 1, "played"), ["current", "next-a", "next-b", "played"]);
+assert.deepEqual(queueWithoutTrack(queue, 1, "current"), queue);
+assert.deepEqual(queueWithoutTrack(queue, 1, "next-a"), ["played", "current", "next-b"]);
+assert.deepEqual(queueWithMovedTrack(queue, 1, "next-b", -1), ["played", "current", "next-b", "next-a"]);
+assert.deepEqual(queueWithMovedTrack(queue, 1, "next-a", -1), queue);
 
 const override = structuredClone(base.sources[0]);
 override.title = "Browser Override";

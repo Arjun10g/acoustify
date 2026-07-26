@@ -31,7 +31,7 @@ import {
 } from "./utils.js";
 
 const STATE_KEY = "app-state-v2";
-const APP_VERSION = 3;
+const APP_VERSION = 4;
 const DEFAULT_STATE = {
   version: APP_VERSION,
   liked: [],
@@ -51,7 +51,8 @@ const DEFAULT_STATE = {
   playback: {
     trackKey: null,
     absolutePosition: 0,
-    updatedAt: null
+    updatedAt: null,
+    queue: []
   }
 };
 
@@ -69,6 +70,7 @@ const dom = {
   qualityReadout: document.getElementById("quality-readout"),
   sourceNote: document.getElementById("source-note"),
   queueCount: document.getElementById("queue-count"),
+  queueClear: document.getElementById("queue-clear"),
   queueList: document.getElementById("queue-list"),
   barArtwork: document.getElementById("bar-artwork"),
   barTrackTitle: document.getElementById("bar-track-title"),
@@ -162,7 +164,8 @@ function normalizeState(input) {
     },
     playback: {
       ...DEFAULT_STATE.playback,
-      ...(candidate.playback || {})
+      ...(candidate.playback || {}),
+      queue: Array.isArray(candidate.playback?.queue) ? [...new Set(candidate.playback.queue.filter(Boolean))] : []
     }
   };
 }
@@ -176,6 +179,7 @@ function rebuildCatalog() {
     ...playlist,
     trackKeys: playlist.trackKeys.filter((key) => validKeys.has(key))
   }));
+  state.playback.queue = state.playback.queue.filter((key) => validKeys.has(key));
   if (state.playback.trackKey && !validKeys.has(state.playback.trackKey)) {
     state.playback = deepClone(DEFAULT_STATE.playback);
   }
@@ -343,6 +347,7 @@ function trackTable(tracks, {
         <td class="action-col">
           <div class="track-actions">
             <button class="icon-button ${liked ? "active" : ""}" type="button" data-action="toggle-like" data-track-key="${escapeHtml(track.key)}" aria-label="${liked ? "Unlike" : "Like"} ${escapeHtml(track.title)}">${liked ? "♥" : "♡"}</button>
+            <button class="icon-button queue-add-button" type="button" data-action="add-to-queue" data-track-key="${escapeHtml(track.key)}" aria-label="Add ${escapeHtml(track.title)} to queue" title="Add to queue">☷</button>
             ${removeButton}
           </div>
         </td>
@@ -806,14 +811,14 @@ function recordTrackStart(snapshot) {
     state.history = state.history.slice(0, 500);
     state.playCounts[track.key] = (state.playCounts[track.key] || 0) + 1;
   }
-  state.playback = { trackKey: track.key, absolutePosition: snapshot.currentTime, updatedAt: now };
+  state.playback = { ...state.playback, trackKey: track.key, absolutePosition: snapshot.currentTime, updatedAt: now, queue: snapshot.queue };
   persistState();
 }
 
 function updatePlaybackMemory(snapshot) {
   if (!snapshot.track || !catalog.trackByKey.has(snapshot.track.key)) return;
   const now = Date.now();
-  state.playback = { trackKey: snapshot.track.key, absolutePosition: snapshot.currentTime, updatedAt: now };
+  state.playback = { ...state.playback, trackKey: snapshot.track.key, absolutePosition: snapshot.currentTime, updatedAt: now, queue: snapshot.queue };
   const historyEntry = state.history.find((entry) => entry.trackKey === snapshot.track.key);
   if (historyEntry) historyEntry.position = snapshot.currentTime;
   if (now - lastPlaybackPersistAt > 5000) {
@@ -896,18 +901,36 @@ function renderPersistedPlaybackPreview() {
 }
 
 function renderQueue(snapshot) {
-  const tracks = snapshot.queue.map((key) => catalog.trackByKey.get(key)).filter(Boolean);
-  dom.queueCount.textContent = `${tracks.length} song${tracks.length === 1 ? "" : "s"}`;
-  if (!tracks.length) {
+  const startIndex = snapshot.queueIndex >= 0 ? snapshot.queueIndex : 0;
+  const entries = snapshot.queue.slice(startIndex).map((key, offset) => ({
+    track: catalog.trackByKey.get(key),
+    index: startIndex + offset
+  })).filter((entry) => entry.track);
+  const upcomingCount = snapshot.queueIndex >= 0 ? Math.max(0, snapshot.queue.length - snapshot.queueIndex - 1) : snapshot.queue.length;
+  dom.queueCount.textContent = `${upcomingCount} queued`;
+  dom.queueClear.disabled = upcomingCount === 0;
+  if (!entries.length) {
     dom.queueList.innerHTML = '<div class="muted small" style="padding:12px 5px">Songs will show up here when you start playing.</div>';
     return;
   }
-  dom.queueList.innerHTML = tracks.map((track, index) => `
-    <div class="queue-item ${track.key === snapshot.track?.key ? "active" : ""}" data-action="play-queue-track" data-track-key="${escapeHtml(track.key)}">
-      <span class="queue-index">${track.key === snapshot.track?.key && snapshot.isPlaying ? "♫" : index + 1}</span>
-      <span class="queue-copy"><strong>${escapeHtml(track.title)}</strong><span>${escapeHtml(track.artist)}</span></span>
-      <span class="queue-duration">${formatTime(track.end - track.start)}</span>
-    </div>`).join("");
+  dom.queueList.innerHTML = entries.map(({ track, index }) => {
+    const isCurrent = index === snapshot.queueIndex;
+    const firstUpcoming = index === snapshot.queueIndex + 1;
+    const last = index === snapshot.queue.length - 1;
+    return `
+      <div class="queue-item ${isCurrent ? "active" : ""}">
+        <button class="queue-select" type="button" data-action="play-queue-track" data-track-key="${escapeHtml(track.key)}" aria-label="${isCurrent && snapshot.isPlaying ? "Pause" : "Play"} ${escapeHtml(track.title)}">
+          <span class="queue-index">${isCurrent ? snapshot.isPlaying ? "♫" : "▶" : index - snapshot.queueIndex}</span>
+          <span class="queue-copy"><strong>${escapeHtml(track.title)}</strong><span>${escapeHtml(track.artist)}</span></span>
+          <span class="queue-duration">${formatTime(track.end - track.start)}</span>
+        </button>
+        ${isCurrent ? '<span class="queue-now">Now</span>' : `<div class="queue-actions">
+          <button class="icon-button compact" type="button" data-action="move-queue-up" data-track-key="${escapeHtml(track.key)}" aria-label="Move ${escapeHtml(track.title)} up" title="Move up" ${firstUpcoming ? "disabled" : ""}>↑</button>
+          <button class="icon-button compact" type="button" data-action="move-queue-down" data-track-key="${escapeHtml(track.key)}" aria-label="Move ${escapeHtml(track.title)} down" title="Move down" ${last ? "disabled" : ""}>↓</button>
+          <button class="icon-button compact" type="button" data-action="remove-from-queue" data-track-key="${escapeHtml(track.key)}" aria-label="Remove ${escapeHtml(track.title)} from queue" title="Remove from queue">×</button>
+        </div>`}
+      </div>`;
+  }).join("");
 }
 
 function syncActiveTrackRows() {
@@ -1438,7 +1461,11 @@ function wirePlayerEvents() {
     renderPlaybackProgress(event.detail);
   });
   player.addEventListener("qualitychange", (event) => renderPlayerSnapshot(event.detail));
-  player.addEventListener("queuechange", (event) => renderQueue(event.detail));
+  player.addEventListener("queuechange", (event) => {
+    state.playback.queue = event.detail.queue;
+    persistState();
+    renderQueue(event.detail);
+  });
   player.addEventListener("optionschange", (event) => {
     state.settings.repeat = event.detail.repeat;
     state.settings.shuffle = event.detail.shuffle;
@@ -1487,7 +1514,29 @@ async function handleAction(action, element, event) {
       else await playTrack(trackKey, queue);
       break;
     }
-    case "play-queue-track": await playTrack(trackKey, player.queue); break;
+    case "play-queue-track": {
+      if (player?.currentTrack?.key === trackKey) await player.toggle();
+      else await playTrack(trackKey, player.queue);
+      break;
+    }
+    case "add-to-queue": {
+      const track = catalog.trackByKey.get(trackKey);
+      if (!track) break;
+      const added = player.addToQueue(trackKey);
+      toast(added ? `Added “${track.title}” to the queue.` : `“${track.title}” is already queued.`, added ? "success" : "info");
+      break;
+    }
+    case "move-queue-up": player.moveInQueue(trackKey, -1); break;
+    case "move-queue-down": player.moveInQueue(trackKey, 1); break;
+    case "remove-from-queue": {
+      const track = catalog.trackByKey.get(trackKey);
+      if (player.removeFromQueue(trackKey)) toast(`Removed “${track?.title || "song"}” from the queue.`);
+      break;
+    }
+    case "clear-queue": {
+      if (player.clearUpcoming()) toast("Upcoming songs cleared.");
+      break;
+    }
     case "play-source": await playSource(sourceId); break;
     case "shuffle-source": await playSource(sourceId, { shuffle: true }); break;
     case "play-playlist": await playPlaylist(playlistId); break;
@@ -1502,6 +1551,7 @@ async function handleAction(action, element, event) {
     }
     case "toggle-play": {
       if (player.currentTrack) await player.toggle();
+      else if (player.queue.length) await player.next();
       else if (state.playback.trackKey) await playTrack(state.playback.trackKey, null, { resume: true });
       else if (catalog.tracks[0]) await playTrack(catalog.tracks[0].key, catalog.sourceById.get(catalog.tracks[0].sourceId).tracks.map((track) => track.key));
       break;
@@ -1931,6 +1981,7 @@ async function init() {
     setRangeFill(dom.volume, state.settings.volume * 100);
     setRangeFill(dom.progress, 0);
     wirePlayerEvents();
+    player.setQueue(state.playback.queue);
     wireDomEvents();
     updateNetworkStatus();
     setPanelOpen(!matchMedia("(max-width: 1120px)").matches && state.settings.playerPanelOpen);

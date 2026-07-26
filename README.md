@@ -9,16 +9,17 @@ The project is designed to deploy as-is to **GitHub Pages**. There is no applica
 - Spotify-influenced dark listening interface with an original Acoustify identity.
 - Responsive desktop, tablet, mobile, and installable PWA layouts.
 - Android media-session controls for play, pause, seek, previous, and next.
-- Ten packaged native-audio sources with local artwork and no YouTube playback dependency.
+- Twenty-two packaged native-audio sources with local artwork and no YouTube playback dependency.
 - Long-source segmentation: selecting a row seeks to the track start, while adjacent tracks from the same source continue without reloading the underlying media.
 - Local master mode for audio files you own. The Blob is stored in IndexedDB and played without Acoustify transcoding it.
 - Authorized-audio import that matches the extractor's `[YouTube ID]` filename to an existing source and keeps its saved track cuts.
+- Editable, persistent play queue with add, reorder, remove, and clear controls.
 - Browser memory for:
   - likes;
   - listening history and play counts;
   - playlists;
   - volume, shuffle, repeat, autoplay, and panel preferences;
-  - current track and resume position;
+  - current track, queue, and resume position;
   - custom sources and timing overrides.
 - JSON memory backup/import.
 - JSON custom-catalog export.

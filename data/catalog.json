@@ -1,6 +1,6 @@
 {
-  "version": 2,
-  "generatedAt": "2026-07-20",
+  "version": 3,
+  "generatedAt": "2026-07-26",
   "sources": [
     {
       "id": "of-monsters-and-men-live-from-skarkali",
@@ -456,6 +456,442 @@
         }
       ],
       "audioUrl": "./media/RdF2zb3KjZE.m4a"
+    },
+    {
+      "id": "houndmouth-sedona-live-at-austin-city-limits-radio",
+      "title": "Sedona (Live at Austin City Limits Radio)",
+      "artist": "Houndmouth",
+      "provider": "local",
+      "youtubeId": "NVRK1xUumiY",
+      "duration": 461,
+      "artwork": "./assets/artwork/NVRK1xUumiY.jpg",
+      "fallbackArtwork": "./assets/artwork/NVRK1xUumiY.jpg",
+      "description": "Houndmouth performing Sedona at Austin City Limits Radio.",
+      "timingStatus": "single-track",
+      "timingNote": "The song starts at 3:27, based on a timestamped YouTube comment.",
+      "tags": [
+        "live",
+        "acoustic"
+      ],
+      "tracks": [
+        {
+          "id": "sedona",
+          "title": "Sedona",
+          "start": 207,
+          "end": 461,
+          "timingConfidence": "user"
+        }
+      ],
+      "year": 2015,
+      "audioUrl": "./media/NVRK1xUumiY.m4a"
+    },
+    {
+      "id": "mumford-sons-the-cave-live-on-the-current",
+      "title": "The Cave (Live on The Current)",
+      "artist": "Mumford & Sons",
+      "provider": "local",
+      "youtubeId": "wwEF1f6Wwj8",
+      "duration": 214,
+      "artwork": "./assets/artwork/wwEF1f6Wwj8.jpg",
+      "fallbackArtwork": "./assets/artwork/wwEF1f6Wwj8.jpg",
+      "description": "Mumford & Sons performing The Cave live on The Current.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live",
+        "acoustic"
+      ],
+      "tracks": [
+        {
+          "id": "the-cave-live-on-the-current",
+          "title": "The Cave (Live on The Current)",
+          "start": 0,
+          "end": 214,
+          "timingConfidence": "user"
+        }
+      ],
+      "year": 2010,
+      "audioUrl": "./media/wwEF1f6Wwj8.m4a"
+    },
+    {
+      "id": "walk-the-moon-shut-up-and-dance-acoustic-on-the-current",
+      "title": "Shut Up and Dance (Acoustic on The Current)",
+      "artist": "Walk The Moon",
+      "provider": "local",
+      "youtubeId": "QVyMBdfrr-E",
+      "duration": 210,
+      "artwork": "./assets/artwork/QVyMBdfrr-E.jpg",
+      "fallbackArtwork": "./assets/artwork/QVyMBdfrr-E.jpg",
+      "description": "An acoustic performance of Shut Up and Dance live on The Current.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live",
+        "acoustic"
+      ],
+      "tracks": [
+        {
+          "id": "shut-up-and-dance-acoustic-on-the-current",
+          "title": "Shut Up and Dance (Acoustic on The Current)",
+          "start": 0,
+          "end": 210,
+          "timingConfidence": "user"
+        }
+      ],
+      "year": 2015,
+      "audioUrl": "./media/QVyMBdfrr-E.m4a"
+    },
+    {
+      "id": "tyler-childers-feathered-indians-live-at-the-current",
+      "title": "Feathered Indians (Live at The Current)",
+      "artist": "Tyler Childers",
+      "provider": "local",
+      "youtubeId": "DUssNntYVCo",
+      "duration": 222,
+      "artwork": "./assets/artwork/DUssNntYVCo.jpg",
+      "fallbackArtwork": "./assets/artwork/DUssNntYVCo.jpg",
+      "description": "Tyler Childers performing Feathered Indians live at The Current.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live",
+        "acoustic"
+      ],
+      "tracks": [
+        {
+          "id": "feathered-indians-live-at-the-current",
+          "title": "Feathered Indians (Live at The Current)",
+          "start": 0,
+          "end": 222,
+          "timingConfidence": "user"
+        }
+      ],
+      "year": 2020,
+      "audioUrl": "./media/DUssNntYVCo.m4a"
+    },
+    {
+      "id": "foster-the-people-pumped-up-kicks-acoustic-on-the-current",
+      "title": "Pumped Up Kicks (Acoustic on The Current)",
+      "artist": "Foster the People",
+      "provider": "local",
+      "youtubeId": "UDScdPrf4N8",
+      "duration": 182,
+      "artwork": "./assets/artwork/UDScdPrf4N8.jpg",
+      "fallbackArtwork": "./assets/artwork/UDScdPrf4N8.jpg",
+      "description": "An acoustic performance of Pumped Up Kicks live on The Current.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live",
+        "acoustic"
+      ],
+      "tracks": [
+        {
+          "id": "pumped-up-kicks-acoustic-on-the-current",
+          "title": "Pumped Up Kicks (Acoustic on The Current)",
+          "start": 0,
+          "end": 182,
+          "timingConfidence": "user"
+        }
+      ],
+      "year": 2011,
+      "audioUrl": "./media/UDScdPrf4N8.m4a"
+    },
+    {
+      "id": "rayland-baxter-yellow-eyes-live-at-paste-studios",
+      "title": "Yellow Eyes (Live at Paste Studios)",
+      "artist": "Rayland Baxter",
+      "provider": "local",
+      "youtubeId": "dF8eU19tmWE",
+      "duration": 222,
+      "artwork": "./assets/artwork/dF8eU19tmWE.jpg",
+      "fallbackArtwork": "./assets/artwork/dF8eU19tmWE.jpg",
+      "description": "Rayland Baxter performing Yellow Eyes at Paste Studios.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live",
+        "acoustic"
+      ],
+      "tracks": [
+        {
+          "id": "yellow-eyes-live-at-paste-studios",
+          "title": "Yellow Eyes (Live at Paste Studios)",
+          "start": 0,
+          "end": 222,
+          "timingConfidence": "user"
+        }
+      ],
+      "year": 2015,
+      "audioUrl": "./media/dF8eU19tmWE.m4a"
+    },
+    {
+      "id": "hollow-coves-audiotree-live",
+      "title": "Audiotree Live",
+      "artist": "Hollow Coves",
+      "provider": "local",
+      "youtubeId": "hli7lApCEXU",
+      "duration": 2474,
+      "artwork": "./assets/artwork/hli7lApCEXU.jpg",
+      "fallbackArtwork": "./assets/artwork/hli7lApCEXU.jpg",
+      "description": "Hollow Coves performing five songs for Audiotree Live.",
+      "timingStatus": "user-calibrated",
+      "timingNote": "Song times come from the tracklist in the video description.",
+      "tags": [
+        "live",
+        "acoustic",
+        "session",
+        "audiotree"
+      ],
+      "tracks": [
+        {
+          "id": "on-the-way",
+          "title": "On The Way",
+          "start": 79,
+          "end": 437,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "coastline",
+          "title": "Coastline",
+          "start": 437,
+          "end": 688,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "purple",
+          "title": "Purple",
+          "start": 688,
+          "end": 1762,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "letting-go",
+          "title": "Letting Go",
+          "start": 1762,
+          "end": 2050,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "milk-honey",
+          "title": "Milk & Honey",
+          "start": 2050,
+          "end": 2474,
+          "timingConfidence": "user"
+        }
+      ],
+      "year": 2024,
+      "audioUrl": "./media/hli7lApCEXU.m4a"
+    },
+    {
+      "id": "chance-pena-i-am-not-who-i-was-live-at-pnc-studio",
+      "title": "i am not who i was (Live at PNC Studio)",
+      "artist": "Chance Peña",
+      "provider": "local",
+      "youtubeId": "Os5fNYxPRwo",
+      "duration": 169,
+      "artwork": "./assets/artwork/Os5fNYxPRwo.jpg",
+      "fallbackArtwork": "./assets/artwork/Os5fNYxPRwo.jpg",
+      "description": "Chance Peña performing i am not who i was at the PNC Live Studio.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live",
+        "acoustic"
+      ],
+      "tracks": [
+        {
+          "id": "i-am-not-who-i-was-live-at-pnc-studio",
+          "title": "i am not who i was (Live at PNC Studio)",
+          "start": 0,
+          "end": 169,
+          "timingConfidence": "user"
+        }
+      ],
+      "year": 2024,
+      "audioUrl": "./media/Os5fNYxPRwo.m4a"
+    },
+    {
+      "id": "chance-pena-live-at-darien-lake",
+      "title": "Live at Darien Lake",
+      "artist": "Chance Peña",
+      "provider": "local",
+      "youtubeId": "PdcwiATrJJk",
+      "duration": 2415,
+      "artwork": "./assets/artwork/PdcwiATrJJk.jpg",
+      "fallbackArtwork": "./assets/artwork/PdcwiATrJJk.jpg",
+      "description": "Chance Peña live at Darien Lake in September 2025.",
+      "timingStatus": "user-calibrated",
+      "timingNote": "Song times come from the top timestamped YouTube comment.",
+      "tags": [
+        "live",
+        "acoustic",
+        "concert"
+      ],
+      "tracks": [
+        {
+          "id": "cold",
+          "title": "Cold",
+          "start": 44,
+          "end": 261,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "spinning",
+          "title": "Spinning",
+          "start": 261,
+          "end": 528,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "good-love-die",
+          "title": "Good Love Die",
+          "start": 528,
+          "end": 754,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "sleep-deprivation",
+          "title": "Sleep Deprivation",
+          "start": 754,
+          "end": 918,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "wolves-of-worry",
+          "title": "Wolves of Worry",
+          "start": 918,
+          "end": 1161,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "my-mind-drifts-to-you",
+          "title": "My Mind Drifts to You",
+          "start": 1161,
+          "end": 1358,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "make-way-for-the-feeling",
+          "title": "Make Way for the Feeling",
+          "start": 1358,
+          "end": 1572,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "west-of-ohio",
+          "title": "West of Ohio",
+          "start": 1572,
+          "end": 1787,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "peacemaker",
+          "title": "Peacemaker",
+          "start": 1787,
+          "end": 1988,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "i-am-not-who-i-was",
+          "title": "i am not who i was",
+          "start": 1988,
+          "end": 2206,
+          "timingConfidence": "user"
+        },
+        {
+          "id": "the-mountain-is-you",
+          "title": "The Mountain Is You",
+          "start": 2206,
+          "end": 2415,
+          "timingConfidence": "user"
+        }
+      ],
+      "year": 2025,
+      "audioUrl": "./media/PdcwiATrJJk.m4a"
+    },
+    {
+      "id": "tyler-childers-all-your-n-live-at-red-rocks",
+      "title": "All Your'n (Live at Red Rocks)",
+      "artist": "Tyler Childers",
+      "provider": "local",
+      "youtubeId": "efdKVloTeqg",
+      "duration": 217,
+      "artwork": "./assets/artwork/efdKVloTeqg.jpg",
+      "fallbackArtwork": "./assets/artwork/efdKVloTeqg.jpg",
+      "description": "Tyler Childers performing All Your'n live at Red Rocks.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live"
+      ],
+      "tracks": [
+        {
+          "id": "all-your-n-live-at-red-rocks",
+          "title": "All Your'n (Live at Red Rocks)",
+          "start": 0,
+          "end": 217,
+          "timingConfidence": "user"
+        }
+      ],
+      "year": 2020,
+      "audioUrl": "./media/efdKVloTeqg.m4a"
+    },
+    {
+      "id": "tyler-childers-and-the-food-stamps-messed-up-kid-somersessions",
+      "title": "Messed Up Kid (SomerSessions)",
+      "artist": "Tyler Childers and the Food Stamps",
+      "provider": "local",
+      "youtubeId": "YCDCFNDrdkE",
+      "duration": 220,
+      "artwork": "./assets/artwork/YCDCFNDrdkE.jpg",
+      "fallbackArtwork": "./assets/artwork/YCDCFNDrdkE.jpg",
+      "description": "Tyler Childers and the Food Stamps performing Messed Up Kid.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live",
+        "acoustic"
+      ],
+      "tracks": [
+        {
+          "id": "messed-up-kid-somersessions",
+          "title": "Messed Up Kid (SomerSessions)",
+          "start": 0,
+          "end": 220,
+          "timingConfidence": "user"
+        }
+      ],
+      "year": 2014,
+      "audioUrl": "./media/YCDCFNDrdkE.m4a"
+    },
+    {
+      "id": "tyler-childers-jersey-giant",
+      "title": "Jersey Giant",
+      "artist": "Tyler Childers",
+      "provider": "local",
+      "youtubeId": "S90ruG91Y_U",
+      "duration": 243,
+      "artwork": "./assets/artwork/S90ruG91Y_U.jpg",
+      "fallbackArtwork": "./assets/artwork/S90ruG91Y_U.jpg",
+      "description": "A live performance of Jersey Giant by Tyler Childers.",
+      "timingStatus": "single-track",
+      "timingNote": "Imported through the repository music-link intake. Adjust in Catalog Studio if a cut is off.",
+      "tags": [
+        "live",
+        "acoustic"
+      ],
+      "tracks": [
+        {
+          "id": "jersey-giant",
+          "title": "Jersey Giant",
+          "start": 0,
+          "end": 243,
+          "timingConfidence": "user"
+        }
+      ],
+      "year": 2023,
+      "audioUrl": "./media/S90ruG91Y_U.m4a"
     }
   ]
 }
