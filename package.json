@@ -1,17 +1,16 @@
 {
-  "name": "acoustify-github-pages",
-  "version": "2.1.0",
+  "name": "acoustify",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
-  "description": "An installable, native-audio music library for GitHub Pages.",
+  "description": "A personal, installable music player for live sessions, streaming from a private Hugging Face dataset.",
   "scripts": {
-    "test": "node tools/validate-catalog.mjs && node tools/unit-test.mjs && node tools/smoke-test.mjs",
-    "audio:list": "python3 tools/extract_for_acoustify.py --list",
-    "audio:extract": "python3 tools/extract_for_acoustify.py",
-    "audio:test": "cd tools/audio-extractor && python3 -m unittest discover -s tests -v",
-    "links:check": "node tools/import-music-links.mjs --check",
-    "links:import": "node tools/import-music-links.mjs",
-    "serve": "python3 -m http.server 8080"
+    "test": "node tools/run-tests.mjs",
+    "serve": "python3 -m http.server 8080",
+    "add": "sh tools/py.sh tools/add_music.py",
+    "publish": "sh tools/py.sh tools/publish.py",
+    "sync": "sh tools/py.sh tools/add_music.py && node tools/validate-catalog.mjs --local && sh tools/py.sh tools/publish.py",
+    "stamp": "node tools/stamp-version.mjs"
   },
   "engines": {
     "node": ">=20"

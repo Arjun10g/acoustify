@@ -1,0 +1,8 @@
+# What tools/publish.py and tools/add_music.py need. tools/add_music.py also
+# needs yt-dlp + ffmpeg on the PATH: brew install yt-dlp ffmpeg
+#
+# Nothing installs from this file directly: CI and the laptop setup install the
+# exact, hash-checked versions in tools/requirements.lock. After editing this
+# file, regenerate the lock (its header has the command).
+huggingface_hub>=0.30,<3
+mutagen>=1.47

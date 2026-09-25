@@ -7,3 +7,13 @@ local-audio/
 tools/audio-extractor/.venv/
 __pycache__/
 *.pyc
+
+# Local secrets (HF_TOKEN) — never commit
+.env
+.env.*
+!.env.example
+.venv/
+
+# Local audio/artwork staging — the library lives in the private HF dataset
+/library/
+/media/

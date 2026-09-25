@@ -1,403 +1,206 @@
 # Acoustify
 
-Acoustify is a dependency-free, installable music library for long-form sources. Its packaged catalog ships with native AAC audio: every timestamp range behaves like its own track, playback advances at the saved boundary, and your browser remembers likes, history, playlists, volume, repeat/shuffle state, and the last playback position.
+A personal, installable music player for live sessions: Tiny Desks, Western AF,
+Red Barn Radio, Audiotree and the like. Long recordings are split into songs,
+and you browse by artist, series, album or song. It supports likes, playlists,
+history, a persistent queue, and offline downloads.
 
-The project is designed to deploy as-is to **GitHub Pages**. There is no application server, cloud database, API key, build framework, or account system.
+The app is static files on GitHub Pages: vanilla HTML, CSS and ES modules, with
+no build step and no server. The music is in a **private Hugging Face dataset**,
+and each device unlocks it with its own read-only token.
 
-## What is already implemented
+- App: https://arjun10g.github.io/acoustify/
+- Music: `arjun10g/acoustify-library` (dataset, private)
 
-- Spotify-influenced dark listening interface with an original Acoustify identity.
-- Responsive desktop, tablet, mobile, and installable PWA layouts.
-- Android media-session controls for play, pause, seek, previous, and next.
-- Twenty-two packaged native-audio sources with local artwork and no YouTube playback dependency.
-- Long-source segmentation: selecting a row seeks to the track start, while adjacent tracks from the same source continue without reloading the underlying media.
-- Local master mode for audio files you own. The Blob is stored in IndexedDB and played without Acoustify transcoding it.
-- Authorized-audio import that matches the extractor's `[YouTube ID]` filename to an existing source and keeps its saved track cuts.
-- Editable, persistent play queue with add, reorder, remove, and clear controls.
-- Browser memory for:
-  - likes;
-  - listening history and play counts;
-  - playlists;
-  - volume, shuffle, repeat, autoplay, and panel preferences;
-  - current track, queue, and resume position;
-  - custom sources and timing overrides.
-- JSON memory backup/import.
-- JSON custom-catalog export.
-- Catalog Studio for adding more long videos or local audio files.
-- Timestamp calibrator with uninterrupted source playback, current-time capture, and ±0.5-second nudging.
-- Offline app shell and artwork. Packaged audio streams from the Pages site and is intentionally not downloaded during PWA installation.
-- GitHub Actions deployment and catalog/static-shell validation.
+## How it fits together
 
-## Seed catalog
-
-### Of Monsters and Men — The Cabin Sessions
-
-YouTube ID: `Y25LDO6OLzQ`
-
-Fourteen separated tracks are included:
-
-1. Dirty Paws
-2. From Finner
-3. King and Lionheart
-4. Mountain Sound
-5. Numb Bears
-6. Six Weeks
-7. Sloom
-8. Slow and Steady
-9. Your Bones
-10. Lakehouse
-11. Little Talks
-12. Love Love Love
-13. Sinking Man
-14. Yellow Light
-
-The included starts follow the complete tracklist in the top YouTube comment, which had about 8,200 likes when checked. They are editable in Catalog Studio.
-
-### Of Monsters and Men — Live from Skarkali
-
-YouTube ID: `JoUq869LXeA`
-
-Seven separated tracks are included:
-
-1. Ordinary Creature
-2. Dream Team
-3. The Towering Skyscraper at the End of the Road
-4. Fruit Bat
-5. Television Love
-6. The Block
-7. Mouse Parade
-
-The included starts follow a highly rated timestamp list in the YouTube comments. A second credible list placed some openings slightly later, so the earlier starts were used to avoid clipping the beginning of a performance.
-
-## Audio-quality model
-
-### Included sources
-
-The default catalog uses the AAC audio in `media/` and artwork in `assets/artwork/`. Playback goes through the browser's native `<audio>` element, so there is no embedded video, YouTube ad, or YouTube runtime request. The original YouTube ID is retained only for provenance, future filename matching, and the optional **Open original** link.
-
-The included files are served unchanged. Acoustify uses the saved chapter boundaries to present long sessions as individual songs without re-encoding or physically splitting the source.
-
-### Mobile and background playback
-
-On Android Chrome, install Acoustify from **Settings -> Phone app** for a standalone layout and lock-screen media controls. Native audio can continue while Chrome or the installed app is in the background, subject to the phone's normal browser battery and media policies. The app saves the current position as the page backgrounds and resynchronizes the logical track when it returns.
-
-Adjacent songs from one long source play as one uninterrupted stream. This avoids a media reload at each timestamp and improves background continuity.
-
-### Local master sources
-
-For the highest-fidelity path, add a FLAC, WAV, AIFF, ALAC/M4A, MP3, AAC, or other browser-supported file that you lawfully possess:
-
-1. Open **Catalog Studio**.
-2. Select **Local master file**.
-3. Choose the audio file.
-4. Add the track-start lines.
-5. Save.
-
-The original file Blob is written to IndexedDB. Acoustify does not alter its bytes. Decoding support and the final device output path still depend on the browser and operating system.
-
-Files imported through the app remain in that browser and are not included in the GitHub Pages artifact or JSON backup. Authorized files intentionally placed in `media/` are different: they are part of the public Pages library and must be content you have the right to publish.
-
-### Extractor-assisted local playback
-
-The repository includes the root-level extractor under `tools/audio-extractor` and publishes its original ZIP from **Settings -> Local audio**. It runs on your computer, not inside GitHub Pages. Use it only for content you own, have permission to download, or are otherwise authorized to save.
-
-Set up the extractor with the installer for your operating system, then list the packaged sources:
-
-```bash
-npm run audio:list
+```
+music-links.json ──npm run add──▶ library/ (audio + artwork, local staging, gitignored)
+                                   data/catalog.json (source of truth: titles, artists, series, song times)
+                                        │
+                                  npm run publish
+                                        ▼
+              Hugging Face dataset (private): media/<id>.m4a · artwork/<id>.jpg · library.json
+                                        │  fetched with the device's token
+                                        ▼
+              Acoustify on the phone: streams, seeks and downloads for offline
 ```
 
-For an authorized source, M4A is the most compatible choice for phone playback:
+- `data/catalog.json` (schema 5) is the only file you edit by hand. It holds
+  each recording's title, credits, series, year, and the start and end of every
+  song. An album joined from a YouTube playlist (like *Live at the Ryman*) has
+  `youtubePlaylistId` instead of `youtubeId`, and a `youtubeId` on each song.
+- `tools/publish.py` uploads only new or changed files, then writes
+  `library.json`. Every file URL in it is pinned to the commit that last
+  changed that file, so publishing new music never invalidates downloads
+  already saved on the phone. After the dataset has the new `library.json`,
+  publish writes the same file to `data/library.json`, which ships with the
+  app as an offline fallback. A dry run never writes it, and `npm test` fails
+  if it pins a file to anything but a commit.
+- The service worker adds the token to requests for the dataset, and nothing
+  else. That makes streaming, seeking and artwork work like any public URL.
 
-```bash
-npm run audio:extract -- --source of-monsters-and-men-the-cabin-sessions --format m4a --confirm-rights
+## Connect a device
+
+1. Create a **fine-grained** token at
+   https://huggingface.co/settings/tokens/new?tokenType=fineGrained. Under
+   **Repositories permissions**, add `arjun10g/acoustify-library` and tick only
+   **Read access to contents of selected repos**. Leave every other box empty.
+   It must be read-only and limited to this one dataset. See
+   [Security model](#security-model) for why.
+2. In the app, open **Settings → Library**, paste the token and choose
+   **Connect**. The app refuses a token that can change your account. It
+   accepts a classic read token but warns you, because that kind opens every
+   private repo you have.
+
+Paste the token. Don't send it to the phone inside a link: the link stays in
+the browser's (synced) history and in whatever app carried it, and the app
+ignores `#/connect?token=` links for that reason. Send it through a password
+manager or type it.
+
+The token stays on that device only. **Disconnect** removes it.
+
+## Add music
+
+Setup on a new machine (one time):
+
+```sh
+brew install yt-dlp ffmpeg
+python3 -m venv .venv && .venv/bin/pip install --require-hashes --only-binary=:all: -r tools/requirements.lock
+echo 'HF_TOKEN=hf_your_write_token' > .env      # .env is gitignored — never commit it
 ```
 
-The wrapper saves into the ignored `local-audio/` folder by default. The extractor app can also be used directly and normally saves into `~/Music/YouTube Podcasts`.
+The publishing token is a fine-grained token with **Read access to contents
+of selected repos** and **Write access to contents/settings of selected repos**
+for `arjun10g/acoustify-library` only. `publish.py` warns when the token can
+reach more than that.
 
-To attach the result:
+**From a list of links.** Copy `music-links.example.json` to
+`music-links.json`, then add entries under `"links"`. Only `url` is required.
+Title, artist, series and year are guessed from YouTube when you leave them
+out. Then run:
 
-1. Open that source in Acoustify.
-2. Choose **Use local audio**.
-3. Select the generated file.
-
-The extractor puts `[VIDEO_ID]` at the end of every filename. **Settings -> Local audio -> Import extracted audio** can therefore match one file or a whole batch without first opening each source. Acoustify checks both the ID and duration, retains all saved song starts, and stores each file in IndexedDB. For a packaged source, removing a browser replacement returns to the included audio.
-
-For a future music link, add/import the catalog entry first using the flow below, then run the wrapper with `--url` or the extractor desktop app. Once the source exists in Acoustify, the same filename matching applies.
-
-## Deploy to GitHub Pages
-
-### Fastest route
-
-1. Create a new GitHub repository, for example `acoustify`.
-2. Put every file in this project at the repository root.
-3. Commit and push to the `main` branch.
-4. In the repository, open **Settings → Pages**.
-5. Under **Build and deployment**, choose **GitHub Actions** as the source.
-6. Open the **Actions** tab and run **Deploy Acoustify to GitHub Pages** if the push did not trigger it automatically.
-7. The deployment job publishes the URL shown in the `github-pages` environment.
-
-The included workflow:
-
-- validates `data/catalog.json`;
-- verifies required static assets;
-- stages only the public site files;
-- uploads a Pages artifact;
-- deploys that artifact.
-
-### Local preview
-
-You need a local HTTP server because module imports, service workers, and catalog fetching do not work correctly from a raw `file://` URL.
-
-```bash
-npm test
-npm run serve
+```sh
+npm run sync          # add every pending link → validate → publish
 ```
 
-Then open:
+**One link.** Run:
 
-```text
-http://localhost:8080/#/home
+```sh
+npm run add -- --url https://youtu.be/VIDEO_ID --title "Sedona (Live at Austin City Limits Radio)" \
+  --artist "Houndmouth" --series "Austin City Limits Radio" --year 2015
+npm run add -- --url https://youtu.be/VIDEO_ID --chapters "0:12 First song
+4:05 Second song"
+npm run publish
 ```
 
-Python can also be used directly:
+`npm run add -- --dry-run` shows the catalog entry it would create without
+downloading anything. Song times come from `chapters`. If there are none, the
+video's own YouTube chapters are used, and failing that the whole video is one
+song. Links that are already imported, or already in the catalog, are skipped,
+unless you pass `--replace`.
 
-```bash
-python3 -m http.server 8080
+**Fix a title or song times** by editing `data/catalog.json`, then run
+`npm run publish` (or just push; see below). Changes you make on the phone with
+**Edit song times** stay on that device only.
+
+If a download fails with **HTTP 403**, YouTube changed something. Run
+`brew upgrade yt-dlp` and try again. If YouTube asks you to confirm you're not
+a bot, add `--cookies-from-browser chrome`.
+
+`npm run publish -- --dry-run` shows what would upload and which recordings
+`library.json` would add, remove or change. It writes nothing, locally or on
+the dataset. `--list-missing` lists catalog entries whose audio is neither
+local nor on the dataset.
+
+## How updates reach the phone
+
+- **New music.** After `npm run publish`, the app checks `library.json`
+  whenever it opens or comes back to the foreground, and every 15 minutes while
+  it is open. New songs appear with a "N new songs" toast and a NEW badge. If
+  **Automatically download new music** is on, they are also saved for offline
+  listening. No reinstall is needed.
+- **App code.** A push to `main` runs `.github/workflows/deploy-pages.yml`. It
+  runs `npm test`, then `publish.py --ci`, which rebuilds `library.json` from
+  the catalog and the files already on the dataset (only when the `HF_TOKEN`
+  repository secret is set). It then stamps the version with the commit and
+  deploys the app. The installed app gets the new service worker and applies it
+  on the next launch. If something is playing, it shows **Update ready**
+  instead, and never interrupts playback.
+- **The `HF_TOKEN` secret** must be the same kind of token as `.env`:
+  fine-grained, with write access to `arjun10g/acoustify-library` only. The
+  publish step runs third-party Python packages with it. They are installed
+  from `tools/requirements.lock` (exact versions, sha256-checked, wheels only),
+  and every action is pinned to a commit. Only the deploy job can write to
+  Pages.
+
+CI never downloads or uploads audio. Publish the audio from the laptop first:
+`--ci` fails if the catalog lists a recording the dataset doesn't have.
+
+## Local development
+
+```sh
+npm run serve         # http://localhost:8080 — connect with your read-only token to play
+npm test              # catalog validation → tests/*.test.mjs → static smoke test
+node tools/run-tests.mjs runtime    # just the steps matching "runtime"
 ```
 
-## Personal-use and privacy notes
+Tests use only Node ≥ 20 and `node:assert`. `tests/pipeline.test.mjs` also runs
+the offline self-tests of the Python tools (`publish.py --self-test` and
+`add_music.py --self-test`).
 
-Acoustify has no telemetry and sends no library memory to an Acoustify server because there is no server. Likes, history, playlists, custom catalog entries, and local audio stay in the browser origin.
+| Path | What it is |
+|---|---|
+| `index.html`, `sw.js`, `manifest.webmanifest` | App shell, service worker (streaming, offline, updates), PWA manifest |
+| `assets/js/` | `app.js` controller, `cloud.js` library sync and downloads, `catalog.js`, `player.js`, `nowplaying.js`, `ui.js`, `views/*` |
+| `assets/css/` | Design system (`app.css`), player (`nowplaying.css`), per-view styles |
+| `data/catalog.json` | Source of truth (not deployed) |
+| `data/library.json` | Last published library, bundled as the offline fallback |
+| `tools/` | `add_music.py`, `publish.py`, `validate-catalog.mjs`, `stamp-version.mjs`, `run-tests.mjs`, `smoke-test.mjs`; `requirements.txt` (what the Python tools need) and `requirements.lock` (the exact, hashed versions CI installs) |
 
-However, a normal GitHub Pages site is a static website, not an authenticated private application. Treat the deployed HTML, JavaScript, catalog, artwork, and `media/` files as publicly accessible. Do not place secrets, private URLs, access tokens, or audio you are not authorized to publish in the repository. Browser-local file imports are not part of the deployed site.
+## Security model
 
-A client-side PIN would not provide meaningful protection for files committed to a public static site. Real access control would require a different hosting/authentication layer or an eligible private Pages configuration.
+**The app shares its origin.** Acoustify is served from
+`arjun10g.github.io/acoustify/`, and every other GitHub Pages site on the
+account (about 50) is served from the same origin, `arjun10g.github.io`.
+Browsers keep storage per origin, not per path. So any page on any of those
+sites can:
 
-## Add another YouTube source in the app
+- read the saved token (Cache Storage `acoustify-auth`),
+- read the downloaded music (`acoustify-audio-v1`), the artwork
+  (`acoustify-art-v1`) and the app's IndexedDB `acoustify` database, which
+  holds likes, playlists and history,
+- message Acoustify's service worker.
 
-1. Open **Catalog Studio**.
-2. Leave **YouTube player** selected.
-3. Enter the source title, artist, YouTube URL, and full duration.
-4. Enter one line per track:
+They also share one storage quota. The risk is that one of those sites is
+compromised, or loads a third-party script that is: several load scripts from
+a CDN.
 
-```text
-0:00 Opening Song
-4:12 Second Song
-8:47 Third Song
-13:31 Final Song
-```
+That is why the device token must be fine-grained, read-only and limited to
+`arjun10g/acoustify-library`, and why the app refuses a token that can
+write. If such a token leaks, the worst it allows is reading the music
+library. Revoke it at https://huggingface.co/settings/tokens and connect
+again with a new one.
 
-5. Choose **Preview cuts**.
-6. Save.
+**The real fix is an origin of its own.** Either point a custom domain at this
+repository's Pages site (for example `music.<your-domain>`), or move the
+repository to a dedicated GitHub organization so it's served from
+`<org>.github.io`. The app uses only relative paths, so it works unchanged.
+Ship one last build at the old address that deletes the `acoustify-*` caches
+and the `acoustify` database, then redirects to the new origin. Devices then
+reconnect there with their token.
 
-The next timestamp is automatically used as the current track’s end. The final track ends at the full source duration.
+**Content-Security-Policy.** `index.html` sets one. It limits where scripts,
+media and requests can go (the app itself, Hugging Face and YouTube), and it
+blocks plugins, `<base>` changes and form submissions. It narrows what an
+injected script could do, but it does nothing about the shared origin. The
+smoke test checks that the policy is there and still allows everything the app
+loads.
 
-The new source is stored in IndexedDB, not automatically written into the GitHub repository. Use **Settings → Export custom catalog** to create a JSON backup.
+## Privacy
 
-## Add future music links to the repository
-
-For links you want packaged into the default catalog, use the local intake file:
-
-```bash
-cp music-links.example.json music-links.json
-```
-
-Add new items under the `links` array. `music-links.json` is intentionally ignored by git and excluded from the GitHub Pages artifact, so pending/private link requests do not ship with the site.
-
-For a single-song YouTube video, chapters can be omitted:
-
-```json
-{
-  "links": [
-    {
-      "url": "https://youtu.be/VIDEO_ID_HERE",
-      "title": "Song title",
-      "artist": "Artist name",
-      "duration": "4:12",
-      "tags": ["acoustic"]
-    }
-  ]
-}
-```
-
-For a long source, add chapter starts:
-
-```json
-{
-  "links": [
-    {
-      "url": "https://www.youtube.com/watch?v=VIDEO_ID_HERE",
-      "title": "Session title",
-      "artist": "Artist name",
-      "duration": "42:30",
-      "chapters": [
-        "0:00 First song",
-        "3:45 Second song",
-        "8:10 Third song"
-      ],
-      "tags": ["session", "live"]
-    }
-  ]
-}
-```
-
-Then run:
-
-```bash
-npm run links:check
-npm run links:import
-npm test
-```
-
-If a link already exists in `data/catalog.json`, set `"replace": true` on that link entry or run `npm run links:import -- --replace`.
-
-## Package a source for every installation
-
-The future-link flow first creates a temporary YouTube-backed catalog entry so its metadata and cuts can be checked. After extracting an authorized M4A, move it to `media/<VIDEO_ID>.m4a`, save the artwork as `assets/artwork/<VIDEO_ID>.jpg`, and change that source in `data/catalog.json` to the packaged shape:
-
-```json
-{
-  "id": "artist-session-name",
-  "title": "Session Name",
-  "artist": "Artist",
-  "provider": "local",
-  "youtubeId": "abcdefghijk",
-  "audioUrl": "./media/abcdefghijk.m4a",
-  "duration": 900,
-  "artwork": "./assets/artwork/abcdefghijk.jpg",
-  "fallbackArtwork": "./assets/artwork/abcdefghijk.jpg",
-  "timingStatus": "user-calibrated",
-  "tracks": [
-    { "id": "first-song", "title": "First Song", "start": 0, "end": 252 },
-    { "id": "second-song", "title": "Second Song", "start": 252, "end": 527 },
-    { "id": "third-song", "title": "Third Song", "start": 527, "end": 900 }
-  ]
-}
-```
-
-Then run:
-
-```bash
-npm test
-```
-
-Rules enforced by validation:
-
-- source IDs are unique;
-- track IDs are unique within a source;
-- YouTube IDs have 11 characters when the YouTube provider is used;
-- every packaged `audioUrl` is a safe path under `media/` and exists;
-- every local artwork path exists;
-- starts and ends are finite and positive;
-- tracks do not overlap;
-- no track ends after the source duration;
-- the last track ends at the source duration.
-
-## Calibrate a long source precisely
-
-1. Open the source album.
-2. Choose **Calibrate cuts** or **Edit timings**.
-3. In **Timestamp calibrator**, choose **Play full source**.
-4. Pause at the first audible moment of a song.
-5. Tap **●** on that song’s row.
-6. Use **−.5** or **+.5** to nudge the start.
-7. Repeat for every track.
-8. Check the preview and choose **Save calibration**.
-
-Editing a packaged source creates a browser override with the same source ID. Removing that override in Settings restores the packaged timings.
-
-## Memory backup and migration
-
-Open **Settings → Export memory**. The JSON contains app state and custom catalog entries but intentionally excludes large local audio Blobs.
-
-On another browser/device:
-
-1. deploy/open the same Acoustify site;
-2. import the memory JSON;
-3. re-import any local master files through Catalog Studio.
-
-The site’s origin matters. Browser storage for `https://username.github.io/acoustify/` is separate from localhost and from any custom domain.
-
-## File map
-
-```text
-.
-├── index.html                    # Application shell
-├── 404.html                      # Safe Pages fallback
-├── manifest.webmanifest          # PWA metadata
-├── sw.js                         # Offline shell cache
-├── music-links.example.json      # Template for local future-link intake
-├── data/
-│   ├── catalog.json              # Packaged source/track map
-│   └── catalog.schema.json       # Catalog shape reference
-├── assets/
-│   ├── artwork/                  # Packaged source artwork
-│   ├── css/app.css               # Responsive interface
-│   ├── icons/                    # PWA icons
-│   └── js/
-│       ├── app.js                # Routes, views, state, studio
-│       ├── catalog.js            # Catalog parsing/validation/indexing
-│       ├── db.js                 # IndexedDB memory and audio Blobs
-│       ├── player.js             # YouTube/local segmented playback
-│       └── utils.js              # Shared helpers
-├── media/                        # Packaged AAC source audio
-├── tools/
-│   ├── import-music-links.mjs    # Imports local music-links.json into the catalog
-│   ├── music-link-ingest.mjs     # Link-intake parsing helpers
-│   ├── validate-catalog.mjs
-│   ├── unit-test.mjs
-│   └── smoke-test.mjs
-└── .github/workflows/deploy-pages.yml
-```
-
-## Architecture
-
-```text
-GitHub Pages
-    │
-    ├── static app shell + packaged catalog + artwork
-    ├── same-origin AAC media ── native background playback
-    ├── optional YouTube IFrame API ── future browser-added sources
-    │
-    └── browser-local data
-          ├── IndexedDB kv store: memory + custom source maps
-          └── IndexedDB audio store: original local file Blobs
-```
-
-There is deliberately no backend. That makes deployment simple and keeps personal memory local, but it also means:
-
-- there is no cross-device sync unless you export/import JSON;
-- browser-local replacement audio must be re-imported per browser;
-- Catalog Studio cannot directly commit to GitHub;
-- there is no secure server-side user authentication;
-- future YouTube-backed custom sources remain controlled by YouTube/uploaders until packaged.
-
-## Keyboard and mobile behavior
-
-- `Space`: play/pause when focus is not inside a form field.
-- `/`: open Search.
-- On mobile, the player becomes a slide-in panel and the bottom bar remains compact.
-- The PWA can be installed from a compatible browser.
-
-## Troubleshooting
-
-### A future YouTube source shows an error
-
-Open the original source to confirm that it still exists and allows embedding. Some videos are region restricted, age restricted, private, deleted, or configured against embedding.
-
-### A cut is early or late
-
-Use Catalog Studio’s calibrator. The player checks the saved end boundary frequently and advances from there. A small **Segment lead-in** in Settings can also protect the first audible moment without changing the saved timestamps.
-
-### A local FLAC/ALAC file will not play
-
-The file is still stored without re-encoding, but the browser may not support that codec/container. Try a browser with support for the format, or create a compatible copy outside Acoustify while retaining your original master.
-
-### Memory disappeared
-
-Browser storage can be cleared by the user, privacy tools, storage pressure, or origin/domain changes. Export memory periodically and use **Request persistent storage** in Settings where supported.
-
-### The app works locally but not under a repository path
-
-All project URLs are intentionally relative. Keep the files at the Pages artifact root and do not add a `<base>` tag unless you update every routing/caching assumption.
+The recordings belong to their artists and are for personal listening only.
+The dataset must stay **private**. `publish.py` creates it as private and
+refuses to upload if it ever finds it public. Keep the publishing token in
+`.env` and in the GitHub `HF_TOKEN` secret, nowhere else. `npm test` fails if
+anything that looks like a Hugging Face token appears in the repository.

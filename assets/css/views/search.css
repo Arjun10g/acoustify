@@ -1,0 +1,112 @@
+/* Search + Songs view extras. Everything else comes from the shared vocabulary in app.css. */
+
+/* ---------------------------------------------------------------- search */
+
+.page--search > .page-title-row { margin-bottom: 4px; }
+
+/* Layout decisions follow the width of the results column, not the window, so they
+   stay right when the desktop now-playing panel narrows the main column. */
+.search-results { container: search-results / inline-size; }
+
+.search-tags { margin-top: -6px; }
+.search-tags + .section { margin-top: 32px; }
+
+.search-top { display: grid; min-width: 0; }
+.search-top > .section { min-width: 0; }
+.search-more--split-only { display: none; }
+
+/* Top result: a compact row on narrow layouts, a tall card beside the songs on wide ones. */
+.top-result {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-areas:
+    "art title"
+    "art sub";
+  align-items: center;
+  align-content: center;
+  column-gap: 14px;
+  row-gap: 4px;
+  padding: 12px 72px 12px 12px;
+  border-radius: var(--radius-l);
+  background: var(--surface-1);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.top-result .top-result-art { grid-area: art; width: 64px; box-shadow: none; }
+.top-result--artist .top-result-art { border-radius: 50%; }
+.top-result .card-link { grid-area: title; align-self: end; min-width: 0; margin-top: 0; }
+.top-result .card-link::after { border-radius: var(--radius-l); }
+.top-result-title {
+  display: block;
+  overflow: hidden;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.top-result-sub {
+  grid-area: sub;
+  align-self: start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.top-result-meta { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.top-result .card-play { right: 16px; bottom: calc(50% - 22px); }
+.top-result:has(.card-link:active) { background: var(--surface-2); }
+@media (hover: hover) {
+  .top-result:hover { background: var(--surface-2); }
+}
+@media (hover: none) {
+  .top-result { padding-right: 12px; }
+}
+
+@container search-results (min-width: 760px) {
+  .search-top--split {
+    grid-template-columns: minmax(260px, 5fr) minmax(0, 7fr);
+    gap: 32px;
+    align-items: stretch;
+  }
+  .search-top--split.is-expanded { align-items: start; }
+  .search-top--split > .section { display: flex; flex-direction: column; margin-top: 0; }
+  .search-top--split .top-result { flex: 1; }
+  .search-top--split:not(.is-expanded) .tracks > .track:nth-child(n + 5) { display: none; }
+  .search-more--split-only { display: inline; }
+
+  .top-result {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 1fr auto auto;
+    grid-template-areas:
+      "art"
+      "title"
+      "sub";
+    align-content: stretch;
+    row-gap: 0;
+    padding: 20px;
+  }
+  .top-result .top-result-art { width: 104px; align-self: start; margin-bottom: 20px; box-shadow: var(--shadow-art); }
+  .top-result .card-link { align-self: end; }
+  .top-result-title { font-size: 30px; font-weight: 800; line-height: 1.15; letter-spacing: -0.025em; }
+  .top-result-sub { margin-top: 8px; }
+  .top-result .card-play { right: 20px; bottom: 20px; width: 48px; height: 48px; }
+}
+
+/* ---------------------------------------------------------------- songs */
+
+.songs-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  margin-bottom: 16px;
+}
+.songs-sort { min-width: 0; }
+
+@media (max-width: 1023.98px) {
+  .songs-toolbar { display: grid; justify-content: stretch; gap: 14px; }
+}

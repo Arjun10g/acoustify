@@ -1,3 +1,14 @@
+# Push to main → test → refresh library.json on the private Hugging Face
+# dataset from data/catalog.json (audio is uploaded from the laptop with
+# `npm run publish`; CI never needs it) → stamp the app version → deploy the
+# app shell to GitHub Pages. Phones pick up new music from library.json on
+# their next open, and new app code through the service worker's update flow.
+#
+# Supply chain: every action is pinned to a commit (the tag it was taken from
+# is in the comment), and the Python tools install from a hash-locked file.
+# The HF_TOKEN secret must be a fine-grained token with write access to
+# arjun10g/acoustify-library only, since the publish step runs third-party
+# packages with it. Only the deploy job can write to Pages.
 name: Deploy Acoustify to GitHub Pages
 
 "on":
@@ -7,34 +18,65 @@ name: Deploy Acoustify to GitHub Pages
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
           package-manager-cache: false
 
-      - name: Validate catalog and static shell
+      - name: Validate catalog, run tests and static shell checks
         run: npm test
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+      # Secrets can't be used in `if:` directly, so record whether one exists.
+      - name: Check for the Hugging Face token
+        id: hf
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [ -n "$HF_TOKEN" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::HF_TOKEN secret is not set — deploying the committed data/library.json without syncing the dataset."
+          fi
+
+      - name: Set up Python
+        if: steps.hf.outputs.present == 'true'
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/requirements.lock
+
+      # Exact versions and sha256 hashes only, and wheels only (no package's
+      # build script ever runs). Regenerate the lock as its header explains.
+      - name: Install publishing tools
+        if: steps.hf.outputs.present == 'true'
+        run: |
+          pip install --require-hashes --only-binary=:all: -r tools/requirements.lock
+
+      - name: Publish library.json to Hugging Face
+        if: steps.hf.outputs.present == 'true'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python tools/publish.py --ci
+
+      - name: Stamp the app version with the commit
+        run: node tools/stamp-version.mjs "${GITHUB_SHA::7}"
 
       - name: Stage public site
         run: |
@@ -42,21 +84,46 @@ jobs:
           rsync -a \
             --exclude='.git' \
             --exclude='.github' \
-            --exclude='_site' \
-            --exclude='local-audio' \
+            --exclude='/_site' \
+            --exclude='/tools' \
+            --exclude='/tests' \
+            --exclude='/library' \
+            --exclude='/media' \
+            --exclude='/local-audio' \
             --exclude='node_modules' \
-            --exclude='test-results' \
+            --exclude='/test-results' \
             --exclude='music-links*.json' \
-            --exclude='tools' \
-            --exclude='package.json' \
-            --exclude='README.md' \
+            --exclude='/README.md' \
+            --exclude='package*.json' \
+            --exclude='.venv' \
+            --exclude='.env*' \
+            --exclude='/data/catalog.json' \
+            --exclude='/data/catalog.schema.json' \
+            --exclude='/downloads' \
+            --exclude='__pycache__' \
+            --exclude='.DS_Store' \
+            --exclude='.gitignore' \
             ./ _site/
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
         with:
           path: _site
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

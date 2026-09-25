@@ -2,250 +2,197 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-8uUuVWY+gdWZlqi5LBjipN8wNRX0VPlrq6punF9sMI4=' https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://huggingface.co https://*.hf.co https://i.ytimg.com; media-src 'self' blob: https://huggingface.co https://*.hf.co; connect-src 'self' https://huggingface.co https://*.hf.co https://i.ytimg.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#07110c">
-  <meta name="description" content="Your live sessions and acoustic sets, ready to play song by song.">
+  <meta name="theme-color" content="#0a0a0b">
   <meta name="color-scheme" content="dark">
+  <meta name="description" content="Live sessions and acoustic sets from the artists you love, song by song.">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Acoustify">
+  <meta name="format-detection" content="telephone=no">
+  <!-- One-release handover from pre-v3 installs: their service worker still serves the old app code into
+       this page until the new worker takes over, so hide the page and reload once it does. Does nothing
+       without a legacy "acoustify-shell-v<semver>" cache. Its sha256 is allowed in the CSP above:
+       change one, change both. -->
+  <style>html.is-handover body > *{display:none!important}html.is-handover body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0a0a0b}html.is-handover body::after{content:"Updating Acoustify\2026";color:#a3a3ab;font:15px -apple-system,BlinkMacSystemFont,sans-serif}</style>
+  <script>(function(){var sw=navigator.serviceWorker;if(!sw||!sw.controller||!window.caches)return;caches.keys().then(function(n){if(!n.some(function(x){return /^acoustify-shell-v\d+\.\d+\.\d+$/.test(x)}))return;document.documentElement.classList.add("is-handover");sw.addEventListener("controllerchange",function(){location.reload()});sw.getRegistration().then(function(r){if(r)r.update()}).catch(function(){});setTimeout(function(){document.documentElement.classList.remove("is-handover")},20000)}).catch(function(){})})();</script>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/icons/icon-192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
   <link rel="stylesheet" href="./assets/css/app.css">
+  <link rel="stylesheet" href="./assets/css/nowplaying.css">
+  <link rel="stylesheet" href="./assets/css/views/home.css">
+  <link rel="stylesheet" href="./assets/css/views/search.css">
+  <link rel="stylesheet" href="./assets/css/views/artists.css">
+  <link rel="stylesheet" href="./assets/css/views/library.css">
+  <link rel="stylesheet" href="./assets/css/views/album.css">
+  <link rel="stylesheet" href="./assets/css/views/settings.css">
   <title>Acoustify</title>
 </head>
 <body>
-  <noscript>
-    <div class="noscript">Turn on JavaScript to use Acoustify.</div>
-  </noscript>
+  <button class="skip-link" type="button" data-action="skip-to-content">Skip to content</button>
+  <noscript><p class="noscript">Turn on JavaScript to use Acoustify.</p></noscript>
 
-  <div class="app-shell" id="app-shell">
-    <aside class="sidebar" aria-label="Primary navigation">
-      <a class="brand" href="#/home" data-route aria-label="Acoustify home">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 48 48" role="img"><path d="M9 39 24 8l15 31"/><path d="M12 29c4 4 7 4 10 0s6-4 10 0 6 4 8 1"/></svg>
-        </span>
-        <span>Acoustify</span>
+  <div id="app" class="app">
+    <aside id="sidebar" class="sidebar" aria-label="Sidebar">
+      <a class="brand" href="#/home" aria-label="Acoustify, home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M9 39 24 8l15 31"/><path d="M12 29c4 4 7 4 10 0s6-4 10 0 6 4 8 1"/></svg></span>
+        <span class="brand-name">Acoustify</span>
       </a>
 
-      <nav class="nav-group" aria-label="Browse">
-        <a href="#/home" data-route data-nav="home"><span class="nav-icon" aria-hidden="true">⌂</span><span>Home</span></a>
-        <a href="#/search" data-route data-nav="search"><span class="nav-icon" aria-hidden="true">⌕</span><span>Search</span></a>
-        <a href="#/songs" data-route data-nav="songs"><span class="nav-icon" aria-hidden="true">♫</span><span>Songs</span></a>
-        <a href="#/library" data-route data-nav="library"><span class="nav-icon" aria-hidden="true">▥</span><span>Your Library</span></a>
+      <nav class="side-nav" aria-label="Browse">
+        <a class="nav-link" href="#/home" data-nav="home"><svg class="icon" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-home"></use></svg><span class="nav-label">Home</span></a>
+        <a class="nav-link" href="#/search" data-nav="search"><svg class="icon" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg><span class="nav-label">Search</span></a>
+        <a class="nav-link" href="#/artists" data-nav="artists"><svg class="icon" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-artists"></use></svg><span class="nav-label">Artists</span></a>
+        <a class="nav-link" href="#/songs" data-nav="songs"><svg class="icon" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-songs"></use></svg><span class="nav-label">Songs</span></a>
+        <a class="nav-link" href="#/library" data-nav="library"><svg class="icon" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-library"></use></svg><span class="nav-label">Library</span></a>
       </nav>
 
-      <nav class="nav-group secondary" aria-label="Personal library">
-        <a href="#/liked" data-route data-nav="liked"><span class="nav-icon liked-icon" aria-hidden="true">♥</span><span>Liked Songs</span></a>
-        <a href="#/history" data-route data-nav="history"><span class="nav-icon" aria-hidden="true">↶</span><span>History</span></a>
-        <a href="#/studio" data-route data-nav="studio"><span class="nav-icon" aria-hidden="true">＋</span><span>Add Music</span></a>
-      </nav>
+      <div class="side-scroll">
+        <div class="side-group">
+          <p class="side-heading">Your music</p>
+          <nav class="side-nav" aria-label="Your music">
+            <a class="nav-link" href="#/liked" data-nav="liked"><svg class="icon" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-heart"></use></svg><span class="nav-label">Liked Songs</span></a>
+            <a class="nav-link" href="#/history" data-nav="history"><svg class="icon" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-clock"></use></svg><span class="nav-label">Recently played</span></a>
+            <a class="nav-link" href="#/downloads" data-nav="downloads"><svg class="icon" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-download"></use></svg><span class="nav-label">Downloads</span></a>
+          </nav>
+        </div>
 
-      <div class="sidebar-section-head">
-        <span>Playlists</span>
-        <button class="icon-button compact" type="button" data-action="new-playlist" aria-label="Create playlist">＋</button>
-      </div>
-      <div class="playlist-nav" id="playlist-nav"></div>
-
-      <div class="sidebar-footer">
-        <a href="#/settings" data-route data-nav="settings"><span class="nav-icon" aria-hidden="true">⚙</span><span>Settings</span></a>
-        <div class="sync-pill" title="Saved on this device">
-          <span class="status-dot"></span>
-          <span>Saved here</span>
+        <div class="side-group">
+          <div class="side-heading-row">
+            <p class="side-heading">Playlists</p>
+            <button class="icon-btn icon-btn--sm" type="button" data-action="new-playlist" aria-label="New playlist" title="New playlist"><svg class="icon" width="18" height="18" aria-hidden="true" focusable="false"><use href="#i-plus"></use></svg></button>
+          </div>
+          <nav id="playlist-nav" class="playlist-nav" aria-label="Playlists"></nav>
         </div>
       </div>
+
+      <nav class="side-footer" aria-label="App">
+        <a class="nav-link" href="#/settings" data-nav="settings"><svg class="icon" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-settings"></use></svg><span class="nav-label">Settings</span></a>
+      </nav>
     </aside>
 
-    <header class="mobile-header">
-      <a class="brand" href="#/home" data-route aria-label="Acoustify home">
-        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M9 39 24 8l15 31"/><path d="M12 29c4 4 7 4 10 0s6-4 10 0 6 4 8 1"/></svg></span>
-        <span>Acoustify</span>
-      </a>
-      <div class="mobile-header-actions">
-        <button class="icon-button" type="button" data-action="open-settings" aria-label="Open settings">⚙</button>
-        <button class="icon-button" type="button" data-action="open-player" aria-label="Open now playing">♫</button>
-      </div>
-    </header>
-
-    <main class="main-stage" id="main-stage">
-      <div class="topbar">
-        <div class="history-buttons" aria-label="Navigation history">
-          <button type="button" class="icon-button" data-action="history-back" aria-label="Go back">‹</button>
-          <button type="button" class="icon-button" data-action="history-forward" aria-label="Go forward">›</button>
-        </div>
-        <div class="topbar-spacer"></div>
-        <span class="network-pill" id="network-pill"><span class="status-dot"></span><span>Online</span></span>
-        <button type="button" class="profile-pill" data-action="open-settings" aria-label="Open settings">
-          <span class="profile-avatar">A</span>
-          <span>My music</span>
-        </button>
-      </div>
-      <section class="view" id="view" aria-live="polite"></section>
+    <main id="main" class="main" tabindex="-1">
+      <div id="view" class="view"></div>
     </main>
 
-    <aside class="player-panel" id="player-panel" aria-label="Now playing panel">
-      <div class="panel-header">
-        <div>
-          <p class="eyebrow">Now playing</p>
-          <h2 id="panel-track-title">Choose a song</h2>
-        </div>
-        <div class="panel-header-actions">
-          <button class="icon-button" type="button" data-action="video-fullscreen" aria-label="Fullscreen video">⛶</button>
-          <button class="icon-button" type="button" data-action="close-player" aria-label="Close player panel">×</button>
-        </div>
-      </div>
+    <section id="now-playing" class="now-playing" aria-label="Now playing"></section>
 
-      <div class="media-stage" id="media-stage">
-        <div class="empty-player" id="empty-player">
-          <span class="empty-disc" aria-hidden="true">♫</span>
-          <p>Pick something to play.</p>
-        </div>
-        <div class="youtube-player-wrap" id="youtube-player-wrap" hidden>
-          <div id="youtube-player"></div>
-        </div>
-        <div class="local-player-wrap" id="local-player-wrap" hidden>
-          <img id="local-artwork" src="./assets/icons/icon-512.png" alt="">
-          <audio id="local-audio" preload="auto"></audio>
-          <div class="local-format-badge">Original local file</div>
-        </div>
-      </div>
+    <div id="player-bar" class="player-bar" role="region" aria-label="Player"></div>
 
-      <div class="panel-meta">
-        <div class="panel-art-row">
-          <img id="panel-artwork" class="panel-artwork" src="./assets/icons/icon-512.png" alt="">
-          <div>
-            <h3 id="panel-title">Nothing playing</h3>
-            <p id="panel-artist">Choose a song</p>
-          </div>
-        </div>
-        <div class="quality-readout" id="quality-readout">
-          <span class="quality-dot"></span>
-          <span>Ready to play</span>
-        </div>
-        <div class="source-note" id="source-note">Plays in the background.</div>
-      </div>
-
-      <div class="queue-section">
-        <div class="section-row">
-          <h3>Up next</h3>
-          <div class="queue-heading-actions">
-            <span id="queue-count">0 queued</span>
-            <button id="queue-clear" class="icon-button compact" type="button" data-action="clear-queue" aria-label="Clear upcoming songs" title="Clear upcoming songs" disabled>×</button>
-          </div>
-        </div>
-        <div class="queue-list" id="queue-list"></div>
-      </div>
-    </aside>
-
-    <footer class="player-bar" id="player-bar">
-      <div class="now-playing-mini">
-        <button class="mini-art-button" type="button" data-action="open-player" aria-label="Open now playing">
-          <img id="bar-artwork" src="./assets/icons/icon-192.png" alt="">
-        </button>
-        <div class="mini-copy">
-          <button type="button" class="text-button" data-action="open-current-source" id="bar-track-title">Choose a song</button>
-          <span id="bar-track-artist">Nothing playing</span>
-        </div>
-        <button class="icon-button like-control" type="button" data-action="like-current" id="bar-like" aria-label="Like current song">♡</button>
-      </div>
-
-      <div class="transport">
-        <div class="transport-buttons">
-          <button class="icon-button mode-button" type="button" data-action="toggle-shuffle" id="shuffle-button" aria-label="Toggle shuffle">⤨</button>
-          <button class="icon-button" type="button" data-action="previous" aria-label="Previous song">◀</button>
-          <button class="icon-button seek-button" type="button" data-action="seek-back" aria-label="Back 10 seconds">−10</button>
-          <button class="play-button" type="button" data-action="toggle-play" id="play-button" aria-label="Play">▶</button>
-          <button class="icon-button seek-button" type="button" data-action="seek-forward" aria-label="Forward 10 seconds">+10</button>
-          <button class="icon-button" type="button" data-action="next" aria-label="Next song">▶</button>
-          <button class="icon-button mode-button" type="button" data-action="cycle-repeat" id="repeat-button" aria-label="Change repeat mode">↻</button>
-        </div>
-        <div class="progress-row">
-          <button id="elapsed-time" class="time-button" type="button" data-action="jump-to-time" title="Jump to a specific time">0:00</button>
-          <input id="progress-control" type="range" min="0" max="1000" value="0" aria-label="Song position">
-          <span id="duration-time">0:00</span>
-        </div>
-      </div>
-
-      <div class="bar-extras">
-        <button class="icon-button" type="button" data-action="open-player" aria-label="Show queue and now playing">▤</button>
-        <span class="volume-icon" aria-hidden="true">◖</span>
-        <input id="volume-control" type="range" min="0" max="100" value="86" aria-label="Volume">
-      </div>
-    </footer>
-
-    <nav class="mobile-nav" aria-label="Mobile navigation">
-      <a href="#/home" data-route data-nav="home"><span>⌂</span><small>Home</small></a>
-      <a href="#/search" data-route data-nav="search"><span>⌕</span><small>Search</small></a>
-      <a href="#/songs" data-route data-nav="songs"><span>♫</span><small>Songs</small></a>
-      <a href="#/library" data-route data-nav="library"><span>▥</span><small>Library</small></a>
-      <a href="#/studio" data-route data-nav="studio"><span>＋</span><small>Add</small></a>
+    <nav id="tabbar" class="tabbar" aria-label="Tabs">
+      <a class="tab" href="#/home" data-nav="home"><svg class="icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-home"></use></svg><span class="tab-label">Home</span></a>
+      <a class="tab" href="#/search" data-nav="search"><svg class="icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg><span class="tab-label">Search</span></a>
+      <a class="tab" href="#/artists" data-nav="artists"><svg class="icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-artists"></use></svg><span class="tab-label">Artists</span></a>
+      <a class="tab" href="#/library" data-nav="library"><svg class="icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-library"></use></svg><span class="tab-label">Library</span></a>
     </nav>
   </div>
 
-  <div class="ad-banner" id="ad-banner" hidden>
-    <span class="ad-banner-copy"><strong>YouTube is playing an ad</strong><small>Open the video to use its Skip button when it appears.</small></span>
-    <div class="ad-banner-actions">
-      <button class="button secondary small-button" type="button" data-action="show-video-for-ad">Show video</button>
-      <button class="icon-button" type="button" data-action="video-fullscreen" aria-label="Fullscreen video">⛶</button>
-    </div>
-  </div>
+  <audio id="local-audio" preload="auto"></audio>
 
-  <dialog class="app-dialog" id="playlist-dialog">
-    <form method="dialog" id="playlist-form">
-      <div class="dialog-head">
-        <div>
-          <p class="eyebrow">Playlist</p>
-          <h2 id="playlist-dialog-title">Create playlist</h2>
-        </div>
-        <button type="button" class="icon-button" data-action="close-playlist-dialog" aria-label="Close">×</button>
-      </div>
+  <div id="sheet-root" class="sheet-root"></div>
+  <div id="toast-region" class="toast-region" aria-live="polite" aria-relevant="additions"></div>
+
+  <dialog id="dialog-playlist" class="dialog dialog--form" aria-labelledby="dialog-playlist-title">
+    <form id="playlist-form" class="dialog-body" method="dialog">
+      <h2 id="dialog-playlist-title" class="dialog-title">New playlist</h2>
       <label class="field">
-        <span>Name</span>
-        <input name="name" required maxlength="80" placeholder="Night drives">
+        <span class="field-label">Name</span>
+        <input class="input" name="name" required maxlength="80" autocomplete="off" placeholder="My playlist">
       </label>
       <label class="field">
-        <span>Description</span>
-        <textarea name="description" rows="3" maxlength="220" placeholder="Optional note"></textarea>
+        <span class="field-label">Description</span>
+        <textarea class="input" name="description" rows="3" maxlength="220" placeholder="Optional"></textarea>
       </label>
       <input type="hidden" name="trackKey">
       <div class="dialog-actions">
-        <button type="button" class="button ghost" data-action="close-playlist-dialog">Cancel</button>
-        <button type="submit" class="button primary">Save playlist</button>
+        <button class="btn btn-ghost" type="button" data-dialog-close>Cancel</button>
+        <button id="dialog-playlist-submit" class="btn btn-primary" type="submit" value="save">Save</button>
       </div>
     </form>
   </dialog>
 
-  <dialog class="app-dialog" id="add-to-playlist-dialog">
-    <div class="dialog-head">
-      <div>
-        <p class="eyebrow">Playlist</p>
-        <h2>Add to playlist</h2>
+  <dialog id="dialog-confirm" class="dialog dialog--alert" aria-labelledby="dialog-confirm-title" aria-describedby="dialog-confirm-body">
+    <form class="dialog-body" method="dialog">
+      <h2 id="dialog-confirm-title" class="dialog-title">Are you sure?</h2>
+      <p id="dialog-confirm-body" class="dialog-text"></p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" type="submit" value="cancel" data-dialog-cancel>Cancel</button>
+        <button class="btn btn-primary" type="submit" value="confirm" data-dialog-confirm>Continue</button>
       </div>
-      <button type="button" class="icon-button" data-action="close-add-dialog" aria-label="Close">×</button>
-    </div>
-    <div class="dialog-list" id="add-to-playlist-list"></div>
-    <button type="button" class="button secondary full" data-action="new-playlist-for-track">＋ New playlist</button>
+    </form>
   </dialog>
 
-  <dialog class="app-dialog compact-dialog" id="confirm-dialog">
-    <div class="dialog-head">
-      <div>
-        <p class="eyebrow">Are you sure?</p>
-        <h2 id="confirm-title">Continue?</h2>
+  <dialog id="dialog-prompt" class="dialog dialog--form" aria-labelledby="dialog-prompt-title">
+    <form class="dialog-body" method="dialog">
+      <h2 id="dialog-prompt-title" class="dialog-title"></h2>
+      <label class="field">
+        <span class="field-label"></span>
+        <input class="input" name="value" required maxlength="120" autocomplete="off">
+      </label>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" type="button" value="cancel" data-dialog-close>Cancel</button>
+        <button class="btn btn-primary" type="submit" value="confirm" data-dialog-confirm>Save</button>
       </div>
-    </div>
-    <p id="confirm-message"></p>
-    <div class="dialog-actions">
-      <button type="button" class="button ghost" data-action="confirm-cancel">Cancel</button>
-      <button type="button" class="button danger" data-action="confirm-accept">Continue</button>
-    </div>
+    </form>
   </dialog>
 
-  <input id="memory-import" type="file" accept="application/json" hidden>
-  <input id="extracted-audio-import" type="file" accept="audio/*,.m4a,.mp3,.opus,.ogg,.webm,.aac,.flac,.wav,.aiff,.aif,.alac" multiple hidden>
-  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <input type="file" id="backup-import" accept="application/json" hidden>
+
+  <!-- Icons: paths adapted from Lucide (https://lucide.dev), ISC License, Copyright (c) Lucide Contributors. -->
+  <svg id="icon-sprite" xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7.5"/><path d="m20.5 20.5-4.2-4.2"/></symbol>
+    <symbol id="i-library" viewBox="0 0 24 24"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></symbol>
+    <symbol id="i-artists" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+    <symbol id="i-songs" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+    <symbol id="i-series" viewBox="0 0 24 24"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4.8a1.5 1.5 0 0 1 2.27-1.29l11.2 7.2a1.5 1.5 0 0 1 0 2.58l-11.2 7.2A1.5 1.5 0 0 1 6 19.2z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><path fill="currentColor" d="M18.5 5.6v12.8a1 1 0 0 1-1.56.83L8.3 13.03a1.25 1.25 0 0 1 0-2.06l8.64-6.2a1 1 0 0 1 1.56.83z"/><path d="M5.5 5v14"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path fill="currentColor" d="M5.5 5.6v12.8a1 1 0 0 0 1.56.83l8.64-6.2a1.25 1.25 0 0 0 0-2.06L7.06 4.77a1 1 0 0 0-1.56.83z"/><path d="M18.5 5v14"/></symbol>
+    <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="m18 14 4 4-4 4"/><path d="m18 2 4 4-4 4"/><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-7.6a4 4 0 0 1 3.3-1.7H22"/><path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"/><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"/></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></symbol>
+    <symbol id="i-repeat-one" viewBox="0 0 24 24"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/><path d="M11 10h1v4"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+    <symbol id="i-heart-fill" viewBox="0 0 24 24"><path fill="currentColor" d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.25"/><path d="M12 7.5v8.5"/><path d="m8.25 12.5 3.75 3.75 3.75-3.75"/></symbol>
+    <symbol id="i-downloaded" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" fill-rule="evenodd" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm-.9 5.6v6.33l-2.36-2.36a.9.9 0 0 0-1.27 1.27l3.9 3.9a.9.9 0 0 0 1.27 0l3.9-3.9a.9.9 0 0 0-1.27-1.27l-2.37 2.36V7.6a.9.9 0 0 0-1.8 0Z"/></symbol>
+    <symbol id="i-queue" viewBox="0 0 24 24"><path d="M21 15V6"/><path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M12 12H3"/><path d="M16 6H3"/><path d="M12 18H3"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></symbol>
+    <symbol id="i-volume-mute" viewBox="0 0 24 24"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="m22 9-6 6"/><path d="m16 9 6 6"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></symbol>
+    <symbol id="i-cloud-off" viewBox="0 0 24 24"><path d="m2 2 20 20"/><path d="M5.782 5.782A7 7 0 0 0 9 19h8.5a4.5 4.5 0 0 0 1.307-.193"/><path d="M21.532 16.5A4.5 4.5 0 0 0 17.5 10h-1.79A7.008 7.008 0 0 0 10 5.07"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.25"/><path d="M12 7v5l3.25 2"/></symbol>
+    <symbol id="i-disc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.25"/><circle cx="12" cy="12" r="2.5"/></symbol>
+    <symbol id="i-sort" viewBox="0 0 24 24"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.25"/><path d="M12 16v-4.5"/><path d="M12 8h.01"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.25"/><path d="M12 7.5V12"/><path d="M12 16h.01"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-play-fill" viewBox="0 0 24 24"><path fill="currentColor" d="M7 5.27a1.3 1.3 0 0 1 1.98-1.1l10.3 6.73a1.3 1.3 0 0 1 0 2.2L8.98 19.83A1.3 1.3 0 0 1 7 18.73z"/></symbol>
+    <symbol id="i-pause-fill" viewBox="0 0 24 24"><rect x="6" y="4.5" width="4" height="15" rx="1.2" fill="currentColor"/><rect x="14" y="4.5" width="4" height="15" rx="1.2" fill="currentColor"/></symbol>
+  </svg>
+
   <script type="module" src="./assets/js/app.js"></script>
 </body>
 </html>

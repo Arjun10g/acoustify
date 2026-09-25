@@ -1,6 +1,11 @@
 {
-  "version": 5,
-  "generatedAt": "2026-09-25",
+  "schema": 2,
+  "app": "acoustify",
+  "generated": "2026-09-25T06:08:38Z",
+  "repo": "arjun10g/acoustify-library",
+  "hub": "https://huggingface.co",
+  "revision": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+  "catalogVersion": 5,
   "sources": [
     {
       "id": "of-monsters-and-men-live-from-skarkali",
@@ -13,8 +18,20 @@
       "provider": "local",
       "youtubeId": "JoUq869LXeA",
       "duration": 2233,
-      "audio": "media/JoUq869LXeA.m4a",
-      "artwork": "artwork/JoUq869LXeA.jpg",
+      "audio": {
+        "path": "media/JoUq869LXeA.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 36113157,
+        "sha256": "a7227348da96c1f470abc120f41944580640b61a31dd51cc83858687d0898c53",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/JoUq869LXeA.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 49660,
+        "sha256": "65810b3068a8a0c21a32582a03948358523c3701e5f58f18fa5f3dbe89f13942",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-20",
       "description": "Seven songs from Of Monsters and Men's Live from Skarkali set.",
       "timingStatus": "comment-derived",
@@ -87,8 +104,20 @@
       "provider": "local",
       "youtubeId": "Y25LDO6OLzQ",
       "duration": 3416,
-      "audio": "media/Y25LDO6OLzQ.m4a",
-      "artwork": "artwork/Y25LDO6OLzQ.jpg",
+      "audio": {
+        "path": "media/Y25LDO6OLzQ.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 55244894,
+        "sha256": "f9b908ee78d65a1f6a65f4bff712d2f99e782a0cd4218d5b8916ccee89627050",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/Y25LDO6OLzQ.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 47782,
+        "sha256": "75aba551e36ea174ae16144708fe85abe1a0b584b78f86eaeffa8e58de59662c",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-20",
       "description": "Fourteen songs from Of Monsters and Men's Cabin Sessions.",
       "timingStatus": "comment-derived",
@@ -210,8 +239,20 @@
       "provider": "local",
       "youtubeId": "BuUkI05OLHQ",
       "duration": 221,
-      "audio": "media/BuUkI05OLHQ.m4a",
-      "artwork": "artwork/BuUkI05OLHQ.jpg",
+      "audio": {
+        "path": "media/BuUkI05OLHQ.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3508609,
+        "sha256": "9cccc0a8ac0302500f9f924095eea1562c856490a2b628c3d097cfec04693260",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/BuUkI05OLHQ.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 56380,
+        "sha256": "402508e3dfec18dbabec10090392d2b356e95acce12d405e853758f433b6e539",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-20",
       "description": "Lord Huron performing The Night We Met at Austin City Limits Radio.",
       "timingStatus": "single-track",
@@ -241,8 +282,20 @@
       "provider": "local",
       "youtubeId": "nuUVSzwAE0A",
       "duration": 185,
-      "audio": "media/nuUVSzwAE0A.m4a",
-      "artwork": "artwork/nuUVSzwAE0A.jpg",
+      "audio": {
+        "path": "media/nuUVSzwAE0A.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3000313,
+        "sha256": "62b3c0736beb5adf77d2528626757b0a663c23ab6fb85ffb38ee5fb16f2c998d",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/nuUVSzwAE0A.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 64053,
+        "sha256": "3b7ca827c05122754927dd8b161134bdc1118061b4121bdfd4d29a531b0811ca",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-20",
       "description": "Chance Peña performing Sleep Deprivation at Austin City Limits Radio.",
       "timingStatus": "single-track",
@@ -272,8 +325,20 @@
       "provider": "local",
       "youtubeId": "J1vTi9ycpiA",
       "duration": 1172,
-      "audio": "media/J1vTi9ycpiA.m4a",
-      "artwork": "artwork/J1vTi9ycpiA.jpg",
+      "audio": {
+        "path": "media/J1vTi9ycpiA.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 18958368,
+        "sha256": "5d63de8c8764b623ff78efb2d2733696e6a0a9c5af6b75256030536600bedba9",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/J1vTi9ycpiA.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 112034,
+        "sha256": "3188b75e499ad98b633381f3e27e5633f68ee5b388432ded60f121e82af8a57e",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-20",
       "description": "Caamp's four-song Tiny Desk concert.",
       "timingStatus": "user-calibrated",
@@ -325,8 +390,20 @@
       "provider": "local",
       "youtubeId": "uJ3Pusp6R_s",
       "duration": 1341,
-      "audio": "media/uJ3Pusp6R_s.m4a",
-      "artwork": "artwork/uJ3Pusp6R_s.jpg",
+      "audio": {
+        "path": "media/uJ3Pusp6R_s.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 21697569,
+        "sha256": "c1502fa0ce35d403efea3531ba60c88e7cbf9656752c8a23692144bd733a0bf6",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/uJ3Pusp6R_s.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 95357,
+        "sha256": "2cb9d7fb98084aa72d00140dbdf0efde9d037bdef4f7a3e53c45f36ede667745",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-20",
       "description": "The Red Clay Strays' five-song Tiny Desk concert.",
       "timingStatus": "user-calibrated",
@@ -384,8 +461,20 @@
       "provider": "local",
       "youtubeId": "HbYhMAI4tL4",
       "duration": 239,
-      "audio": "media/HbYhMAI4tL4.m4a",
-      "artwork": "artwork/HbYhMAI4tL4.jpg",
+      "audio": {
+        "path": "media/HbYhMAI4tL4.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3866873,
+        "sha256": "16b7d4a0dd31ab3ca2f9df097fae3243868575cd72fcd1d3b4b524444b083b20",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/HbYhMAI4tL4.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 102037,
+        "sha256": "c8f4bcbbf3c9f374ba4632535ed3aa331cacee588ad70c2741c59e5e3affbe1f",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-20",
       "description": "Kodaline performing Brother on the streets of Warsaw.",
       "timingStatus": "single-track",
@@ -413,8 +502,20 @@
       "provider": "local",
       "youtubeId": "jGUASAxXwg4",
       "duration": 529,
-      "audio": "media/jGUASAxXwg4.m4a",
-      "artwork": "artwork/jGUASAxXwg4.jpg",
+      "audio": {
+        "path": "media/jGUASAxXwg4.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 8560170,
+        "sha256": "4fbbfd56df95fdb5e763a3d4d30a9bf8f9e30f8f5e175b48426ba50fc47c73ec",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/jGUASAxXwg4.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 34810,
+        "sha256": "bf64e1bf9349627fd93e010ebce46bec90fb33aba939f5c692d796858c490391",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-20",
       "description": "A live performance of All I Want by Kodaline.",
       "timingStatus": "single-track",
@@ -443,8 +544,20 @@
       "provider": "local",
       "youtubeId": "kTlaky9zzhw",
       "duration": 243,
-      "audio": "media/kTlaky9zzhw.m4a",
-      "artwork": "artwork/kTlaky9zzhw.jpg",
+      "audio": {
+        "path": "media/kTlaky9zzhw.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3926003,
+        "sha256": "65c99b7331181fa3de89336355d586d7c00b878c6eb2f07a1a0bbbb34a331e43",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/kTlaky9zzhw.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 25413,
+        "sha256": "e64e772a89d8541f4f7882786b2320252afaf089897b54d9714f1eb8a08e0781",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-20",
       "description": "The Red Clay Strays performing Wondering Why at Austin City Limits Radio.",
       "timingStatus": "single-track",
@@ -473,8 +586,20 @@
       "provider": "local",
       "youtubeId": "RdF2zb3KjZE",
       "duration": 263,
-      "audio": "media/RdF2zb3KjZE.m4a",
-      "artwork": "artwork/RdF2zb3KjZE.jpg",
+      "audio": {
+        "path": "media/RdF2zb3KjZE.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 4254458,
+        "sha256": "33b272e6b067c38012312521c3f5984ebbf9f242a6b591b215819eb3a4c8e9c7",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/RdF2zb3KjZE.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 45572,
+        "sha256": "866118d6df0cf84c15c60fe18b708c74227367f09aee762979398930fd172ed6",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-20",
       "description": "The White Buffalo performing Oh Darlin' What Have I Done at Audiotree Live.",
       "timingStatus": "single-track",
@@ -505,8 +630,20 @@
       "provider": "local",
       "youtubeId": "NVRK1xUumiY",
       "duration": 461,
-      "audio": "media/NVRK1xUumiY.m4a",
-      "artwork": "artwork/NVRK1xUumiY.jpg",
+      "audio": {
+        "path": "media/NVRK1xUumiY.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 7455299,
+        "sha256": "4392d325b18b40155fe7df4834060866eb561eaf7ff23de7e8d3bd82fde369a1",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/NVRK1xUumiY.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 45616,
+        "sha256": "6eef9515df6fef63da4769460d39da6412fb734deda04a5dd89d838d5e3ce22e",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-26",
       "description": "Houndmouth performing Sedona at Austin City Limits Radio.",
       "timingStatus": "single-track",
@@ -537,8 +674,20 @@
       "provider": "local",
       "youtubeId": "wwEF1f6Wwj8",
       "duration": 214,
-      "audio": "media/wwEF1f6Wwj8.m4a",
-      "artwork": "artwork/wwEF1f6Wwj8.jpg",
+      "audio": {
+        "path": "media/wwEF1f6Wwj8.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3455328,
+        "sha256": "a5a83d15a9e9cd8f176df22dd1d5d7ae5530b373d8cb7dc8c20bcb03c9380c15",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/wwEF1f6Wwj8.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 97692,
+        "sha256": "6907f33f56fc50c6a71c53eb5d8fb24e2927a8deac398d08eb03c4018c7c5055",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-26",
       "description": "Mumford & Sons performing The Cave live on The Current.",
       "timingStatus": "single-track",
@@ -569,8 +718,20 @@
       "provider": "local",
       "youtubeId": "QVyMBdfrr-E",
       "duration": 210,
-      "audio": "media/QVyMBdfrr-E.m4a",
-      "artwork": "artwork/QVyMBdfrr-E.jpg",
+      "audio": {
+        "path": "media/QVyMBdfrr-E.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3402743,
+        "sha256": "e871a9eff0738d125d41ce0b0b02d1447f37f455e4f30d172e27f41d2a1868fa",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/QVyMBdfrr-E.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 54183,
+        "sha256": "55e5d5b62e8a96a0072df0afddf4c44c44e8b971090e8b81a69a48081ea4d2bf",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-26",
       "description": "An acoustic performance of Shut Up and Dance live on The Current.",
       "timingStatus": "single-track",
@@ -601,8 +762,20 @@
       "provider": "local",
       "youtubeId": "DUssNntYVCo",
       "duration": 222,
-      "audio": "media/DUssNntYVCo.m4a",
-      "artwork": "artwork/DUssNntYVCo.jpg",
+      "audio": {
+        "path": "media/DUssNntYVCo.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3598850,
+        "sha256": "7df76d4c9254c16c4f895d2d8c43c873e13b26c3e5e850fd30060080e6cc695d",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/DUssNntYVCo.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 105592,
+        "sha256": "e355f3a0a0a4ed2065114d3ec3ba4d7e23e2ace8d92035f893dd8e26b87eeffa",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-26",
       "description": "Tyler Childers performing Feathered Indians live at The Current.",
       "timingStatus": "single-track",
@@ -633,8 +806,20 @@
       "provider": "local",
       "youtubeId": "UDScdPrf4N8",
       "duration": 182,
-      "audio": "media/UDScdPrf4N8.m4a",
-      "artwork": "artwork/UDScdPrf4N8.jpg",
+      "audio": {
+        "path": "media/UDScdPrf4N8.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 2949980,
+        "sha256": "7be3d3b4dabc6aa96b876e0ea2c973659b583e75cf015b6e52b28aedb4c6ca96",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/UDScdPrf4N8.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 46560,
+        "sha256": "d5366d94201c486112dd5f93ff6f1a60118157d2f8b38fbf1659b366e4094811",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-26",
       "description": "An acoustic performance of Pumped Up Kicks live on The Current.",
       "timingStatus": "single-track",
@@ -665,8 +850,20 @@
       "provider": "local",
       "youtubeId": "dF8eU19tmWE",
       "duration": 222,
-      "audio": "media/dF8eU19tmWE.m4a",
-      "artwork": "artwork/dF8eU19tmWE.jpg",
+      "audio": {
+        "path": "media/dF8eU19tmWE.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3517224,
+        "sha256": "ab821c0692fa6979bf57ab10e232c475994aef673b0d9b79963b79b6abc4b1fc",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/dF8eU19tmWE.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 45149,
+        "sha256": "f3af78b6c86195fe3fc910d2606c8a542541f8ff3238ccdcb9940f6e874e8d91",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-26",
       "description": "Rayland Baxter performing Yellow Eyes at Paste Studios.",
       "timingStatus": "single-track",
@@ -697,8 +894,20 @@
       "provider": "local",
       "youtubeId": "hli7lApCEXU",
       "duration": 2474,
-      "audio": "media/hli7lApCEXU.m4a",
-      "artwork": "artwork/hli7lApCEXU.jpg",
+      "audio": {
+        "path": "media/hli7lApCEXU.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 40022605,
+        "sha256": "1ccfb41f11c9b65403391dab680fe50a53c921da6d2c6409c2c073b715658315",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/hli7lApCEXU.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 63764,
+        "sha256": "1e44672d619a3e08c87d7b547367e3885852e629a42ffe618a2efdff250e7aa0",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-26",
       "description": "Hollow Coves performing five songs for Audiotree Live.",
       "timingStatus": "user-calibrated",
@@ -759,8 +968,20 @@
       "provider": "local",
       "youtubeId": "Os5fNYxPRwo",
       "duration": 169,
-      "audio": "media/Os5fNYxPRwo.m4a",
-      "artwork": "artwork/Os5fNYxPRwo.jpg",
+      "audio": {
+        "path": "media/Os5fNYxPRwo.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 2738324,
+        "sha256": "0b4e1fec5b5c4064400bccf28fca9b3e7eef639a2dcc0cb8473fa59a1365c23b",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/Os5fNYxPRwo.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 66384,
+        "sha256": "e7c32371bc0633df0cd56e2f28f83e36874163f16f8bc4e7f52b64bf1759927c",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-26",
       "description": "Chance Peña performing i am not who i was at the PNC Live Studio.",
       "timingStatus": "single-track",
@@ -790,8 +1011,20 @@
       "provider": "local",
       "youtubeId": "PdcwiATrJJk",
       "duration": 2415,
-      "audio": "media/PdcwiATrJJk.m4a",
-      "artwork": "artwork/PdcwiATrJJk.jpg",
+      "audio": {
+        "path": "media/PdcwiATrJJk.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 39059953,
+        "sha256": "684409e5eea4d1e36882c17aca9f21a245102abc37af3fa3fdfd20921bf8a50f",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/PdcwiATrJJk.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 76266,
+        "sha256": "d72ae0a5e1cb625a1fcdd7e10857e3d8321578f6697d290bfe0d69e2a0041810",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-26",
       "description": "Chance Peña live at Darien Lake in September 2025.",
       "timingStatus": "user-calibrated",
@@ -892,8 +1125,20 @@
       "provider": "local",
       "youtubeId": "efdKVloTeqg",
       "duration": 217,
-      "audio": "media/efdKVloTeqg.m4a",
-      "artwork": "artwork/efdKVloTeqg.jpg",
+      "audio": {
+        "path": "media/efdKVloTeqg.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3516950,
+        "sha256": "40f015984e716ede63cb525e142428260f46b2c4038465d20134b8b2e22fbb8d",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/efdKVloTeqg.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 85125,
+        "sha256": "20675822445c3ff3a673b717783c36457ca58122d3da2111a416e7eddf2dc1bb",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-26",
       "description": "Tyler Childers performing All Your'n live at Red Rocks.",
       "timingStatus": "single-track",
@@ -923,8 +1168,20 @@
       "provider": "local",
       "youtubeId": "YCDCFNDrdkE",
       "duration": 220,
-      "audio": "media/YCDCFNDrdkE.m4a",
-      "artwork": "artwork/YCDCFNDrdkE.jpg",
+      "audio": {
+        "path": "media/YCDCFNDrdkE.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3553079,
+        "sha256": "fc8ea3aed91361a4627c2c15e52c9be0f2c4e76a5267ee72ec2021e2292c325f",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/YCDCFNDrdkE.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 74055,
+        "sha256": "e0d11d69d83bc31a198bbc47d59e74187a21e0cc4eed8b28359a9b2f460f7e70",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-26",
       "description": "Tyler Childers and the Food Stamps performing Messed Up Kid.",
       "timingStatus": "single-track",
@@ -954,8 +1211,20 @@
       "provider": "local",
       "youtubeId": "S90ruG91Y_U",
       "duration": 243,
-      "audio": "media/S90ruG91Y_U.m4a",
-      "artwork": "artwork/S90ruG91Y_U.jpg",
+      "audio": {
+        "path": "media/S90ruG91Y_U.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3925657,
+        "sha256": "066289ee5f15d1ff29d158222c48f9b5b969c22df24cca95e9bbbb2ab259bc7f",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/S90ruG91Y_U.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 89344,
+        "sha256": "3144dac90b0f18f906b2fe8c926547a083429a7416cac7c5aff81b07a65de8dd",
+        "type": "image/jpeg"
+      },
       "added": "2026-07-26",
       "description": "A live performance of Jersey Giant by Tyler Childers.",
       "timingStatus": "single-track",
@@ -986,8 +1255,20 @@
       "provider": "local",
       "youtubePlaylistId": "PLDtVvFL-MTp4S1vFu91Yd9XKWNyOwDY3R",
       "duration": 3045.9,
-      "audio": "media/rcs-live-at-the-ryman.m4a",
-      "artwork": "artwork/rcs-live-at-the-ryman.jpg",
+      "audio": {
+        "path": "media/rcs-live-at-the-ryman.m4a",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 49260238,
+        "sha256": "08fd7075190f03e9ed159eca79054fa24aae75b1c83bebb04e5d1f7e5efaab74",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/rcs-live-at-the-ryman.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 30218,
+        "sha256": "48ae429885537a56f448a79db2831777c4f38b20b321680450fd7f573e877629",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Twelve songs from The Red Clay Strays' Live at the Ryman, recorded at the Ryman Auditorium in Nashville.",
       "timingStatus": "official-chapters",
@@ -1107,8 +1388,20 @@
       "provider": "local",
       "youtubeId": "wZL7rPowq2w",
       "duration": 887.49,
-      "audio": "media/wZL7rPowq2w.m4a",
-      "artwork": "artwork/wZL7rPowq2w.jpg",
+      "audio": {
+        "path": "media/wZL7rPowq2w.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 14354045,
+        "sha256": "00310db21a69aa25bdec043725d76b8a18a6b8f4b6a9ab1dc21dc9471b410202",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/wZL7rPowq2w.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 96486,
+        "sha256": "851ac5ebb0d55ed4625608d203e56fdef5e738221480cc1798dc0c02b066cf9f",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Four songs from The Red Clay Strays' Live AF session in Laramie, Wyoming.",
       "timingStatus": "official-chapters",
@@ -1160,8 +1453,20 @@
       "provider": "local",
       "youtubeId": "NmPbgBy9d1A",
       "duration": 1168.47,
-      "audio": "media/NmPbgBy9d1A.m4a",
-      "artwork": "artwork/NmPbgBy9d1A.jpg",
+      "audio": {
+        "path": "media/NmPbgBy9d1A.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 18898319,
+        "sha256": "38a2c5d93873e8c5ac65d811c59b6e2e7716c416e4bf7e1ed7e7bf8da0e912fd",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/NmPbgBy9d1A.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 50602,
+        "sha256": "6d001b579db5f0851282c728429daa0ef24ac8985aaed83edea54e9667a83873",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Four songs from The Red Clay Strays' Live AF session at Callaghan's Irish Social Club in Mobile, Alabama.",
       "timingStatus": "official-chapters",
@@ -1213,8 +1518,20 @@
       "provider": "local",
       "youtubeId": "1O31IIprXWM",
       "duration": 261.87,
-      "audio": "media/1O31IIprXWM.m4a",
-      "artwork": "artwork/1O31IIprXWM.jpg",
+      "audio": {
+        "path": "media/1O31IIprXWM.m4a",
+        "rev": "fd8ed7f64e6605c33d286d9f28c1a85928af22d9",
+        "bytes": 4235997,
+        "sha256": "d3ec9f38d48a90b05b18ef1068872d9c27e9cbc72a8282dde3641c77a60faa54",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/1O31IIprXWM.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 47639,
+        "sha256": "a82e4ff628699c95c9ba9e249379d430dccf278860bc2dbd423046226ef88805",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Brandon Coleman of The Red Clay Strays singing Sunshine for Western AF at the Terry Bison Ranch outside Cheyenne, Wyoming.",
       "timingStatus": "single-track",
@@ -1245,8 +1562,20 @@
       "provider": "local",
       "youtubeId": "_lsran_Slzc",
       "duration": 228.48,
-      "audio": "media/_lsran_Slzc.m4a",
-      "artwork": "artwork/_lsran_Slzc.jpg",
+      "audio": {
+        "path": "media/_lsran_Slzc.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3696343,
+        "sha256": "755309bcfb76182f0f05e4c231db596bafd4cb246eccce49dbd49b99a4c92a3b",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/_lsran_Slzc.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 80144,
+        "sha256": "857de3196a9a78b5f2daba5a2a4fd7e569a8fc5d7a36d74c21ca428da4214295",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Tyler Childers playing Feathered Indians for LR Baggs in Nashville during the 2017 Americana Festival.",
       "timingStatus": "single-track",
@@ -1278,8 +1607,20 @@
       "provider": "local",
       "youtubeId": "YI6zVQ7gCtQ",
       "duration": 192.08,
-      "audio": "media/YI6zVQ7gCtQ.m4a",
-      "artwork": "artwork/YI6zVQ7gCtQ.jpg",
+      "audio": {
+        "path": "media/YI6zVQ7gCtQ.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3107182,
+        "sha256": "93a3d315bd6ffc54eb703fb40866babbd9c35236a8355360eac48f9f2aa47ed8",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/YI6zVQ7gCtQ.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 54303,
+        "sha256": "79786b3b2123d602bccee03c31bb0b8f1fe3a3b0b69e0c1502bb71eead940804",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Tyler Childers playing Shake the Frost solo on Red Barn Radio after stepping in for an ailing Hannah Aldridge.",
       "timingStatus": "single-track",
@@ -1310,8 +1651,20 @@
       "provider": "local",
       "youtubeId": "YvKZw4a2hUI",
       "duration": 179.75,
-      "audio": "media/YvKZw4a2hUI.m4a",
-      "artwork": "artwork/YvKZw4a2hUI.jpg",
+      "audio": {
+        "path": "media/YvKZw4a2hUI.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 2907781,
+        "sha256": "a46a832d8b1ccd828da4c2aa51f01e6f3b60565f5365dd7f7b1b739580232bc3",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/YvKZw4a2hUI.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 66309,
+        "sha256": "f63bf1bab01cfb966fd568c84fa3194ae2d1a37aed10e37ad9a2c0f37ea05a9c",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Tyler Childers performing Charleston Girl at the 2016 Whispering Beard Folk Festival.",
       "timingStatus": "single-track",
@@ -1342,8 +1695,20 @@
       "provider": "local",
       "youtubeId": "y9x0Myp9sBE",
       "duration": 212.51,
-      "audio": "media/y9x0Myp9sBE.m4a",
-      "artwork": "artwork/y9x0Myp9sBE.jpg",
+      "audio": {
+        "path": "media/y9x0Myp9sBE.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3437910,
+        "sha256": "ba7fc0709d1625b9958630aa47ea9ca6e0bd22935258f24c7873b1cf2b8c0df4",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/y9x0Myp9sBE.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 60422,
+        "sha256": "f93a0d0d5592d2e8a358a8d824774bf4adbda204add5ad322f8a2a54b7b122ed",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Tyler Childers singing Follow You to Virgie live with Chris Stapleton.",
       "timingStatus": "single-track",
@@ -1372,8 +1737,20 @@
       "provider": "local",
       "youtubeId": "kp_T3ljeHkQ",
       "duration": 228.48,
-      "audio": "media/kp_T3ljeHkQ.m4a",
-      "artwork": "artwork/kp_T3ljeHkQ.jpg",
+      "audio": {
+        "path": "media/kp_T3ljeHkQ.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3696012,
+        "sha256": "87dfdb97da00440c8e74939557ad590b5df711037421a0137666b1f8306579ce",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/kp_T3ljeHkQ.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 41251,
+        "sha256": "fd5b6d24f3ce1d09d2980c9cc6a6140d05ffaf6822e44ee3dee3a528a26ab235",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Tyler Childers performing In Your Love live from Radio City Music Hall in New York.",
       "timingStatus": "single-track",
@@ -1404,8 +1781,20 @@
       "provider": "local",
       "youtubeId": "1Lwzn5nLRPw",
       "duration": 261.83,
-      "audio": "media/1Lwzn5nLRPw.m4a",
-      "artwork": "artwork/1Lwzn5nLRPw.jpg",
+      "audio": {
+        "path": "media/1Lwzn5nLRPw.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 4235246,
+        "sha256": "05fdc6c2d8ebd9eb96bd2ce75aebb4f4ee4de706855ea43e53d1afe6bf6cd6ef",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/1Lwzn5nLRPw.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 70538,
+        "sha256": "8e3ec2bca251846f9784605b34b7632ed0590806717806a7df606b83745edef5",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Tyler Childers performing Hard Times on a return visit to Red Barn Radio.",
       "timingStatus": "single-track",
@@ -1435,8 +1824,20 @@
       "provider": "local",
       "youtubeId": "2slZN8YFsPg",
       "duration": 199.97,
-      "audio": "media/2slZN8YFsPg.m4a",
-      "artwork": "artwork/2slZN8YFsPg.jpg",
+      "audio": {
+        "path": "media/2slZN8YFsPg.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3234862,
+        "sha256": "e6c8bc728b03b2eb25a0feb85f41495c7db49593bb5382c34f825b62918a9a17",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/2slZN8YFsPg.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 94828,
+        "sha256": "ebd70f0ab2d5e4a8f6aaa0e8fefe6af4530eb37ced94de4bf981e172274f23b6",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Tyler Childers performing Nose on the Grindstone at Rupp Arena in Lexington, Kentucky, in February 2020.",
       "timingStatus": "single-track",
@@ -1467,8 +1868,20 @@
       "provider": "local",
       "youtubeId": "tiwJadn-Nso",
       "duration": 209.86,
-      "audio": "media/tiwJadn-Nso.m4a",
-      "artwork": "artwork/tiwJadn-Nso.jpg",
+      "audio": {
+        "path": "media/tiwJadn-Nso.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3394834,
+        "sha256": "d8938799dc193b304e5840cc541c5fe54cac5194b8fb053c9634445461ac78d1",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/tiwJadn-Nso.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 29782,
+        "sha256": "dde0a8a07642c9c4bd04702ca278c8803aac26234249be5057b97a5a4d612cae",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Tyler Childers performing Lady May on Red Barn Radio.",
       "timingStatus": "single-track",
@@ -1499,8 +1912,20 @@
       "provider": "local",
       "youtubeId": "orDpIGFqg8U",
       "duration": 213.28,
-      "audio": "media/orDpIGFqg8U.m4a",
-      "artwork": "artwork/orDpIGFqg8U.jpg",
+      "audio": {
+        "path": "media/orDpIGFqg8U.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3450035,
+        "sha256": "355ca3035d0e3ecd02e8c13016b84edc7091b6d349828746c6682e001f529f63",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/orDpIGFqg8U.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 84665,
+        "sha256": "9fb68d7e5afa2a6a0cf020a1041a7136066e6859d61e886b710d84c244b6fc64",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Tyler Childers performing Rock Salt & Nails on Red Barn Radio.",
       "timingStatus": "single-track",
@@ -1531,8 +1956,20 @@
       "provider": "local",
       "youtubeId": "LqidfoTbHts",
       "duration": 255.44,
-      "audio": "media/LqidfoTbHts.m4a",
-      "artwork": "artwork/LqidfoTbHts.jpg",
+      "audio": {
+        "path": "media/LqidfoTbHts.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 4131978,
+        "sha256": "5777d1d8964a492c0f71b010e24c0e629fae23c800417895f626f94b7f933984",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/LqidfoTbHts.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 109967,
+        "sha256": "146635c1dfc35439c418bc4c0c5ce6705700e07cb6bebc629620b396730c6213",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Tyler Childers covering Kris Kristofferson's Help Me Make It Through the Night at Farm Aid 2021 in Hartford, Connecticut.",
       "timingStatus": "single-track",
@@ -1564,8 +2001,20 @@
       "provider": "local",
       "youtubeId": "6xcqb_ituUQ",
       "duration": 203.06,
-      "audio": "media/6xcqb_ituUQ.m4a",
-      "artwork": "artwork/6xcqb_ituUQ.jpg",
+      "audio": {
+        "path": "media/6xcqb_ituUQ.m4a",
+        "rev": "9f4fa3fbd53af47c29ce6970144ec008b899d5d6",
+        "bytes": 3284807,
+        "sha256": "223ea1bf48cc0624544ad3c6f286a876d8e366ccc3c643f06ed999a0814d91e8",
+        "type": "audio/mp4"
+      },
+      "art": {
+        "path": "artwork/6xcqb_ituUQ.jpg",
+        "rev": "c1fd91ff37fbe9ceced39de71732cbc09bd2b269",
+        "bytes": 28175,
+        "sha256": "41063124acec5d8b8984f03cbd4406df2ea8470155f0e59a855429b6d6e7c452",
+        "type": "image/jpeg"
+      },
       "added": "2026-09-24",
       "description": "Tyler Childers covering Pink Floyd's Time in a 2018 in-store session for 94.9 The River at The Record Exchange in Boise.",
       "timingStatus": "single-track",

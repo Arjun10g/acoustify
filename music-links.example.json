@@ -1,24 +1,30 @@
 {
+  "_help": "Copy to music-links.json (gitignored), put links under \"links\", then run `npm run sync` (or `npm run add` then `npm run publish`). Only url is required: title, artist, series and year are guessed from YouTube when left out, and song times come from \"chapters\", else the video's own chapters, else one song for the whole video. Imported links get \"status\": \"imported\".",
   "links": [],
   "templates": [
     {
       "url": "https://youtu.be/VIDEO_ID_HERE",
-      "title": "Song or source title",
-      "artist": "Artist name",
-      "duration": "4:12",
-      "tags": ["acoustic", "live"]
+      "title": "Sedona (Live at Austin City Limits Radio)",
+      "artist": "Houndmouth",
+      "series": "Austin City Limits Radio",
+      "year": 2015,
+      "tags": ["live", "acoustic"]
     },
     {
       "url": "https://www.youtube.com/watch?v=VIDEO_ID_HERE",
-      "title": "Long source title",
-      "artist": "Artist name",
-      "duration": "42:30",
+      "title": "Tiny Desk Concert",
+      "artist": "Tyler Childers & Chris Stapleton",
+      "artists": ["Tyler Childers", "Chris Stapleton"],
+      "series": "NPR Tiny Desk",
       "chapters": [
-        "0:00 First song",
+        "0:12 First song",
         "3:45 Second song",
         "8:10 Third song"
       ],
-      "tags": ["session"]
+      "timingStatus": "comment-derived",
+      "timingNote": "Song starts follow a timestamped YouTube comment.",
+      "description": "Three songs from their Tiny Desk set.",
+      "tags": ["live", "session"]
     }
   ]
 }

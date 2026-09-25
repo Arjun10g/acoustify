@@ -1,0 +1,83 @@
+/* Album / session and playlist pages. The hero, actions row and track list come from app.css;
+   this adds the footer notes, the playlist cover + description and the loading placeholder. */
+
+/* ---------------------------------------------------------------- album */
+
+.album-page .hero-meta { font-variant-numeric: tabular-nums; }
+.album-tracks { margin-top: 4px; }
+
+.album-footer {
+  display: grid;
+  gap: 6px;
+  max-width: 68ch;
+  margin-top: 28px;
+}
+.album-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+.album-added,
+.album-note {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-3);
+}
+.album-description + .album-added { margin-top: 6px; }
+.album-note a {
+  color: var(--text-2);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.25);
+  text-underline-offset: 2px;
+}
+@media (hover: hover) {
+  .album-note a:hover { color: var(--text); text-decoration-color: currentColor; }
+}
+
+/* Loading placeholder shaped like the hero, so the page does not jump when it fills in. */
+.album-skeleton-hero {
+  display: flex;
+  align-items: flex-end;
+  gap: 28px;
+  margin-bottom: 32px;
+  padding-top: 8px;
+}
+.album-skeleton-art {
+  flex: none;
+  width: 232px;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+}
+.album-skeleton-text { display: grid; flex: 1; gap: 4px; max-width: 420px; padding-bottom: 8px; }
+.album-skeleton-text > .skeleton-text:first-child { height: 28px; width: 70%; border-radius: 6px; }
+@container (max-width: 639.98px) {
+  .album-skeleton-hero { flex-direction: column; align-items: center; gap: 18px; padding-top: 12px; }
+  .album-skeleton-art { width: min(64cqw, 280px); }
+  .album-skeleton-text { width: 70%; justify-items: center; }
+}
+
+/* ---------------------------------------------------------------- playlist */
+
+.playlist-cover > .mosaic,
+.playlist-cover > .card-placeholder { position: absolute; inset: 0; }
+.playlist-cover > .card-placeholder .icon { width: 30%; height: 30%; }
+
+.hero-desc {
+  display: -webkit-box;
+  max-width: 60ch;
+  margin-top: 10px;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.hero-desc + .hero-meta { margin-top: 8px; }
+@container (max-width: 639.98px) {
+  .hero-desc { margin: 6px auto 0; }
+}
+
+.playlist-page--empty .empty { padding-top: 24px; }

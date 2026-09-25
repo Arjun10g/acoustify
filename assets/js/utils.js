@@ -117,3 +117,43 @@ export function safeArtwork(source) {
 export function deepClone(value) {
   return typeof structuredClone === "function" ? structuredClone(value) : JSON.parse(JSON.stringify(value));
 }
+
+export function pluralize(count, word, plural = `${word}s`) {
+  const n = Number(count) || 0;
+  return `${n.toLocaleString("en-US")} ${n === 1 ? word : plural}`;
+}
+
+// "1 hr 12 min" / "14 min" / "45 sec" — for totals, never for playback positions.
+export function formatDurationLong(seconds) {
+  const total = Number.isFinite(Number(seconds)) ? Math.max(0, Math.round(Number(seconds))) : 0;
+  if (total < 60) return `${total} sec`;
+  let hours = Math.floor(total / 3600);
+  let minutes = Math.round((total - hours * 3600) / 60);
+  if (minutes === 60) {
+    hours += 1;
+    minutes = 0;
+  }
+  if (!hours) return `${minutes} min`;
+  return minutes ? `${hours} hr ${minutes} min` : `${hours} hr`;
+}
+
+// Name used for alphabetical sorting: "The Red Clay Strays" sorts under R.
+export function sortName(name = "") {
+  return String(name).trim().replace(/^the\s+/i, "").trim() || String(name).trim();
+}
+
+export function joinMeta(parts = []) {
+  return (Array.isArray(parts) ? parts : [parts])
+    .map((part) => (part === null || part === undefined || part === false ? "" : String(part).trim()))
+    .filter(Boolean)
+    .join(" · ");
+}
+
+// Decimal units, the way iOS and macOS report storage ("357 MB", "1.2 GB").
+export function formatBytes(bytes) {
+  const n = Math.max(0, Number(bytes) || 0);
+  if (n === 0) return "0 MB";
+  if (n < 1e6) return `${Math.max(1, Math.round(n / 1e3))} KB`;
+  if (n < 1e9) return `${Math.round(n / 1e6)} MB`;
+  return `${(n / 1e9).toFixed(n < 1e10 ? 1 : 0)} GB`;
+}
