@@ -134,13 +134,65 @@ function readToken() {
       try {
         const cache = await caches.open(AUTH_CACHE);
         const hit = await cache.match(scopeUrl("./__hf_token__"));
-        return hit ? (await hit.text()).trim() : "";
+        const token = hit ? (await hit.text()).trim() : "";
+        if (token) return token;
       } catch (error) {
-        return "";
+        // Fall through to the IndexedDB backup.
       }
+      // Another app on this origin may have wiped Cache Storage; the page keeps
+      // a backup copy in IndexedDB (cloud.js), so read it and restore the cache.
+      const backup = await readTokenBackup();
+      if (backup) {
+        try {
+          const cache = await caches.open(AUTH_CACHE);
+          await cache.put(scopeUrl("./__hf_token__"), new Response(backup, { headers: { "Content-Type": "text/plain", "Cache-Control": "no-store" } }));
+        } catch (error) {
+          // Serving with the in-memory copy still works.
+        }
+      }
+      return backup;
     })();
   }
   return tokenMemo;
+}
+
+// Reads the "hf-token-backup" value from the page's "acoustify" database
+// without ever creating or upgrading it (that would block the page's own open).
+function readTokenBackup() {
+  return new Promise((resolve) => {
+    let request;
+    try {
+      request = indexedDB.open("acoustify");
+    } catch (error) {
+      resolve("");
+      return;
+    }
+    request.onupgradeneeded = () => request.transaction.abort();
+    request.onerror = () => resolve("");
+    request.onblocked = () => resolve("");
+    request.onsuccess = () => {
+      const db = request.result;
+      try {
+        if (!db.objectStoreNames.contains("kv")) {
+          db.close();
+          resolve("");
+          return;
+        }
+        const get = db.transaction("kv", "readonly").objectStore("kv").get("hf-token-backup");
+        get.onsuccess = () => {
+          db.close();
+          resolve(typeof get.result === "string" ? get.result.trim() : "");
+        };
+        get.onerror = () => {
+          db.close();
+          resolve("");
+        };
+      } catch (error) {
+        db.close();
+        resolve("");
+      }
+    };
+  });
 }
 
 /* ── lifecycle ──────────────────────────────────────────────────────────── */

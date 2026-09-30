@@ -1,5 +1,5 @@
 import { CONFIG } from "./config.js";
-import { getValue, requestPersistentStorage, setValue } from "./db.js";
+import { deleteValue, getValue, requestPersistentStorage, setValue } from "./db.js";
 
 // Everything here must stay importable in Node (tests use the pure helpers),
 // so browser globals are only touched inside functions.
@@ -200,7 +200,14 @@ async function notifyServiceWorker() {
   await Promise.all(live.map((worker) => postAndWait(worker, { type: "TOKEN_CHANGED" })));
 }
 
-export async function getToken() {
+// The service worker reads the token from Cache Storage, but other apps on
+// arjun10g.github.io (Papers_Audio) have wiped every cache on the origin when
+// they update. IndexedDB keeps a backup copy; a missing cache entry is restored
+// from it so the owner is never asked to connect again.
+const TOKEN_BACKUP_KEY = "hf-token-backup";
+let backedUpToken = false;
+
+async function readCachedToken() {
   if (typeof caches === "undefined") return "";
   try {
     const cache = await caches.open(AUTH_CACHE);
@@ -211,12 +218,45 @@ export async function getToken() {
   }
 }
 
+async function writeCachedToken(value) {
+  const cache = await caches.open(AUTH_CACHE);
+  await cache.put(tokenKey(), new Response(value, { headers: { "Content-Type": "text/plain", "Cache-Control": "no-store" } }));
+}
+
+export async function getToken() {
+  const cached = await readCachedToken();
+  if (cached) {
+    if (!backedUpToken) {
+      backedUpToken = true;
+      getValue(TOKEN_BACKUP_KEY, "")
+        .then((backup) => (cleanToken(backup) === cached ? null : setValue(TOKEN_BACKUP_KEY, cached)))
+        .catch(() => {});
+    }
+    return cached;
+  }
+  let backup = "";
+  try {
+    backup = cleanToken(await getValue(TOKEN_BACKUP_KEY, ""));
+  } catch {
+    return "";
+  }
+  if (!backup || typeof caches === "undefined") return backup;
+  try {
+    await writeCachedToken(backup);
+    await notifyServiceWorker();
+  } catch {
+    // The page can still authenticate its own fetches with the backup.
+  }
+  return backup;
+}
+
 export async function setToken(token) {
   const value = cleanToken(token);
   if (!value) return clearToken();
   if (typeof caches === "undefined") throw new Error("This browser can't store your access token (a secure https page is required).");
-  const cache = await caches.open(AUTH_CACHE);
-  await cache.put(tokenKey(), new Response(value, { headers: { "Content-Type": "text/plain", "Cache-Control": "no-store" } }));
+  await writeCachedToken(value);
+  await setValue(TOKEN_BACKUP_KEY, value).catch(() => {});
+  requestPersistentStorage().catch(() => {});
   await notifyServiceWorker();
 }
 
@@ -229,6 +269,7 @@ export async function clearToken() {
       // Nothing stored.
     }
   }
+  await deleteValue(TOKEN_BACKUP_KEY).catch(() => {});
   await notifyServiceWorker();
 }
 
